@@ -53,6 +53,7 @@ export interface AuditLogEntry {
   sessionId: string;
   userId: string;
   input: string;
+  normalizedInput: string;
   decisions: GuardResult[];
   finalAction: GuardResult["action"];
   riskScore: number;

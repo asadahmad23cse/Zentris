@@ -188,6 +188,7 @@ const routesPlugin = fp(async (app) => {
       sessionId: pipelineContext.request.sessionId,
       userId: pipelineContext.request.userId,
       input: pipelineContext.request.rawInput,
+      normalizedInput: pipelineContext.normalizedInput,
       decisions: pipelineContext.guardResults,
       finalAction,
       riskScore,
