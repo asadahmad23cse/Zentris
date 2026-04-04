@@ -23,11 +23,29 @@ export interface GuardResult {
   action: "allow" | "block" | "sanitize" | "require_confirmation";
 }
 
+export interface IntentClassificationResult {
+  intent: IntentType;
+  confidence: number;
+  riskScore: number;
+}
+
+export interface AuthorizationResult {
+  authorized: boolean;
+  reason: string;
+}
+
+export type ContextGuardResult = GuardResult & { riskScore: number };
+
 export interface PipelineContext {
   request: ZentrisRequest;
   guardResults: GuardResult[];
   normalizedInput: string;
   sanitizedInput: string;
+  injectionResult?: GuardResult;
+  contextResult?: ContextGuardResult;
+  intentResult?: IntentClassificationResult;
+  authResult?: AuthorizationResult;
+  piiDetected?: string[];
 }
 
 export interface AuditLogEntry {
