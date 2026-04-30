@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const nextConfig = {
   output: "export",
   basePath: "",
-  assetPrefix: "/litellm-asset-prefix",
+  assetPrefix: "",
   turbopack: {
     // Must be absolute; "." is no longer allowed
     root: __dirname,
