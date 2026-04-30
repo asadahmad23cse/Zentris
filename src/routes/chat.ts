@@ -1,5 +1,6 @@
 import fp from "fastify-plugin";
 import { type FastifyPluginAsync, type FastifyReply } from "fastify";
+import { RagSecurityGuard, type RagChunkInput } from "../guards/ragSecurityGuard";
 import { StreamingGuard } from "../guards/streamingGuard";
 import { wrapUntrustedData } from "../guards/ragWrapper";
 import { StreamingClient } from "../llm/streamingClient";
@@ -18,6 +19,7 @@ interface ChatRouteBody {
   message: string;
   history?: ClientMessage[];
   ragContext?: string;
+  ragChunks?: RagChunkInput[];
 }
 
 const SESSION_ID_REGEX = /^[A-Za-z0-9-]{1,64}$/;
@@ -30,6 +32,19 @@ const bodySchema = {
     sessionId: { type: "string", maxLength: 64, pattern: "^[A-Za-z0-9-]{1,64}$" },
     message: { type: "string", minLength: 1, maxLength: 8000 },
     ragContext: { type: "string" },
+    ragChunks: {
+      type: "array",
+      maxItems: 50,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["content"],
+        properties: {
+          content: { type: "string", minLength: 1, maxLength: 8000 },
+          source: { type: "string", maxLength: 128 }
+        }
+      }
+    },
     history: {
       type: "array",
       items: {
@@ -63,22 +78,47 @@ const normalizeClientHistory = (history: ClientMessage[] | undefined): ChatMessa
     timestamp: message.timestamp
   }));
 
-const toZentrisRequest = (body: ChatRouteBody, identity: AuthenticatedIdentity): ZentrisRequest => {
-  const history = normalizeClientHistory(body.history);
+const buildRagInputs = (body: ChatRouteBody): RagChunkInput[] => {
+  const chunks = [...(body.ragChunks ?? [])];
 
   if (body.ragContext && body.ragContext.trim().length > 0) {
+    chunks.push({
+      content: body.ragContext,
+      source: "rag_context"
+    });
+  }
+
+  return chunks;
+};
+
+const toZentrisRequest = async (
+  body: ChatRouteBody,
+  identity: AuthenticatedIdentity,
+  ragSecurityGuard: RagSecurityGuard
+): Promise<ZentrisRequest> => {
+  const history = normalizeClientHistory(body.history);
+  const ragInputs = buildRagInputs(body);
+  const sanitizedRag = await ragSecurityGuard.sanitizeChunks(ragInputs);
+
+  for (const chunk of sanitizedRag.accepted) {
     history.push({
       role: "user",
-      content: wrapUntrustedData(body.ragContext, "rag_context"),
+      content: wrapUntrustedData(chunk.content, {
+        source: chunk.source,
+        trustLevel: chunk.trustLevel,
+        chunkId: chunk.chunkId
+      }),
       timestamp: Date.now()
     });
   }
+
+  const boundedHistory = history.slice(-config.MAX_SESSION_MESSAGES);
 
   return {
     sessionId: body.sessionId,
     identity,
     rawInput: body.message,
-    messages: history
+    messages: boundedHistory
   };
 };
 
@@ -96,6 +136,7 @@ const sendJsonError = (
     .send(payload);
 
 const chatRoutes: FastifyPluginAsync = async (app) => {
+  const ragSecurityGuard = new RagSecurityGuard();
   const pipeline = new ZentrisPipeline();
   const streamingClient = new StreamingClient();
   const streamingGuard = new StreamingGuard();
@@ -136,7 +177,9 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
         });
       }
 
-      const pipelineResult = await pipeline.run(toZentrisRequest(body, request.identity));
+      const pipelineResult = await pipeline.run(
+        await toZentrisRequest(body, request.identity, ragSecurityGuard)
+      );
 
       if (pipelineResult.action === "block") {
         return sendJsonError(reply, 400, requestId, pipelineResult.riskLevel, {
@@ -205,7 +248,9 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
         });
       }
 
-      const guardOutcome = await pipeline.runGuards(toZentrisRequest(body, request.identity));
+      const guardOutcome = await pipeline.runGuards(
+        await toZentrisRequest(body, request.identity, ragSecurityGuard)
+      );
 
       if (guardOutcome.action === "block") {
         return sendJsonError(reply, 400, requestId, guardOutcome.riskLevel, {

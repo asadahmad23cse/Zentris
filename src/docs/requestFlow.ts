@@ -49,3 +49,9 @@
 // - Client messages with role="system" are rejected.
 // - Client history is normalized to role="user" before model dispatch.
 // - A server-controlled system prompt is always injected at model message index 0.
+//
+// RAG Security Rule:
+// - Every RAG chunk is treated as untrusted.
+// - Each chunk is scanned for injection/instruction patterns.
+// - Chunks that trigger malicious/instruction signals are dropped.
+// - Accepted chunks are wrapped with source + trust metadata and injected as role="user".

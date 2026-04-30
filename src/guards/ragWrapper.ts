@@ -4,13 +4,25 @@ const escapeXml = (value: string): string =>
 const unescapeXml = (value: string): string =>
   value.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 
-export const wrapUntrustedData = (data: string, source?: string): string => {
-  const safeSource = escapeXml((source ?? "external").trim() || "external");
+export interface UntrustedMetadata {
+  source?: string;
+  trustLevel?: "trusted" | "untrusted";
+  chunkId?: string;
+}
+
+export const wrapUntrustedData = (data: string, metadata?: string | UntrustedMetadata): string => {
+  const metadataObject: UntrustedMetadata =
+    typeof metadata === "string" ? { source: metadata } : metadata ?? {};
+  const safeSource = escapeXml((metadataObject.source ?? "external").trim() || "external");
+  const safeTrustLevel = escapeXml((metadataObject.trustLevel ?? "untrusted").trim() || "untrusted");
+  const safeChunkId = escapeXml((metadataObject.chunkId ?? "chunk-unknown").trim() || "chunk-unknown");
   const safeData = escapeXml(data);
 
   return [
     "<SAFE_CONTEXT>",
     `  <SOURCE>${safeSource}</SOURCE>`,
+    `  <TRUST_LEVEL>${safeTrustLevel}</TRUST_LEVEL>`,
+    `  <CHUNK_ID>${safeChunkId}</CHUNK_ID>`,
     "  <UNTRUSTED_DATA>",
     safeData,
     "  </UNTRUSTED_DATA>",
