@@ -1,42 +1,44 @@
 <h1 align="center">
-        🚅 LiteLLM
+        🚅 Zentris
     </h1>
     <p align="center">
         <p align="center">Call 100+ LLMs in OpenAI format. [Bedrock, Azure, OpenAI, VertexAI, Anthropic, Groq, etc.]
         </p>
         <p align="center">
-        <a href="https://render.com/deploy?repo=https://github.com/BerriAI/litellm" target="_blank" rel="nofollow"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render"></a>
+        <a href="https://render.com/deploy?repo=https://github.com/asadahmad23cse/Zentris" target="_blank" rel="nofollow"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render"></a>
         <a href="https://railway.app/template/HLP0Ub?referralCode=jch2ME">
           <img src="https://railway.app/button.svg" alt="Deploy on Railway">
         </a>
         </p>
     </p>
-<h4 align="center"><a href="https://docs.litellm.ai/docs/simple_proxy" target="_blank">LiteLLM Proxy Server (AI Gateway)</a> | <a href="https://docs.litellm.ai/docs/enterprise#hosted-litellm-proxy" target="_blank"> Hosted Proxy</a> | <a href="https://docs.litellm.ai/docs/enterprise"target="_blank">Enterprise Tier</a></h4>
+<h4 align="center"><a href="https://docs.litellm.ai/docs/simple_proxy" target="_blank">Zentris Proxy Server (AI Gateway)</a> | <a href="https://docs.litellm.ai/docs/enterprise#hosted-litellm-proxy" target="_blank"> Hosted Proxy</a> | <a href="https://docs.litellm.ai/docs/enterprise"target="_blank">Enterprise Tier</a></h4>
 <h4 align="center">
     <a href="https://pypi.org/project/litellm/" target="_blank">
         <img src="https://img.shields.io/pypi/v/litellm.svg" alt="PyPI Version">
     </a>
-    <a href="https://www.ycombinator.com/companies/berriai">
-        <img src="https://img.shields.io/badge/Y%20Combinator-W23-orange?style=flat-square" alt="Y Combinator W23">
+    <a href="https://github.com/asadahmad23cse/Zentris">
+        <img src="https://img.shields.io/badge/GitHub-Repository-black?style=flat-square&logo=github" alt="GitHub Repository">
     </a>
-    <a href="https://wa.link/huol9n">
-        <img src="https://img.shields.io/static/v1?label=Chat%20on&message=WhatsApp&color=success&logo=WhatsApp&style=flat-square" alt="Whatsapp">
+    <a href="https://github.com/asadahmad23cse/Zentris/issues">
+        <img src="https://img.shields.io/static/v1?label=Support&message=Issues&color=success&logo=github&style=flat-square" alt="Issues">
     </a>
-    <a href="https://discord.gg/wuPM9dRgDw">
-        <img src="https://img.shields.io/static/v1?label=Chat%20on&message=Discord&color=blue&logo=Discord&style=flat-square" alt="Discord">
+    <a href="https://github.com/asadahmad23cse/Zentris/discussions">
+        <img src="https://img.shields.io/static/v1?label=Community&message=Discussions&color=blue&logo=github&style=flat-square" alt="Discussions">
     </a>
-    <a href="https://www.litellm.ai/support">
-        <img src="https://img.shields.io/static/v1?label=Chat%20on&message=Slack&color=black&logo=Slack&style=flat-square" alt="Slack">
+    <a href="https://github.com/asadahmad23cse/Zentris">
+        <img src="https://img.shields.io/static/v1?label=Project&message=Zentris&color=black&logo=github&style=flat-square" alt="Zentris">
     </a>
     <a href="https://codspeed.io/BerriAI/litellm?utm_source=badge">
         <img src="https://img.shields.io/endpoint?url=https://codspeed.io/badge.json" alt="CodSpeed"/>
     </a>
 </h4>
 
-<img width="2688" height="1600" alt="Group 7154 (1)" src="https://github.com/user-attachments/assets/c5ee0412-6fb5-4fb6-ab5b-bafae4209ca6" />
+<p align="center">
+  <img width="220" alt="Zentris Logo" src="ui/litellm-dashboard/public/assets/logos/zentris_logo.svg" />
+</p>
 
 
-## Use LiteLLM for
+## Use Zentris for
 
 <details open>
 <summary><b>LLMs</b> - Call 100+ LLMs (Python SDK + AI Gateway)</summary>
@@ -125,8 +127,8 @@ from a2a.types import MessageSendParams, SendMessageRequest
 from uuid import uuid4
 import httpx
 
-base_url = "http://localhost:4000/a2a/my-agent"  # LiteLLM proxy + agent name
-headers = {"Authorization": "Bearer sk-1234"}    # LiteLLM Virtual Key
+base_url = "http://localhost:4000/a2a/my-agent"  # Zentris proxy + agent name
+headers = {"Authorization": "Bearer sk-1234"}    # Zentris Virtual Key
 
 async with httpx.AsyncClient(headers=headers) as httpx_client:
     resolver = A2ACardResolver(httpx_client=httpx_client, base_url=base_url)
@@ -170,7 +172,7 @@ async with stdio_client(server_params) as (read, write):
         # Load MCP tools in OpenAI format
         tools = await experimental_mcp_client.load_mcp_tools(session=session, format="openai")
 
-        # Use with any LiteLLM model
+        # Use with any Zentris model
         response = await litellm.acompletion(
             model="gpt-4o",
             messages=[{"role": "user", "content": "What's 3 + 5?"}],
@@ -205,7 +207,7 @@ curl -X POST 'http://0.0.0.0:4000/v1/chat/completions' \
 ```json
 {
   "mcpServers": {
-    "LiteLLM": {
+    "Zentris": {
       "url": "http://localhost:4000/mcp/",
       "headers": {
         "x-litellm-api-key": "Bearer sk-1234"
@@ -221,23 +223,23 @@ curl -X POST 'http://0.0.0.0:4000/v1/chat/completions' \
 
 ---
 
-## How to use LiteLLM
+## How to use Zentris
 
-You can use LiteLLM through either the Proxy Server or Python SDK. Both gives you a unified interface to access multiple LLMs (100+ LLMs). Choose the option that best fits your needs:
+You can use Zentris through either the Proxy Server or Python SDK. Both gives you a unified interface to access multiple LLMs (100+ LLMs). Choose the option that best fits your needs:
 
 <table style={{width: '100%', tableLayout: 'fixed'}}>
 <thead>
 <tr>
 <th style={{width: '14%'}}></th>
-<th style={{width: '43%'}}><strong><a href="https://docs.litellm.ai/docs/simple_proxy">LiteLLM AI Gateway</a></strong></th>
-<th style={{width: '43%'}}><strong><a href="https://docs.litellm.ai/docs/">LiteLLM Python SDK</a></strong></th>
+<th style={{width: '43%'}}><strong><a href="https://docs.litellm.ai/docs/simple_proxy">Zentris AI Gateway</a></strong></th>
+<th style={{width: '43%'}}><strong><a href="https://docs.litellm.ai/docs/">Zentris Python SDK</a></strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style={{width: '14%'}}><strong>Use Case</strong></td>
 <td style={{width: '43%'}}>Central service (LLM Gateway) to access multiple LLMs</td>
-<td style={{width: '43%'}}>Use LiteLLM directly in your Python code</td>
+<td style={{width: '43%'}}>Use Zentris directly in your Python code</td>
 </tr>
 <tr>
 <td style={{width: '14%'}}><strong>Who Uses It?</strong></td>
@@ -252,14 +254,14 @@ You can use LiteLLM through either the Proxy Server or Python SDK. Both gives yo
 </tbody>
 </table>
 
-LiteLLM Performance: **8ms P95 latency** at 1k RPS (See benchmarks [here](https://docs.litellm.ai/docs/benchmarks))
+Zentris Performance: **8ms P95 latency** at 1k RPS (See benchmarks [here](https://docs.litellm.ai/docs/benchmarks))
 
-[**Jump to LiteLLM Proxy (LLM Gateway) Docs**](https://docs.litellm.ai/docs/simple_proxy) <br>
+[**Jump to Zentris Proxy (LLM Gateway) Docs**](https://docs.litellm.ai/docs/simple_proxy) <br>
 [**Jump to Supported LLM Providers**](https://docs.litellm.ai/docs/providers)
 
 **Stable Release:** Use docker images with the `-stable` tag. These have undergone 12 hour load tests, before being published. [More information about the release cycle here](https://docs.litellm.ai/docs/proxy/release_cycle)
 
-Support for more providers. Missing a provider or LLM Platform, raise a [feature request](https://github.com/BerriAI/litellm/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.yml&title=%5BFeature%5D%3A+).
+Support for more providers. Missing a provider or LLM Platform, raise a [feature request](https://github.com/asadahmad23cse/Zentris/issues/new?labels=enhancement&title=%5BFeature%5D%3A+).
 
 ## OSS Adopters 
 
@@ -336,7 +338,7 @@ Support for more providers. Missing a provider or LLM Platform, raise a [feature
 | [Jina AI (`jina_ai`)](https://docs.litellm.ai/docs/providers/jina_ai) |  |  |  | ✅ |  |  |  |  |  |  |
 | [Lambda AI (`lambda_ai`)](https://docs.litellm.ai/docs/providers/lambda_ai) | ✅ | ✅ | ✅ |  |  |  |  |  |  |  |
 | [Lemonade (`lemonade`)](https://docs.litellm.ai/docs/providers/lemonade) | ✅ | ✅ | ✅ |  |  |  |  |  |  |  |
-| [LiteLLM Proxy (`litellm_proxy`)](https://docs.litellm.ai/docs/providers/litellm_proxy) | ✅ | ✅ | ✅ | ✅ | ✅ |  |  |  |  |  |
+| [Zentris Proxy (`litellm_proxy`)](https://docs.litellm.ai/docs/providers/litellm_proxy) | ✅ | ✅ | ✅ | ✅ | ✅ |  |  |  |  |  |
 | [Llamafile (`llamafile`)](https://docs.litellm.ai/docs/providers/llamafile) | ✅ | ✅ | ✅ |  |  |  |  |  |  |  |
 | [LM Studio (`lm_studio`)](https://docs.litellm.ai/docs/providers/lm_studio) | ✅ | ✅ | ✅ |  |  |  |  |  |  |  |
 | [Maritalk (`maritalk`)](https://docs.litellm.ai/docs/providers/maritalk) | ✅ | ✅ | ✅ |  |  |  |  |  |  |  |
@@ -403,10 +405,10 @@ Support for more providers. Missing a provider or LLM Platform, raise a [feature
 # Enterprise
 For companies that need better security, user management and professional support
 
-[Talk to founders](https://enterprise.litellm.ai/demo)
+[Project Discussions](https://github.com/asadahmad23cse/Zentris/discussions)
 
 This covers:
-- ✅ **Features under the [LiteLLM Commercial License](https://docs.litellm.ai/docs/proxy/enterprise):**
+- ✅ **Features under the [Zentris Commercial License](https://docs.litellm.ai/docs/proxy/enterprise):**
 - ✅ **Feature Prioritization**
 - ✅ **Custom Integrations**
 - ✅ **Professional Support - Dedicated discord + slack**
@@ -415,15 +417,15 @@ This covers:
 
 # Contributing
 
-We welcome contributions to LiteLLM! Whether you're fixing bugs, adding features, or improving documentation, we appreciate your help.
+We welcome contributions to Zentris! Whether you're fixing bugs, adding features, or improving documentation, we appreciate your help.
 
 ## Quick Start for Contributors
 
 This requires poetry to be installed.
 
 ```bash
-git clone https://github.com/BerriAI/litellm.git
-cd litellm
+git clone https://github.com/asadahmad23cse/Zentris.git
+cd Zentris
 make install-dev    # Install development dependencies
 make format         # Format your code
 make lint           # Run all linting checks
@@ -435,7 +437,7 @@ For detailed contributing guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Code Quality / Linting
 
-LiteLLM follows the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
+Zentris follows the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
 
 Our automated checks include:
 - **Black** for code formatting
@@ -450,10 +452,10 @@ All these checks must pass before your PR can be merged.
 
 # Support / talk with founders
 
-- [Schedule Demo 👋](https://calendly.com/d/4mp-gd3-k5k/berriai-1-1-onboarding-litellm-hosted-version)
-- [Community Discord 💭](https://discord.gg/wuPM9dRgDw)
-- [Community Slack 💭](https://www.litellm.ai/support)
-- Our emails ✉️ ishaan@berri.ai / krrish@berri.ai
+- [Project Repository](https://github.com/asadahmad23cse/Zentris)
+- [Community Discord 💭](https://github.com/asadahmad23cse/Zentris/discussions)
+- [Community Slack 💭](https://github.com/asadahmad23cse/Zentris)
+- Open an issue for support: [GitHub Issues](https://github.com/asadahmad23cse/Zentris/issues)
 
 # Why did we build this
 
@@ -470,7 +472,7 @@ All these checks must pass before your PR can be merged.
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-<a href="https://github.com/BerriAI/litellm/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=BerriAI/litellm" />
+<a href="https://github.com/asadahmad23cse/Zentris/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=asadahmad23cse/Zentris" />
 </a>
 

@@ -5,7 +5,7 @@
 
 We value the security community's role in protecting our systems and users. To report a security vulnerability:
 
-- File a private vulnerability report on GitHub: [Report a vulnerability](https://github.com/BerriAI/litellm/security/advisories/new)
+- File a private vulnerability report on GitHub: [Report a vulnerability](https://github.com/asadahmad23cse/Zentris/security/advisories/new)
 - Include steps to reproduce the issue
 - Provide any relevant additional information
 
@@ -19,7 +19,7 @@ Attacks that compromise our CI/CD pipeline, allowing a malicious actor to point 
 
 **P1: Unauthenticated Proxy Access**
 
-Application-level attacks where an unauthenticated user is able to gain access to protected data on a LiteLLM proxy instance that should be protected (e.g api keys).
+Application-level attacks where an unauthenticated user is able to gain access to protected data on a Zentris proxy instance that should be protected (e.g api keys).
 
 **P2: Authenticated Malicious Actions**
 
@@ -46,31 +46,31 @@ To qualify for a bounty, reports must include clear reproduction steps and must 
 
 ## Security Measures
 
-### LiteLLM Github
+### Zentris Github
 
 - All commits run through Github's CodeQL checking
 
-### Self-hosted Instances LiteLLM
+### Self-hosted Instances Zentris
 
-- **No data or telemetry is stored on LiteLLM Servers when you self host**
+- **No data or telemetry is stored on Zentris Servers when you self host**
 - For installation and configuration, see: [Self-hosting guided](https://docs.litellm.ai/docs/proxy/deploy)
-- **Telemetry** We run no telemetry when you self host LiteLLM
+- **Telemetry** We run no telemetry when you self host Zentris
 
-### LiteLLM Cloud
+### Zentris Cloud
 
-- We encrypt all data stored using your `LITELLM_MASTER_KEY` and in transit using TLS.
+- We encrypt all data stored using your `MASTER_KEY` and in transit using TLS.
 - Our database and application run on GCP, AWS infrastructure, partly managed by NeonDB.
     - US data region: Northern California (AWS/GCP `us-west-1`) & Virginia (AWS `us-east-1`)
     - EU data region Germany/Frankfurt (AWS/GCP `eu-central-1`)
 - All users have access to SSO (Single Sign-On) through OAuth 2.0 with Google, Okta, Microsoft, KeyCloak. 
 - Audit Logs with retention policy
-- Control Allowed IP Addresses that can access your Cloud LiteLLM Instance
+- Control Allowed IP Addresses that can access your Cloud Zentris Instance
 
-For security inquiries, please contact us at support@berri.ai
+For security inquiries, please contact us at security@zentris.local
 
-#### Supported data regions for LiteLLM Cloud
+#### Supported data regions for Zentris Cloud
 
-LiteLLM supports the following data regions:
+Zentris supports the following data regions:
 
 - US, Northern California (AWS/GCP `us-west-1`)
 - Europe, Frankfurt, Germany (AWS/GCP `eu-central-1`)

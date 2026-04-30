@@ -1,10 +1,10 @@
-# Contributing to LiteLLM
+# Contributing to Zentris
 
-Thank you for your interest in contributing to LiteLLM! We welcome contributions of all kinds - from bug fixes and documentation improvements to new features and integrations.
+Thank you for your interest in contributing to Zentris! We welcome contributions of all kinds - from bug fixes and documentation improvements to new features and integrations.
 
 ## **Checklist before submitting a PR**
 
-Here are the core requirements for any PR submitted to LiteLLM:
+Here are the core requirements for any PR submitted to Zentris:
 
 - [ ] **Sign the Contributor License Agreement (CLA)** - [see details](#contributor-license-agreement-cla)
 - [ ] **Keep scope isolated** - Your changes should address 1 specific problem at a time
@@ -24,7 +24,7 @@ Here are the core requirements for any PR submitted to LiteLLM:
 
 ## **Contributor License Agreement (CLA)**
 
-Before contributing code to LiteLLM, you must sign our [Contributor License Agreement (CLA)](https://cla-assistant.io/BerriAI/litellm). This is a legal requirement for all contributions to be merged into the main repository.
+Before contributing code to Zentris, you must sign our [Contributor License Agreement (CLA)](https://cla-assistant.io/asadahmad23cse/Zentris). This is a legal requirement for all contributions to be merged into the main repository.
 
 **Important:** We strongly recommend reviewing and signing the CLA before starting work on your contribution to avoid any delays in the PR process.
 
@@ -33,10 +33,10 @@ Before contributing code to LiteLLM, you must sign our [Contributor License Agre
 ### 1. Setup Your Local Development Environment
 
 ```bash
-# Fork the repository on GitHub (click the Fork button at https://github.com/BerriAI/litellm)
+# Fork the repository on GitHub (click the Fork button at https://github.com/asadahmad23cse/Zentris)
 # Then clone your fork locally
-git clone https://github.com/YOUR_USERNAME/litellm.git
-cd litellm
+git clone https://github.com/YOUR_USERNAME/Zentris.git
+cd Zentris
 
 # Create a new branch for your feature
 git checkout -b your-feature-branch
@@ -81,7 +81,7 @@ git push origin your-feature-branch
 
 ### Where to Add Tests
 
-Add your tests to the [`tests/test_litellm/` directory](https://github.com/BerriAI/litellm/tree/main/tests/test_litellm).
+Add your tests to the [`tests/test_litellm/` directory](https://github.com/asadahmad23cse/Zentris/tree/main/tests/test_litellm).
 
 - This directory mirrors the structure of the `litellm/` directory
 - **Only add mocked tests** - no real LLM API calls in this directory
@@ -183,7 +183,7 @@ make test-unit-helm            # Run Helm unit tests
 
 ## Code Quality Standards
 
-LiteLLM follows the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
+Zentris follows the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
 
 Our automated quality checks include:
 - **Black** for consistent code formatting
@@ -225,7 +225,7 @@ If `make test-unit` fails:
 
 ## Building and Running Locally
 
-### LiteLLM Proxy Server
+### Zentris Proxy Server
 
 To run the proxy server locally:
 
@@ -260,8 +260,8 @@ docker run \
 
 ```bash
 # Clone the repo (if you haven't already)
-git clone https://github.com/YOUR_USERNAME/litellm.git
-cd litellm
+git clone https://github.com/YOUR_USERNAME/Zentris.git
+cd Zentris
 
 # Navigate to the UI dashboard directory
 cd ui/litellm-dashboard
@@ -304,19 +304,19 @@ npm run build
 
 If you need help:
 
-- 💬 [Join our Discord](https://discord.gg/wuPM9dRgDw)
-- 💬 [Join our Slack](https://www.litellm.ai/support)
-- 📧 Email us: ishaan@berri.ai / krrish@berri.ai
-- 🐛 [Create an issue](https://github.com/BerriAI/litellm/issues/new)
+- 💬 [Community Discussions](https://github.com/asadahmad23cse/Zentris/discussions)
+- 💬 [Project Repository](https://github.com/asadahmad23cse/Zentris)
+- 📧 Open an issue for support: [GitHub Issues](https://github.com/asadahmad23cse/Zentris/issues)
+- 🐛 [Create an issue](https://github.com/asadahmad23cse/Zentris/issues/new)
 
 ## What to Contribute
 
 Looking for ideas? Check out:
 
-- 🐛 [Good first issues](https://github.com/BerriAI/litellm/labels/good%20first%20issue)
-- 🚀 [Feature requests](https://github.com/BerriAI/litellm/labels/enhancement)
+- 🐛 [Good first issues](https://github.com/asadahmad23cse/Zentris/labels/good%20first%20issue)
+- 🚀 [Feature requests](https://github.com/asadahmad23cse/Zentris/labels/enhancement)
 - 📚 Documentation improvements
 - 🧪 Test coverage improvements
 - 🔌 New LLM provider integrations
 
-Thank you for contributing to LiteLLM! 🚀 
+Thank you for contributing to Zentris! 🚀 
