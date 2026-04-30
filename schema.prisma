@@ -655,6 +655,20 @@ model LiteLLM_AuditLog {
   updated_values     Json?       // value of the row after change
 }
 
+model LiteLLM_ComplianceAuditLog {
+  id          String   @id @default(uuid())
+  timestamp   DateTime @default(now())
+  user_id     String
+  action      String
+  ip_address  String
+  resource_id String
+
+  @@index([timestamp])
+  @@index([user_id])
+  @@index([action])
+  @@index([resource_id])
+}
+
 // Track daily user spend metrics per model and key
 model LiteLLM_DailyUserSpend {
   id                  String   @id @default(uuid())

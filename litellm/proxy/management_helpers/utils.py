@@ -2,6 +2,7 @@
 ## Helper utils for the management endpoints (keys/users/teams)
 from datetime import datetime
 from functools import wraps
+import os
 from typing import Optional, Tuple
 
 from fastapi import HTTPException, Request
@@ -357,6 +358,18 @@ async def send_management_endpoint_alert(
             )
 
 
+def _is_compliance_audit_write_request(http_request: Optional[Request]) -> bool:
+    if http_request is None:
+        return False
+    write_methods = {"POST", "PUT", "PATCH", "DELETE"}
+    path = http_request.url.path
+    return (
+        path.startswith("/compliance/")
+        and path not in {"/compliance/audit-logs", "/compliance/audit-logs/export"}
+        and http_request.method.upper() in write_methods
+    )
+
+
 def management_endpoint_wrapper(func):
     """
     This wrapper does the following:
@@ -385,6 +398,23 @@ def management_endpoint_wrapper(func):
                     function_name=func.__name__,
                 )
                 _http_request = kwargs.get("http_request", None)
+
+                if (
+                    os.getenv("LITELLM_ENABLE_COMPLIANCE_AUDIT_LOGS", "true").lower()
+                    == "true"
+                    and not _is_compliance_audit_write_request(_http_request)
+                ):
+                    from litellm.proxy.management_helpers.compliance_audit_logging import (
+                        create_compliance_audit_log,
+                    )
+
+                    await create_compliance_audit_log(
+                        request_kwargs=kwargs,
+                        user_api_key_dict=user_api_key_dict,
+                        function_name=func.__name__,
+                        http_request=_http_request,
+                    )
+
                 parent_otel_span = getattr(user_api_key_dict, "parent_otel_span", None)
                 if parent_otel_span is not None:
                     from litellm.proxy.proxy_server import open_telemetry_logger
