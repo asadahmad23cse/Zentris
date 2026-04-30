@@ -44,3 +44,8 @@
 // - Client receives blocked response:
 //   { error: "Request blocked", reason: "injection_detected_high", requestId: "<id>" }
 // - Headers include X-Request-ID and X-Risk-Level.
+//
+// Message Integrity Rule:
+// - Client messages with role="system" are rejected.
+// - Client history is normalized to role="user" before model dispatch.
+// - A server-controlled system prompt is always injected at model message index 0.

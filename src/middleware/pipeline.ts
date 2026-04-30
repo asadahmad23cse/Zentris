@@ -222,9 +222,20 @@ export class ZentrisPipeline {
   }
 
   private buildLLMMessages(history: ChatMessage[], promptForModel: string): ChatMessage[] {
-    const boundedHistory = history.slice(-config.MAX_SESSION_MESSAGES);
+    const boundedHistory = history.slice(-Math.max(0, config.MAX_SESSION_MESSAGES - 1));
+    const normalizedHistory = boundedHistory.map((message) => ({
+      role: "user" as const,
+      content: message.content,
+      timestamp: message.timestamp
+    }));
+
     return [
-      ...boundedHistory,
+      {
+        role: "system",
+        content: config.SERVER_SYSTEM_PROMPT,
+        timestamp: Date.now()
+      },
+      ...normalizedHistory,
       {
         role: "user",
         content: promptForModel,

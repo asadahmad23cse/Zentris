@@ -7,10 +7,16 @@ import { ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
 import { type AuthenticatedIdentity, type ChatMessage, type ZentrisRequest } from "../types";
 
+interface ClientMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+  timestamp: number;
+}
+
 interface ChatRouteBody {
   sessionId: string;
   message: string;
-  history?: ChatMessage[];
+  history?: ClientMessage[];
   ragContext?: string;
 }
 
@@ -47,12 +53,22 @@ const hasForbiddenIdentityFields = (value: unknown): boolean =>
       ("userId" in value || "userRole" in value || "role" in value || "isAdmin" in value)
   );
 
+const hasClientSystemRole = (history: ClientMessage[] | undefined): boolean =>
+  Boolean(history?.some((message) => message.role === "system"));
+
+const normalizeClientHistory = (history: ClientMessage[] | undefined): ChatMessage[] =>
+  (history ?? []).slice(-config.MAX_SESSION_MESSAGES).map((message) => ({
+    role: "user",
+    content: message.content,
+    timestamp: message.timestamp
+  }));
+
 const toZentrisRequest = (body: ChatRouteBody, identity: AuthenticatedIdentity): ZentrisRequest => {
-  const history = [...(body.history ?? [])].slice(-config.MAX_SESSION_MESSAGES);
+  const history = normalizeClientHistory(body.history);
 
   if (body.ragContext && body.ragContext.trim().length > 0) {
     history.push({
-      role: "system",
+      role: "user",
       content: wrapUntrustedData(body.ragContext, "rag_context"),
       timestamp: Date.now()
     });
@@ -92,6 +108,13 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
           return sendJsonError(reply, 403, request.id, "high", {
             error: "Forbidden identity fields in request body",
             reason: "client_identity_override_attempt"
+          });
+        }
+        const body = request.body as ChatRouteBody;
+        if (hasClientSystemRole(body.history)) {
+          return sendJsonError(reply, 400, request.id, "high", {
+            error: "System role is not allowed in client history",
+            reason: "client_system_role_forbidden"
           });
         }
       },
@@ -154,6 +177,13 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
           return sendJsonError(reply, 403, request.id, "high", {
             error: "Forbidden identity fields in request body",
             reason: "client_identity_override_attempt"
+          });
+        }
+        const body = request.body as ChatRouteBody;
+        if (hasClientSystemRole(body.history)) {
+          return sendJsonError(reply, 400, request.id, "high", {
+            error: "System role is not allowed in client history",
+            reason: "client_system_role_forbidden"
           });
         }
       },
