@@ -1,3 +1,25 @@
+## Dependencies / build output
 node_modules/
 dist/
+build/
+coverage/
+
+## Environment and local secrets
 .env
+.env.*
+!.env.example
+
+## Frontend artifacts
+.next/
+next-env.d.ts
+
+## Python cache
+__pycache__/
+*.py[cod]
+
+## Test artifacts
+test-results/
+
+## Logs
+*.log
+logs/
