@@ -10,6 +10,7 @@ const FALLBACK_RESPONSE = "The assistant is temporarily unavailable. Please retr
 interface RedisMemoryState {
   lists: Map<string, string[]>;
   hashes: Map<string, Record<string, string>>;
+  kv: Map<string, string>;
 }
 
 let buildServer: typeof import("../server").buildServer;
@@ -68,7 +69,8 @@ const resolveRange = (length: number, start: number, end: number): { start: numb
 const createRedisStubs = (sandbox: SinonSandbox): RedisMemoryState => {
   const state: RedisMemoryState = {
     lists: new Map<string, string[]>(),
-    hashes: new Map<string, Record<string, string>>()
+    hashes: new Map<string, Record<string, string>>(),
+    kv: new Map<string, string>()
   };
 
   const getList = (key: string): string[] => {
@@ -100,6 +102,23 @@ const createRedisStubs = (sandbox: SinonSandbox): RedisMemoryState => {
     return hash ? { ...hash } : {};
   });
 
+  sandbox.stub(redisClient, "set").callsFake(async (...args: unknown[]) => {
+    const [key, value, ...options] = args;
+    const normalizedKey = String(key);
+    const normalizedValue = String(value);
+    const optionsUpper = options.map((option) =>
+      typeof option === "string" ? option.toUpperCase() : String(option).toUpperCase()
+    );
+
+    const nxIndex = optionsUpper.indexOf("NX");
+    if (nxIndex >= 0 && state.kv.has(normalizedKey)) {
+      return null;
+    }
+
+    state.kv.set(normalizedKey, normalizedValue);
+    return "OK";
+  });
+
   (sandbox.stub(redisClient, "del") as unknown as sinon.SinonStub).callsFake(async (...keys: unknown[]) => {
     let removed = 0;
     for (const key of keys) {
@@ -108,6 +127,9 @@ const createRedisStubs = (sandbox: SinonSandbox): RedisMemoryState => {
         removed += 1;
       }
       if (state.hashes.delete(normalizedKey)) {
+        removed += 1;
+      }
+      if (state.kv.delete(normalizedKey)) {
         removed += 1;
       }
     }
@@ -201,6 +223,7 @@ describe("Zentris integration", () => {
   afterEach(async () => {
     redisState.lists.clear();
     redisState.hashes.clear();
+    redisState.kv.clear();
     await app.close();
     sandbox.restore();
   });
@@ -771,6 +794,68 @@ describe("Zentris integration", () => {
     const blockedBody = blocked.json();
     assert.match(blockedBody.reason, /tool_confirmation_rejected/);
     assert.equal(llmStub.callCount, 0);
+  });
+
+  test("Test 21b: replayed confirmation token is blocked after first use", async () => {
+    const llmStub = sandbox.stub(LiteLLMClient.prototype, "chat").resolves("deployment accepted");
+
+    const payload = {
+      sessionId: "sess-tool-confirm-replay-1",
+      message: "deploy now",
+      toolInvocation: {
+        toolName: "deployment.execute",
+        arguments: {
+          service: "api-core",
+          environment: "production",
+          version: "v1.2.3"
+        },
+        resourceScope: {
+          tenantId: "tenant_a",
+          clusterId: "cluster_1"
+        }
+      }
+    };
+
+    const confirmation = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload,
+      headers: authHeader("user-tool-admin", "admin")
+    });
+    assert.equal(confirmation.statusCode, 202);
+    const token = confirmation.json().confirmationToken as string;
+
+    const firstUse = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        ...payload,
+        toolInvocation: {
+          ...payload.toolInvocation,
+          confirmationToken: token
+        }
+      },
+      headers: authHeader("user-tool-admin", "admin")
+    });
+    assert.equal(firstUse.statusCode, 200);
+
+    const replay = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        ...payload,
+        toolInvocation: {
+          ...payload.toolInvocation,
+          confirmationToken: token
+        }
+      },
+      headers: authHeader("user-tool-admin", "admin")
+    });
+
+    assert.equal(replay.statusCode, 400);
+    const replayBody = replay.json();
+    assert.match(replayBody.reason, /tool_confirmation_rejected:tool_confirmation_token_replay_detected/);
+    assert.equal(llmStub.callCount, 1);
   });
 
   test("Test 22: per-request stream control uses unique stream IDs", async () => {

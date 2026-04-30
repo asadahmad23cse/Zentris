@@ -120,7 +120,7 @@ export class ZentrisPipeline {
       decisions = [injectionResult, contextResult];
     }
 
-    const finalDecision: ExecutionGuardResult = this.executionGuard.decide({
+    const finalDecision: ExecutionGuardResult = await this.executionGuard.decide({
       ...baseContext,
       guardResults: decisions,
       injectionResult,

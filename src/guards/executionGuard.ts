@@ -38,7 +38,7 @@ export class ExecutionGuard {
   private readonly toolRegistry = new ToolRegistry();
   private readonly confirmationService = new ToolConfirmationTokenService();
 
-  public decide(context: PipelineContext): ExecutionGuardResult {
+  public async decide(context: PipelineContext): Promise<ExecutionGuardResult> {
     try {
       const { injectionResult, contextResult, intentResult, authResult, piiDetected } =
         assertDecisionInputs(context);
@@ -97,7 +97,7 @@ export class ExecutionGuard {
             };
           }
 
-          const verification = this.confirmationService.verify(confirmationToken, {
+          const verification = await this.confirmationService.verifyAndConsume(confirmationToken, {
             userId: context.request.identity.userId,
             userRole: context.request.identity.userRole,
             toolInvocation: context.request.toolInvocation

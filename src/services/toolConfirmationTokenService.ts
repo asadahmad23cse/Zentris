@@ -1,5 +1,6 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { randomUUID, createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { config } from "../config";
+import { redisClient } from "./redisClient";
 import { type ToolInvocation, type UserRole } from "../types";
 
 interface ConfirmationTokenHeader {
@@ -13,7 +14,9 @@ interface ConfirmationTokenPayload {
   tool: string;
   argsDigest: string;
   scopeDigest: string;
+  jti: string;
   iat: number;
+  nbf: number;
   exp: number;
 }
 
@@ -24,6 +27,8 @@ interface TokenValidationContext {
 }
 
 const BASE64_URL_PATTERN = /^[A-Za-z0-9_-]+$/;
+const JTI_PATTERN = /^[A-Za-z0-9-]{16,128}$/;
+const JTI_KEY_PREFIX = "zentris:tool_confirmation:jti";
 
 const base64UrlEncode = (value: string): string =>
   Buffer.from(value, "utf8")
@@ -70,10 +75,16 @@ const parseJson = <T>(encoded: string): T | null => {
   }
 };
 
+const confirmationJtiKey = (jti: string): string => `${JTI_KEY_PREFIX}:${jti}`;
+
+const isFiniteInteger = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value) && Number.isInteger(value);
+
 export class ToolConfirmationTokenService {
   public issue(context: TokenValidationContext): string {
     const now = Math.floor(Date.now() / 1000);
     const digests = computeInvocationDigests(context.toolInvocation);
+    const jti = randomUUID();
 
     const header = base64UrlEncode(JSON.stringify({ alg: "HS256", typ: "TOOLCONF" } as ConfirmationTokenHeader));
     const payload = base64UrlEncode(
@@ -83,7 +94,9 @@ export class ToolConfirmationTokenService {
         tool: context.toolInvocation.toolName,
         argsDigest: digests.argsDigest,
         scopeDigest: digests.scopeDigest,
+        jti,
         iat: now,
+        nbf: now,
         exp: now + config.CONFIRMATION_TOKEN_TTL_SECONDS
       } as ConfirmationTokenPayload)
     );
@@ -97,7 +110,10 @@ export class ToolConfirmationTokenService {
     return `${header}.${payload}.${signature}`;
   }
 
-  public verify(token: string, context: TokenValidationContext): { valid: boolean; reason: string } {
+  public async verifyAndConsume(
+    token: string,
+    context: TokenValidationContext
+  ): Promise<{ valid: boolean; reason: string }> {
     const parts = token.split(".");
     if (parts.length !== 3) {
       return { valid: false, reason: "tool_confirmation_token_format_invalid" };
@@ -133,18 +149,58 @@ export class ToolConfirmationTokenService {
       return { valid: false, reason: "tool_confirmation_token_signature_invalid" };
     }
 
+    const skewSeconds = config.CONFIRMATION_TOKEN_MAX_CLOCK_SKEW_SECONDS;
     const now = Math.floor(Date.now() / 1000);
-    if (!Number.isFinite(payload.exp) || now >= payload.exp) {
+    if (
+      !isFiniteInteger(payload.iat) ||
+      !isFiniteInteger(payload.nbf) ||
+      !isFiniteInteger(payload.exp) ||
+      payload.exp <= payload.iat
+    ) {
+      return { valid: false, reason: "tool_confirmation_token_time_claims_invalid" };
+    }
+    if (now + skewSeconds < payload.nbf) {
+      return { valid: false, reason: "tool_confirmation_token_not_active" };
+    }
+    if (now - skewSeconds >= payload.exp) {
       return { valid: false, reason: "tool_confirmation_token_expired" };
     }
+    if (payload.iat > payload.exp) {
+      return { valid: false, reason: "tool_confirmation_token_time_claims_invalid" };
+    }
 
-    if (payload.sub !== context.userId || payload.role !== context.userRole || payload.tool !== context.toolInvocation.toolName) {
+    if (!JTI_PATTERN.test(payload.jti)) {
+      return { valid: false, reason: "tool_confirmation_token_jti_invalid" };
+    }
+
+    if (
+      payload.sub !== context.userId ||
+      payload.role !== context.userRole ||
+      payload.tool !== context.toolInvocation.toolName
+    ) {
       return { valid: false, reason: "tool_confirmation_token_subject_mismatch" };
     }
 
     const expectedDigests = computeInvocationDigests(context.toolInvocation);
     if (payload.argsDigest !== expectedDigests.argsDigest || payload.scopeDigest !== expectedDigests.scopeDigest) {
       return { valid: false, reason: "tool_confirmation_token_scope_mismatch" };
+    }
+
+    const ttlSeconds = Math.max(1, payload.exp - now + skewSeconds);
+    try {
+      const inserted = await redisClient.set(
+        confirmationJtiKey(payload.jti),
+        JSON.stringify({ consumedAt: now, userId: context.userId, tool: context.toolInvocation.toolName }),
+        "EX",
+        ttlSeconds,
+        "NX"
+      );
+
+      if (inserted !== "OK") {
+        return { valid: false, reason: "tool_confirmation_token_replay_detected" };
+      }
+    } catch {
+      return { valid: false, reason: "tool_confirmation_redis_unavailable" };
     }
 
     return { valid: true, reason: "tool_confirmation_token_valid" };
