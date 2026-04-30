@@ -9,6 +9,7 @@ Run checks for:
 3. If end_user ('user' passed to /chat/completions, /embeddings endpoint) is in budget
 """
 import asyncio
+import os
 import re
 import time
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union, cast
@@ -3130,6 +3131,7 @@ async def _team_max_budget_check(
         )
 
         if spend > team_object.max_budget:
+            await _disable_team_keys_on_budget_exceeded(team_object=team_object)
             if valid_token:
                 call_info = CallInfo(
                     token=valid_token.token,
@@ -3153,6 +3155,57 @@ async def _team_max_budget_check(
                 max_budget=team_object.max_budget,
                 message=f"Budget has been exceeded! Team={team_object.team_id} Current cost: {spend}, Max budget: {team_object.max_budget}",
             )
+
+
+async def _disable_team_keys_on_budget_exceeded(
+    team_object: LiteLLM_TeamTable,
+) -> None:
+    """
+    Budget guardrail:
+    - Automatically disable all active virtual keys for a team once the
+      team exceeds its configured budget.
+    """
+    if (
+        os.getenv("LITELLM_DISABLE_TEAM_KEYS_ON_BUDGET_EXCEEDED", "true").lower()
+        != "true"
+    ):
+        return
+
+    if team_object.team_id is None:
+        return
+
+    try:
+        from litellm.proxy.proxy_server import prisma_client, proxy_logging_obj
+
+        if prisma_client is None:
+            return
+
+        await prisma_client.db.litellm_verificationtoken.update_many(
+            where={"team_id": team_object.team_id, "blocked": {"not": True}},
+            data={"blocked": True},
+        )
+
+        verbose_proxy_logger.warning(
+            "Budget guardrail triggered: disabled active keys for team_id=%s after budget exceeded",
+            team_object.team_id,
+        )
+
+        if proxy_logging_obj is not None:
+            await proxy_logging_obj.alerting_handler(
+                message=(
+                    "Budget guardrail triggered: team keys disabled "
+                    f"(team_id={team_object.team_id}, team_alias={team_object.team_alias})"
+                ),
+                level="Low",
+            )
+    except Exception as e:
+        # Non-blocking: auth path should still return budget exceeded even if
+        # key disable write fails for transient reasons.
+        verbose_proxy_logger.debug(
+            "Failed to disable team keys on budget exceeded for team_id=%s: %s",
+            team_object.team_id,
+            str(e),
+        )
 
 
 async def _team_soft_budget_check(
