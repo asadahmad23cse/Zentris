@@ -1,0 +1,39 @@
+# =====================================================
+# LiteLLM Dev Config - No DB / No Redis required
+# =====================================================
+# Minimal config to get the proxy running locally.
+# Add your API keys to .env and uncomment models below.
+
+model_list:
+  # Wildcard: any openai/* model will use OPENAI_API_KEY
+  - model_name: "openai/*"
+    litellm_params:
+      model: "openai/*"
+      api_key: "os.environ/OPENAI_API_KEY"
+
+  # Wildcard: any anthropic/* model will use ANTHROPIC_API_KEY
+  - model_name: "anthropic/*"
+    litellm_params:
+      model: "anthropic/*"
+      api_key: "os.environ/ANTHROPIC_API_KEY"
+
+  # Wildcard: any gemini/* model will use GOOGLE_API_KEY
+  - model_name: "gemini/*"
+    litellm_params:
+      model: "gemini/*"
+      api_key: "os.environ/GOOGLE_API_KEY"
+
+  # Wildcard: any groq/* model will use GROQ_API_KEY
+  - model_name: "groq/*"
+    litellm_params:
+      model: "groq/*"
+      api_key: "os.environ/GROQ_API_KEY"
+
+litellm_settings:
+  drop_params: True
+  num_retries: 2
+  request_timeout: 120
+  telemetry: False
+
+general_settings:
+  master_key: "sk-1234"   # Use this as your Bearer token when calling the proxy
