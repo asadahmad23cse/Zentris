@@ -14,8 +14,8 @@ export const buildServer = async () => {
 
   await app.register(rateLimit, {
     global: true,
-    max: 30,
-    timeWindow: "1 minute"
+    max: config.RATE_LIMIT_MAX,
+    timeWindow: config.RATE_LIMIT_WINDOW
   });
 
   app.get("/health", async () => ({ status: "ok", service: "zentris", timestamp: Date.now() }));

@@ -6,6 +6,7 @@ import { wrapUntrustedData } from "../guards/ragWrapper";
 import { StreamingClient } from "../llm/streamingClient";
 import { ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
+import { StreamAbuseGuard } from "../services/streamAbuseGuard";
 import { type AuthenticatedIdentity, type ChatMessage, type ToolInvocation, type ZentrisRequest } from "../types";
 
 interface ClientMessage {
@@ -152,6 +153,7 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
   const ragSecurityGuard = new RagSecurityGuard();
   const pipeline = new ZentrisPipeline();
   const streamingClient = new StreamingClient();
+  const streamAbuseGuard = new StreamAbuseGuard();
   const streamingGuard = new StreamingGuard(
     config.STREAMING_ROLLING_BUFFER_CHARS,
     config.STREAMING_SUSPICIOUS_EVENT_LIMIT
@@ -232,6 +234,12 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
   app.post<{ Body: ChatRouteBody }>(
     "/v1/chat/stream",
     {
+      config: {
+        rateLimit: {
+          max: Math.max(1, Math.floor(config.RATE_LIMIT_MAX / 2)),
+          timeWindow: config.RATE_LIMIT_WINDOW
+        }
+      },
       preValidation: async (request, reply) => {
         if (hasForbiddenIdentityFields(request.body)) {
           return sendJsonError(reply, 403, request.id, "high", {
@@ -289,10 +297,27 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
           });
       }
 
+      if (await streamAbuseGuard.isSessionWatchdogExceeded(body.sessionId)) {
+        return sendJsonError(reply, 429, requestId, "high", {
+          error: "Request blocked",
+          reason: "stream_session_watchdog_limit_exceeded",
+          requestId
+        });
+      }
+
+      const streamId = `${requestId}:${Date.now().toString(36)}`;
+      const slotResult = await streamAbuseGuard.acquireSlot(request.identity.userId, body.sessionId, streamId);
+      if (!slotResult.allowed) {
+        return sendJsonError(reply, 429, requestId, "high", {
+          error: "Request blocked",
+          reason: slotResult.reason ?? "concurrent_stream_limit_exceeded",
+          requestId
+        });
+      }
+
       reply.hijack();
 
       const response = reply.raw;
-      const streamId = `${requestId}:${Date.now().toString(36)}`;
       const streamState = streamingGuard.createState();
       response.writeHead(200, {
         "Content-Type": "text/event-stream",
@@ -303,6 +328,7 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
       });
 
       let streamClosed = false;
+      let slotReleased = false;
 
       const sendSse = (payload: Record<string, unknown>): void => {
         if (streamClosed || response.writableEnded) {
@@ -319,9 +345,18 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
         response.end();
       };
 
+      const releaseSlot = async (): Promise<void> => {
+        if (slotReleased) {
+          return;
+        }
+        slotReleased = true;
+        await streamAbuseGuard.releaseSlot(request.identity.userId, body.sessionId, streamId);
+      };
+
       const disconnectHandler = (): void => {
         streamClosed = true;
         streamingClient.abortStream(streamId);
+        void releaseSlot();
       };
 
       request.raw.socket.on("close", disconnectHandler);
@@ -332,6 +367,23 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
         {},
         (chunk) => {
           const inspection = streamingGuard.inspectChunk(chunk, streamState);
+          if (inspection.detectedTypes.length > 0) {
+            void (async () => {
+              const sessionTotal = await streamAbuseGuard.recordSuspiciousEvents(
+                body.sessionId,
+                inspection.detectedTypes.length
+              );
+              if (sessionTotal >= config.STREAMING_SESSION_SUSPICIOUS_EVENT_LIMIT) {
+                sendSse({
+                  error: "stream_terminated",
+                  reason: "session_suspicious_event_limit_exceeded"
+                });
+                streamingClient.abortStream(streamId);
+                closeStream();
+              }
+            })();
+          }
+
           if (inspection.terminate) {
             sendSse({
               error: "stream_terminated",
@@ -371,6 +423,7 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
       );
 
       request.raw.socket.off("close", disconnectHandler);
+      await releaseSlot();
     }
   );
 };

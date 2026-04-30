@@ -11,6 +11,7 @@ interface RedisMemoryState {
   lists: Map<string, string[]>;
   hashes: Map<string, Record<string, string>>;
   kv: Map<string, string>;
+  sets: Map<string, Set<string>>;
 }
 
 let buildServer: typeof import("../server").buildServer;
@@ -80,7 +81,8 @@ const createRedisStubs = (sandbox: SinonSandbox): RedisMemoryState => {
   const state: RedisMemoryState = {
     lists: new Map<string, string[]>(),
     hashes: new Map<string, Record<string, string>>(),
-    kv: new Map<string, string>()
+    kv: new Map<string, string>(),
+    sets: new Map<string, Set<string>>()
   };
 
   const getList = (key: string): string[] => {
@@ -112,6 +114,16 @@ const createRedisStubs = (sandbox: SinonSandbox): RedisMemoryState => {
     return hash ? { ...hash } : {};
   });
 
+  const getSet = (key: string): Set<string> => {
+    const existing = state.sets.get(key);
+    if (existing) {
+      return existing;
+    }
+    const created = new Set<string>();
+    state.sets.set(key, created);
+    return created;
+  };
+
   sandbox.stub(redisClient, "set").callsFake(async (...args: unknown[]) => {
     const [key, value, ...options] = args;
     const normalizedKey = String(key);
@@ -129,6 +141,58 @@ const createRedisStubs = (sandbox: SinonSandbox): RedisMemoryState => {
     return "OK";
   });
 
+  sandbox.stub(redisClient, "get").callsFake(async (key: unknown) => state.kv.get(String(key)) ?? null);
+
+  sandbox.stub(redisClient, "expire").callsFake(async () => 1);
+
+  sandbox.stub(redisClient, "incrby").callsFake(async (key: unknown, increment: number) => {
+    const normalizedKey = String(key);
+    const current = Number.parseInt(state.kv.get(normalizedKey) ?? "0", 10);
+    const next = current + Number(increment);
+    state.kv.set(normalizedKey, String(next));
+    return next;
+  });
+
+  (sandbox.stub(redisClient, "eval") as unknown as sinon.SinonStub).callsFake(async (...args: unknown[]) => {
+    const script = String(args[0] ?? "");
+    const numKeys = Number(args[1] ?? 0);
+    const keys = args.slice(2, 2 + numKeys).map((key) => String(key));
+    const values = args.slice(2 + numKeys).map((value) => String(value));
+
+    if (script.includes("stream_limit_acquire")) {
+      const [userKey, sessionKey] = keys;
+      const [streamId, maxUserRaw, maxSessionRaw] = values;
+      const maxUser = Number.parseInt(maxUserRaw ?? "0", 10);
+      const maxSession = Number.parseInt(maxSessionRaw ?? "0", 10);
+      const userSet = getSet(userKey ?? "");
+      const sessionSet = getSet(sessionKey ?? "");
+
+      if (userSet.has(streamId ?? "")) {
+        return [1, userSet.size, sessionSet.size];
+      }
+
+      if (userSet.size >= maxUser || sessionSet.size >= maxSession) {
+        return [0, userSet.size, sessionSet.size];
+      }
+
+      userSet.add(streamId ?? "");
+      sessionSet.add(streamId ?? "");
+      return [1, userSet.size, sessionSet.size];
+    }
+
+    if (script.includes("stream_limit_release")) {
+      const [userKey, sessionKey] = keys;
+      const [streamId] = values;
+      const userSet = getSet(userKey ?? "");
+      const sessionSet = getSet(sessionKey ?? "");
+      userSet.delete(streamId ?? "");
+      sessionSet.delete(streamId ?? "");
+      return 1;
+    }
+
+    return null;
+  });
+
   (sandbox.stub(redisClient, "del") as unknown as sinon.SinonStub).callsFake(async (...keys: unknown[]) => {
     let removed = 0;
     for (const key of keys) {
@@ -140,6 +204,9 @@ const createRedisStubs = (sandbox: SinonSandbox): RedisMemoryState => {
         removed += 1;
       }
       if (state.kv.delete(normalizedKey)) {
+        removed += 1;
+      }
+      if (state.sets.delete(normalizedKey)) {
         removed += 1;
       }
     }
@@ -234,6 +301,7 @@ describe("Zentris integration", () => {
     redisState.lists.clear();
     redisState.hashes.clear();
     redisState.kv.clear();
+    redisState.sets.clear();
     await app.close();
     sandbox.restore();
   });
@@ -984,5 +1052,129 @@ describe("Zentris integration", () => {
     assert.equal(response.statusCode, 200);
     assert.equal(response.payload.includes("stream_terminated"), true);
     assert.equal(response.payload.includes("suspicious_stream_circuit_open"), true);
+  });
+
+  test("Test 24: concurrent stream limit blocks third active stream", async () => {
+    const pendingEndCallbacks: Array<() => void> = [];
+    sandbox.stub(StreamingClient.prototype, "streamChat").callsFake(
+      async (_streamId, _messages, _options, _onChunk, onEnd) =>
+        new Promise<void>((resolve) => {
+          pendingEndCallbacks.push(() => {
+            onEnd();
+            resolve();
+          });
+        })
+    );
+
+    const first = app.inject({
+      method: "POST",
+      url: "/v1/chat/stream",
+      payload: {
+        sessionId: "sess-stream-concurrency-1",
+        message: "stream"
+      },
+      headers: authHeader("user-stream-concurrency", "operator")
+    });
+
+    const second = app.inject({
+      method: "POST",
+      url: "/v1/chat/stream",
+      payload: {
+        sessionId: "sess-stream-concurrency-1",
+        message: "stream"
+      },
+      headers: authHeader("user-stream-concurrency", "operator")
+    });
+
+    const waitForActive = async (): Promise<void> => {
+      for (let attempt = 0; attempt < 50; attempt += 1) {
+        if (pendingEndCallbacks.length >= 2) {
+          return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      throw new Error("timed_out_waiting_for_active_streams");
+    };
+
+    await waitForActive();
+
+    const third = await app.inject({
+      method: "POST",
+      url: "/v1/chat/stream",
+      payload: {
+        sessionId: "sess-stream-concurrency-1",
+        message: "stream"
+      },
+      headers: authHeader("user-stream-concurrency", "operator")
+    });
+
+    assert.equal(third.statusCode, 429);
+    assert.match(third.json().reason, /concurrent_stream_limit_exceeded/);
+
+    for (const end of pendingEndCallbacks) {
+      end();
+    }
+    const [firstResult, secondResult] = await Promise.all([first, second]);
+    assert.equal(firstResult.statusCode, 200);
+    assert.equal(secondResult.statusCode, 200);
+  });
+
+  test("Test 25: dedicated stream rate-limit is stricter than global chat rate-limit", async () => {
+    sandbox.stub(StreamingClient.prototype, "streamChat").callsFake(async (_streamId, _messages, _options, _onChunk, onEnd) => {
+      onEnd();
+    });
+
+    let limited = false;
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      const response = await app.inject({
+        method: "POST",
+        url: "/v1/chat/stream",
+        payload: {
+          sessionId: `sess-stream-rate-${attempt}`,
+          message: "stream"
+        },
+        headers: authHeader("user-stream-rate", "operator")
+      });
+
+      if (response.statusCode === 429) {
+        limited = true;
+        break;
+      }
+    }
+
+    assert.equal(limited, true);
+  });
+
+  test("Test 26: session watchdog terminates stream when cumulative suspicious events exceed limit", async () => {
+    sandbox.stub(StreamingClient.prototype, "streamChat").callsFake(async (_streamId, _messages, _options, onChunk, onEnd) => {
+      onChunk("leak sk-1234567890ABCDEFGHIJKLMNOPQRST");
+      onEnd();
+    });
+
+    let watchdogTriggered = false;
+    for (let attempt = 0; attempt < 15; attempt += 1) {
+      const response = await app.inject({
+        method: "POST",
+        url: "/v1/chat/stream",
+        payload: {
+          sessionId: "sess-stream-watchdog-1",
+          message: "stream"
+        },
+        headers: authHeader("user-stream-watchdog", "operator")
+      });
+      const reason =
+        response.statusCode === 429 ? (response.json() as { reason?: string }).reason ?? "" : "";
+
+      if (
+        response.payload.includes("session_suspicious_event_limit_exceeded") ||
+        response.payload.includes("stream_session_watchdog_limit_exceeded") ||
+        reason === "stream_session_watchdog_limit_exceeded"
+      ) {
+        watchdogTriggered = true;
+        break;
+      }
+    }
+
+    assert.equal(watchdogTriggered, true);
   });
 });
