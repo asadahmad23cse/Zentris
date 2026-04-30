@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Zentris Dashboards
+    orgId: 1
+    folder: Zentris
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

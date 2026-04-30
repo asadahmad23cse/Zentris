@@ -97,10 +97,29 @@ services:
       - "--storage.tsdb.retention.time=15d"
     restart: always
 
+  grafana:
+    image: grafana/grafana:11.5.2
+    container_name: zentris_grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}"
+      GF_USERS_DEFAULT_THEME: "light"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    restart: unless-stopped
+
 volumes:
   prometheus_data:
     driver: local
   postgres_data:
     name: litellm_postgres_data # Named volume for Postgres data persistence
   redis_data:
+    driver: local
+  grafana_data:
     driver: local
