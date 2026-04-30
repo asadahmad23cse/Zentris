@@ -12,12 +12,16 @@ import { AuditLogger } from "../services/auditLogger";
 import { CircuitBreaker } from "../services/circuitBreaker";
 import {
   type AuthorizationResult,
+  type ChatMessage,
   type ContextGuardResult,
   type GuardResult,
   type IntentClassificationResult,
   type PipelineContext,
   type ZentrisRequest
 } from "../types";
+
+const fallbackResponse = (): string =>
+  "The assistant is temporarily unavailable. Please retry in a moment.";
 
 const DEFAULT_CONTEXT_RESULT: ContextGuardResult = {
   safe: true,
@@ -38,28 +42,36 @@ const DEFAULT_AUTH_RESULT: AuthorizationResult = {
   reason: "auth_not_evaluated"
 };
 
-const fallbackResponse = (): string =>
-  "The assistant is temporarily unavailable. Please retry in a moment.";
-
-const guardRiskToScore = (result: GuardResult): number => {
-  if (result.risk === "high") {
+const riskWeight = (risk: GuardResult["risk"]): number => {
+  if (risk === "high") {
     return 90;
   }
-  if (result.risk === "medium") {
+  if (risk === "medium") {
     return 50;
   }
   return 10;
 };
 
-const actionToError = (action: GuardResult["action"]): string | undefined => {
-  if (action === "block") {
-    return "Request blocked by security policy";
-  }
-  if (action === "require_confirmation") {
-    return "Confirmation required before processing this request";
-  }
-  return undefined;
-};
+export interface PipelineGuardOutcome {
+  action: GuardResult["action"];
+  riskLevel: GuardResult["risk"];
+  reason: string;
+  guardResult: GuardResult;
+  normalizedInput: string;
+  scrubbedInput: string;
+  piiDetected: string[];
+  decisions: GuardResult[];
+  intentResult: IntentClassificationResult;
+  llmMessages: ChatMessage[];
+}
+
+export interface PipelineRunResult {
+  action: GuardResult["action"];
+  riskLevel: GuardResult["risk"];
+  guardResult: GuardResult;
+  response?: string;
+  error?: string;
+}
 
 export class ZentrisPipeline {
   private readonly inputNormalizer = new InputNormalizer();
@@ -73,75 +85,28 @@ export class ZentrisPipeline {
   private readonly circuitBreaker = new CircuitBreaker();
   private readonly auditLogger = new AuditLogger();
 
-  public async run(
-    req: ZentrisRequest
-  ): Promise<{ action: GuardResult["action"]; response?: string; error?: string }> {
-    const startedAt = Date.now();
+  public async runGuards(req: ZentrisRequest): Promise<PipelineGuardOutcome> {
+    const normalizedInput = this.inputNormalizer.normalize(req.rawInput);
+    const piiInputResult = this.piiScrubber.scrub(normalizedInput);
+    const scrubbedInput = piiInputResult.scrubbed;
+    const piiDetected = piiInputResult.detectedTypes;
 
-    let normalizedInput = "";
-    let scrubbedInput = "";
-    let piiDetected: string[] = [];
-    let injectionResult: GuardResult = {
-      safe: true,
-      risk: "low",
-      reason: "injection_not_evaluated",
-      action: "allow"
-    };
+    const injectionResult = await this.injectionDetector.detect(scrubbedInput, normalizedInput);
     let contextResult: ContextGuardResult = { ...DEFAULT_CONTEXT_RESULT };
     let intentResult: IntentClassificationResult = { ...DEFAULT_INTENT_RESULT };
     let authResult: AuthorizationResult = { ...DEFAULT_AUTH_RESULT };
-    let finalDecision: GuardResult = {
-      safe: true,
-      risk: "low",
-      reason: "decision_not_evaluated",
-      action: "allow"
-    };
+    let decisions: GuardResult[] = [injectionResult];
 
     const baseContext: Omit<PipelineContext, "injectionResult" | "contextResult" | "intentResult" | "authResult"> =
       {
         request: req,
         guardResults: [],
-        normalizedInput: "",
-        sanitizedInput: ""
+        normalizedInput,
+        sanitizedInput: scrubbedInput,
+        piiDetected
       };
 
-    try {
-      normalizedInput = this.inputNormalizer.normalize(req.rawInput);
-
-      const piiInputResult = this.piiScrubber.scrub(normalizedInput);
-      scrubbedInput = piiInputResult.scrubbed;
-      piiDetected = piiInputResult.detectedTypes;
-
-      injectionResult = await this.injectionDetector.detect(scrubbedInput, normalizedInput);
-
-      if (!injectionResult.safe && injectionResult.risk === "high") {
-        finalDecision = this.executionGuard.decide({
-          ...baseContext,
-          guardResults: [injectionResult],
-          normalizedInput,
-          sanitizedInput: scrubbedInput,
-          injectionResult,
-          contextResult,
-          intentResult,
-          authResult,
-          piiDetected
-        });
-
-        await this.logAudit(
-          req,
-          scrubbedInput || normalizedInput,
-          [injectionResult, finalDecision],
-          finalDecision,
-          startedAt,
-          intentResult
-        );
-
-        return {
-          action: finalDecision.action,
-          error: actionToError(finalDecision.action) ?? "Request rejected"
-        };
-      }
-
+    if (!(injectionResult.safe === false && injectionResult.risk === "high")) {
       contextResult = await this.contextGuard.analyze(req.sessionId, scrubbedInput, req.messages);
       intentResult = this.intentClassifier.classify(scrubbedInput, req.messages);
       authResult = this.authorizationService.authorize(
@@ -150,130 +115,156 @@ export class ZentrisPipeline {
         intentResult.intent,
         intentResult.riskScore
       );
+      decisions = [injectionResult, contextResult];
+    }
 
-      finalDecision = this.executionGuard.decide({
-        ...baseContext,
-        guardResults: [injectionResult, contextResult],
-        normalizedInput,
-        sanitizedInput: scrubbedInput,
-        injectionResult,
-        contextResult,
-        intentResult,
-        authResult,
-        piiDetected
-      });
+    const finalDecision = this.executionGuard.decide({
+      ...baseContext,
+      guardResults: decisions,
+      injectionResult,
+      contextResult,
+      intentResult,
+      authResult
+    });
 
-      if (finalDecision.action === "block" || finalDecision.action === "require_confirmation") {
-        await this.logAudit(
-          req,
-          scrubbedInput || normalizedInput,
-          [injectionResult, contextResult, finalDecision],
-          finalDecision,
-          startedAt,
-          intentResult
-        );
+    const promptForModel =
+      finalDecision.action === "sanitize"
+        ? wrapUntrustedData(scrubbedInput, "user_input")
+        : scrubbedInput;
 
+    const llmMessages = this.buildLLMMessages(req.messages, promptForModel);
+    const allDecisions = [...decisions, finalDecision];
+
+    return {
+      action: finalDecision.action,
+      riskLevel: finalDecision.risk,
+      reason: finalDecision.reason,
+      guardResult: finalDecision,
+      normalizedInput,
+      scrubbedInput,
+      piiDetected,
+      decisions: allDecisions,
+      intentResult,
+      llmMessages
+    };
+  }
+
+  public async run(req: ZentrisRequest): Promise<PipelineRunResult> {
+    const startedAt = Date.now();
+
+    try {
+      const guardOutcome = await this.runGuards(req);
+
+      if (guardOutcome.action === "block") {
+        await this.logAudit(req, guardOutcome, startedAt);
         return {
-          action: finalDecision.action,
-          error: actionToError(finalDecision.action)
+          action: "block",
+          riskLevel: guardOutcome.riskLevel,
+          guardResult: guardOutcome.guardResult,
+          error: "Request blocked by security policy"
         };
       }
 
-      const promptForModel =
-        finalDecision.action === "sanitize"
-          ? wrapUntrustedData(scrubbedInput, "user_input")
-          : scrubbedInput;
-
-      const boundedHistory = req.messages.slice(-config.MAX_SESSION_MESSAGES);
-      const llmMessages = [
-        ...boundedHistory,
-        {
-          role: "user" as const,
-          content: promptForModel,
-          timestamp: Date.now()
-        }
-      ];
+      if (guardOutcome.action === "require_confirmation") {
+        await this.logAudit(req, guardOutcome, startedAt);
+        return {
+          action: "require_confirmation",
+          riskLevel: guardOutcome.riskLevel,
+          guardResult: guardOutcome.guardResult,
+          error: "High risk action requires confirmation"
+        };
+      }
 
       const llmResponse = await this.circuitBreaker.execute(
-        () => this.litellmClient.chat(llmMessages),
+        () => this.litellmClient.chat(guardOutcome.llmMessages),
         fallbackResponse
       );
 
       const scrubbedResponse = this.piiScrubber.scrub(llmResponse);
-      const allDetectedTypes = Array.from(new Set([...piiDetected, ...scrubbedResponse.detectedTypes]));
+      const combinedPii = Array.from(new Set([...guardOutcome.piiDetected, ...scrubbedResponse.detectedTypes]));
 
-      await this.logAudit(
-        req,
-        scrubbedInput || normalizedInput,
-        [injectionResult, contextResult, finalDecision],
-        finalDecision,
-        startedAt,
-        intentResult,
-        allDetectedTypes
-      );
+      await this.logAudit(req, guardOutcome, startedAt, combinedPii);
 
       return {
-        action: finalDecision.action,
+        action: guardOutcome.action,
+        riskLevel: guardOutcome.riskLevel,
+        guardResult: guardOutcome.guardResult,
         response: scrubbedResponse.scrubbed
       };
     } catch {
-      finalDecision = {
+      const failClosed: GuardResult = {
         safe: false,
         risk: "high",
         action: "block",
         reason: "guard_internal_error"
       };
 
-      await this.logAudit(
-        req,
-        scrubbedInput || normalizedInput,
-        [injectionResult, contextResult, finalDecision],
-        finalDecision,
-        startedAt,
-        intentResult,
-        piiDetected
-      );
+      await this.auditLogger.log({
+        sessionId: req.sessionId,
+        userId: req.userId,
+        input: req.rawInput,
+        normalizedInput: req.rawInput,
+        decisions: [failClosed],
+        finalAction: failClosed.action,
+        riskScore: 100,
+        durationMs: Date.now() - startedAt,
+        userRole: req.userRole,
+        intent: "unknown"
+      });
 
       return {
         action: "block",
+        riskLevel: "high",
+        guardResult: failClosed,
         error: "Request blocked due to internal guard failure"
       };
     }
   }
 
+  private buildLLMMessages(history: ChatMessage[], promptForModel: string): ChatMessage[] {
+    const boundedHistory = history.slice(-config.MAX_SESSION_MESSAGES);
+    return [
+      ...boundedHistory,
+      {
+        role: "user",
+        content: promptForModel,
+        timestamp: Date.now()
+      }
+    ];
+  }
+
   private async logAudit(
     req: ZentrisRequest,
-    normalizedInput: string,
-    decisions: GuardResult[],
-    finalDecision: GuardResult,
+    guardOutcome: PipelineGuardOutcome,
     startedAt: number,
-    intentResult: IntentClassificationResult,
     piiTypes: string[] = []
   ): Promise<void> {
-    const derivedRiskScore = Math.min(
+    const riskScore = Math.min(
       100,
-      Math.max(intentResult.riskScore, ...decisions.map((decision) => guardRiskToScore(decision)))
+      Math.max(
+        guardOutcome.intentResult.riskScore,
+        ...guardOutcome.decisions.map((decision) => riskWeight(decision.risk))
+      )
     );
 
-    const sanitizedDecisions = decisions.map((decision) => ({
-      ...decision,
-      reason:
-        piiTypes.length > 0 && decision.reason.includes("pii_detected")
-          ? `pii_detected: ${piiTypes.join(", ")}`
-          : decision.reason
-    }));
+    const decisions = guardOutcome.decisions.map((decision) => {
+      if (decision.reason.startsWith("pii_detected:")) {
+        return { ...decision, reason: `pii_detected: ${piiTypes.join(", ")}` };
+      }
+      return decision;
+    });
 
     await this.auditLogger.log({
       sessionId: req.sessionId,
       userId: req.userId,
-      input: normalizedInput,
-      normalizedInput,
-      decisions: sanitizedDecisions,
-      finalAction: finalDecision.action,
-      riskScore: derivedRiskScore,
+      input: guardOutcome.scrubbedInput,
+      normalizedInput: guardOutcome.scrubbedInput,
+      decisions,
+      finalAction: guardOutcome.action,
+      riskScore,
       durationMs: Date.now() - startedAt,
       userRole: req.userRole,
-      intent: intentResult.intent
+      intent: guardOutcome.intentResult.intent
     });
   }
 }

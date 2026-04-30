@@ -87,6 +87,12 @@ const isBase64Candidate = (candidate: string): boolean => {
   if (candidate.length % 4 !== 0) {
     return false;
   }
+  if (/^[A-Za-z]+$/.test(candidate)) {
+    return false;
+  }
+  if (candidate.length < 16 && !/[+/=]/.test(candidate) && !/\d/.test(candidate)) {
+    return false;
+  }
   if (/^[a-fA-F0-9]+$/.test(candidate)) {
     return false;
   }

@@ -22,7 +22,7 @@ const isChatMessage = (value: unknown): value is ChatMessage => {
 };
 
 export const redisClient = new Redis(config.REDIS_URL, {
-  lazyConnect: false,
+  lazyConnect: true,
   maxRetriesPerRequest: 2
 });
 

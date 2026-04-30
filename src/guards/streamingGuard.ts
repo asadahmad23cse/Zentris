@@ -138,7 +138,7 @@ export class StreamingGuard {
         { detectionType: chunkDetection.type, position: chunkDetection.position },
         "stream_sensitive_pattern_detected"
       );
-      return { safe: false, terminate: true, reason: chunkDetection.reason };
+      return { safe: false, terminate: true, reason: chunkDetection.type };
     }
 
     const rollingDetection = findPattern(rolling);
@@ -147,7 +147,7 @@ export class StreamingGuard {
         { detectionType: rollingDetection.type, position: rollingDetection.position },
         "stream_sensitive_pattern_detected"
       );
-      return { safe: false, terminate: true, reason: rollingDetection.reason };
+      return { safe: false, terminate: true, reason: rollingDetection.type };
     }
 
     return { safe: true, terminate: false };

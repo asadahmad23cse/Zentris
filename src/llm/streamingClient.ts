@@ -37,6 +37,14 @@ const extractContent = (value: unknown): string => {
 };
 
 export class StreamingClient {
+  private activeAbortController: AbortController | null = null;
+
+  public abortCurrentStream(): void {
+    if (this.activeAbortController) {
+      this.activeAbortController.abort();
+    }
+  }
+
   public async streamChat(
     messages: ChatMessage[],
     options: LLMOptions,
@@ -45,6 +53,8 @@ export class StreamingClient {
     onError: (err: Error) => void
   ): Promise<void> {
     const url = `${config.LITELLM_BASE_URL.replace(/\/$/, "")}/chat/completions`;
+    const abortController = new AbortController();
+    this.activeAbortController = abortController;
 
     try {
       const response = await fetch(url, {
@@ -62,7 +72,8 @@ export class StreamingClient {
           stream: true,
           temperature: options.temperature ?? DEFAULT_TEMPERATURE,
           ...(options.maxTokens ? { max_tokens: options.maxTokens } : {})
-        })
+        }),
+        signal: abortController.signal
       });
 
       if (!response.ok) {
@@ -124,8 +135,13 @@ export class StreamingClient {
 
       onEnd();
     } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        return;
+      }
       const normalizedError = error instanceof Error ? error : new Error("streaming_failed");
       onError(normalizedError);
+    } finally {
+      this.activeAbortController = null;
     }
   }
 }

@@ -1,7 +1,22 @@
 import { type ChatMessage, type IntentClassificationResult, type IntentType } from "../types";
 
 const INTENT_KEYWORDS: Record<IntentType, ReadonlyArray<string>> = {
-  read: ["show", "list", "get", "fetch", "display", "tell me", "what is", "describe", "find", "search", "read"],
+  read: [
+    "show",
+    "list",
+    "get",
+    "fetch",
+    "display",
+    "tell me",
+    "what is",
+    "how does",
+    "how",
+    "why",
+    "describe",
+    "find",
+    "search",
+    "read"
+  ],
   write: [
     "create",
     "write",
