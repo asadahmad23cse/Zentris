@@ -1,5 +1,6 @@
 import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import rateLimit from "@fastify/rate-limit";
+import authMiddleware from "./auth/authMiddleware";
 import { config } from "./config";
 import chatRoutes from "./routes/chat";
 import { redisClient } from "./services/redisClient";
@@ -19,6 +20,7 @@ export const buildServer = async () => {
 
   app.get("/health", async () => ({ status: "ok", service: "zentris", timestamp: Date.now() }));
 
+  await app.register(authMiddleware);
   await app.register(chatRoutes);
 
   app.setErrorHandler((error: Error, request: FastifyRequest, reply: FastifyReply) => {

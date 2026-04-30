@@ -110,8 +110,8 @@ export class ZentrisPipeline {
       contextResult = await this.contextGuard.analyze(req.sessionId, scrubbedInput, req.messages);
       intentResult = this.intentClassifier.classify(scrubbedInput, req.messages);
       authResult = this.authorizationService.authorize(
-        req.userId,
-        req.userRole,
+        req.identity.userId,
+        req.identity.userRole,
         intentResult.intent,
         intentResult.riskScore
       );
@@ -201,14 +201,14 @@ export class ZentrisPipeline {
 
       await this.auditLogger.log({
         sessionId: req.sessionId,
-        userId: req.userId,
+        userId: req.identity.userId,
         input: req.rawInput,
         normalizedInput: req.rawInput,
         decisions: [failClosed],
         finalAction: failClosed.action,
         riskScore: 100,
         durationMs: Date.now() - startedAt,
-        userRole: req.userRole,
+        userRole: req.identity.userRole,
         intent: "unknown"
       });
 
@@ -256,14 +256,14 @@ export class ZentrisPipeline {
 
     await this.auditLogger.log({
       sessionId: req.sessionId,
-      userId: req.userId,
+      userId: req.identity.userId,
       input: guardOutcome.scrubbedInput,
       normalizedInput: guardOutcome.scrubbedInput,
       decisions,
       finalAction: guardOutcome.action,
       riskScore,
       durationMs: Date.now() - startedAt,
-      userRole: req.userRole,
+      userRole: req.identity.userRole,
       intent: guardOutcome.intentResult.intent
     });
   }

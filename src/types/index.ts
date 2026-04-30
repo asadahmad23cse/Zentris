@@ -8,10 +8,14 @@ export interface ChatMessage {
   timestamp: number;
 }
 
-export interface ZentrisRequest {
-  sessionId: string;
+export interface AuthenticatedIdentity {
   userId: string;
   userRole: UserRole;
+}
+
+export interface ZentrisRequest {
+  sessionId: string;
+  identity: AuthenticatedIdentity;
   rawInput: string;
   messages: ChatMessage[];
 }

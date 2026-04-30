@@ -8,6 +8,7 @@ export interface AppConfig {
   REDIS_URL: string;
   LITELLM_BASE_URL: string;
   LITELLM_API_KEY: string;
+  JWT_SECRET: string;
   MAX_SESSION_MESSAGES: number;
   CIRCUIT_BREAKER_ENABLED: boolean;
   LOG_LEVEL: LogLevel;
@@ -70,6 +71,7 @@ export const config: AppConfig = {
   REDIS_URL: getRequiredEnv("REDIS_URL"),
   LITELLM_BASE_URL: getRequiredEnv("LITELLM_BASE_URL"),
   LITELLM_API_KEY: getRequiredEnv("LITELLM_API_KEY"),
+  JWT_SECRET: getRequiredEnv("JWT_SECRET"),
   MAX_SESSION_MESSAGES: getNumberEnv("MAX_SESSION_MESSAGES", 20),
   CIRCUIT_BREAKER_ENABLED: getBooleanEnv("CIRCUIT_BREAKER_ENABLED", true),
   LOG_LEVEL: getLogLevel(),

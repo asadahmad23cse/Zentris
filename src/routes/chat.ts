@@ -5,12 +5,10 @@ import { wrapUntrustedData } from "../guards/ragWrapper";
 import { StreamingClient } from "../llm/streamingClient";
 import { ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
-import { type ChatMessage, type UserRole, type ZentrisRequest } from "../types";
+import { type AuthenticatedIdentity, type ChatMessage, type ZentrisRequest } from "../types";
 
 interface ChatRouteBody {
   sessionId: string;
-  userId: string;
-  userRole: UserRole;
   message: string;
   history?: ChatMessage[];
   ragContext?: string;
@@ -21,11 +19,9 @@ const SESSION_ID_REGEX = /^[A-Za-z0-9-]{1,64}$/;
 const bodySchema = {
   type: "object",
   additionalProperties: false,
-  required: ["sessionId", "userId", "userRole", "message"],
+  required: ["sessionId", "message"],
   properties: {
     sessionId: { type: "string", maxLength: 64, pattern: "^[A-Za-z0-9-]{1,64}$" },
-    userId: { type: "string", minLength: 1, maxLength: 128 },
-    userRole: { type: "string", enum: ["admin", "operator", "viewer", "anonymous"] },
     message: { type: "string", minLength: 1, maxLength: 8000 },
     ragContext: { type: "string" },
     history: {
@@ -44,7 +40,14 @@ const bodySchema = {
   }
 } as const;
 
-const toZentrisRequest = (body: ChatRouteBody): ZentrisRequest => {
+const hasForbiddenIdentityFields = (value: unknown): boolean =>
+  Boolean(
+    value &&
+      typeof value === "object" &&
+      ("userId" in value || "userRole" in value || "role" in value || "isAdmin" in value)
+  );
+
+const toZentrisRequest = (body: ChatRouteBody, identity: AuthenticatedIdentity): ZentrisRequest => {
   const history = [...(body.history ?? [])].slice(-config.MAX_SESSION_MESSAGES);
 
   if (body.ragContext && body.ragContext.trim().length > 0) {
@@ -57,8 +60,7 @@ const toZentrisRequest = (body: ChatRouteBody): ZentrisRequest => {
 
   return {
     sessionId: body.sessionId,
-    userId: body.userId,
-    userRole: body.userRole,
+    identity,
     rawInput: body.message,
     messages: history
   };
@@ -85,9 +87,15 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
   app.post<{ Body: ChatRouteBody }>(
     "/v1/chat",
     {
-      schema: {
-        body: bodySchema
-      }
+      preValidation: async (request, reply) => {
+        if (hasForbiddenIdentityFields(request.body)) {
+          return sendJsonError(reply, 403, request.id, "high", {
+            error: "Forbidden identity fields in request body",
+            reason: "client_identity_override_attempt"
+          });
+        }
+      },
+      schema: { body: bodySchema }
     },
     async (request, reply) => {
       const requestId = request.id;
@@ -105,7 +113,7 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
         });
       }
 
-      const pipelineResult = await pipeline.run(toZentrisRequest(body));
+      const pipelineResult = await pipeline.run(toZentrisRequest(body, request.identity));
 
       if (pipelineResult.action === "block") {
         return sendJsonError(reply, 400, requestId, pipelineResult.riskLevel, {
@@ -141,9 +149,15 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
   app.post<{ Body: ChatRouteBody }>(
     "/v1/chat/stream",
     {
-      schema: {
-        body: bodySchema
-      }
+      preValidation: async (request, reply) => {
+        if (hasForbiddenIdentityFields(request.body)) {
+          return sendJsonError(reply, 403, request.id, "high", {
+            error: "Forbidden identity fields in request body",
+            reason: "client_identity_override_attempt"
+          });
+        }
+      },
+      schema: { body: bodySchema }
     },
     async (request, reply) => {
       const requestId = request.id;
@@ -161,7 +175,7 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
         });
       }
 
-      const guardOutcome = await pipeline.runGuards(toZentrisRequest(body));
+      const guardOutcome = await pipeline.runGuards(toZentrisRequest(body, request.identity));
 
       if (guardOutcome.action === "block") {
         return sendJsonError(reply, 400, requestId, guardOutcome.riskLevel, {
