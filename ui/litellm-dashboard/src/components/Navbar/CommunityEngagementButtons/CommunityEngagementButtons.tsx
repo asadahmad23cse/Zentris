@@ -14,13 +14,13 @@ export const CommunityEngagementButtons: React.FC = () => {
   return (
     <>
       <Button
-        href="https://www.litellm.ai/support"
+        href="https://github.com/asadahmad23cse/Zentris/discussions"
         target="_blank"
         rel="noopener noreferrer"
         icon={<SlackOutlined />}
         className="shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/50 transition-shadow"
       >
-        Join Slack
+        Community
       </Button>
       <Button
         href="https://github.com/asadahmad23cse/Zentris"
@@ -29,7 +29,7 @@ export const CommunityEngagementButtons: React.FC = () => {
         className="shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/50 transition-shadow"
         icon={<GithubOutlined />}
       >
-        Star us on GitHub
+        Star Zentris
       </Button>
     </>
   );

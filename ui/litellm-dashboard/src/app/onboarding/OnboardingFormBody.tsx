@@ -26,7 +26,7 @@ export function OnboardingFormBody({
     <div className="mx-auto w-full max-w-md mt-10">
       <Card>
         <Typography.Title level={5} className="text-center mb-5">
-          🚅 LiteLLM
+          🚅 Zentris
         </Typography.Title>
         <Typography.Title level={3}>
           {variant === "reset_password" ? "Reset Password" : "Sign Up"}

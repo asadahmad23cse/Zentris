@@ -204,12 +204,12 @@ function LoginPageContent() {
               <>
                 <Paragraph className="text-sm">
                   By default, Username is <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">admin</code> and
-                  Password is your set LiteLLM Proxy
+                  Password is your set Zentris Proxy
                   <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">MASTER_KEY</code>.
                 </Paragraph>
                 <Paragraph className="text-sm">
                   Need to set UI credentials or SSO?{" "}
-                  <a href="https://docs.litellm.ai/docs/proxy/ui" target="_blank" rel="noopener noreferrer">
+                  <a href="https://github.com/asadahmad23cse/Zentris" target="_blank" rel="noopener noreferrer">
                     Check the documentation
                   </a>
                   .
@@ -323,7 +323,7 @@ function LoginPageContent() {
             type="info"
             showIcon
             closable
-            message={<Text>Single Sign-On (SSO) is enabled. LiteLLM no longer automatically redirects to the SSO login flow upon loading this page. To re-enable auto-redirect-to-SSO, set <Text code>AUTO_REDIRECT_UI_LOGIN_TO_SSO=true</Text> in your environment configuration.</Text>}
+            message={<Text>Single Sign-On (SSO) is enabled. Zentris no longer automatically redirects to the SSO login flow upon loading this page. To re-enable auto-redirect-to-SSO, set <Text code>AUTO_REDIRECT_UI_LOGIN_TO_SSO=true</Text> in your environment configuration.</Text>}
           />
         )}
       </Card>

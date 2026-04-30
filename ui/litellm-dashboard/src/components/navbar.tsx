@@ -51,7 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const disableBouncingIcon = useDisableBouncingIcon();
 
   // Simple logo URL: use custom logo if available, otherwise default
-  const imageUrl = logoUrl || `${baseUrl}/get_image`;
+  const imageUrl = logoUrl || "/assets/logos/zentris_logo.svg";
 
   useEffect(() => {
     const initializeProxySettings = async () => {
@@ -107,7 +107,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   <div className="h-10 max-w-48 flex items-center justify-center overflow-hidden">
                     <img
                       src={imageUrl}
-                      alt="LiteLLM Brand"
+                      alt="Zentris Brand"
                       className="max-w-full max-h-full w-auto h-auto object-contain"
                     />
                   </div>
@@ -119,7 +119,7 @@ const Navbar: React.FC<NavbarProps> = ({
                     <span
                       className="absolute -top-1 -left-2 text-lg animate-bounce"
                       style={{ animationDuration: "2s" }}
-                      title="Thanks for using LiteLLM!"
+                      title="Thanks for using Zentris!"
                     >
                       🌑
                     </span>
@@ -153,7 +153,12 @@ const Navbar: React.FC<NavbarProps> = ({
                 unCheckedChildren={<SunOutlined />}
               />
             )}
-            <Button type="text" href="https://docs.litellm.ai/docs/" target="_blank" rel="noopener noreferrer">
+            <Button
+              type="text"
+              href="https://github.com/asadahmad23cse/Zentris"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Docs
             </Button>
             <BlogDropdown />

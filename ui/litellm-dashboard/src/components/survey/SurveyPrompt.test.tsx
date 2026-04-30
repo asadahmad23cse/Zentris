@@ -44,7 +44,7 @@ describe("SurveyPrompt", () => {
     renderWithProviders(
       <SurveyPrompt isVisible={true} onOpen={vi.fn()} onDismiss={vi.fn()} />
     );
-    expect(screen.getByText(/Help us improve LiteLLM/i)).toBeInTheDocument();
+    expect(screen.getByText(/Help us improve Zentris/i)).toBeInTheDocument();
   });
 
   it("should call onOpen when the share feedback button is clicked", async () => {

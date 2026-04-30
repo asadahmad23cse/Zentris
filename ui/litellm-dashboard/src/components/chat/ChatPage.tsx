@@ -131,7 +131,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ accessToken, userRole, userId, user
   const uiRoot = uiConfig?.server_root_path && uiConfig.server_root_path !== "/"
     ? uiConfig.server_root_path.replace(/\/+$/, "")
     : "";
-  const logoSrc = `${getProxyBaseUrl()}/get_image`;
+  const logoSrc = "/assets/logos/zentris_logo.svg";
 
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [models, setModels] = useState<string[]>([]);
@@ -840,11 +840,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ accessToken, userRole, userId, user
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <img
                 src={logoSrc}
-                alt="LiteLLM"
+                alt="Zentris"
                 style={{ height: 28, maxWidth: 120, objectFit: "contain", flexShrink: 0 }}
               />
               <span style={{ fontWeight: 700, fontSize: 15, color: "#111827", letterSpacing: "-0.01em" }}>
-                LiteLLM
+                Zentris
               </span>
             </div>
           )}

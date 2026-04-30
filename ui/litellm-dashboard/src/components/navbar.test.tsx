@@ -78,11 +78,11 @@ vi.mock("@/utils/proxyUtils", () => ({
 vi.mock("./Navbar/CommunityEngagementButtons/CommunityEngagementButtons", () => ({
   CommunityEngagementButtons: () => (
     <div data-testid="community-engagement-buttons">
-      <a href="https://www.litellm.ai/support" target="_blank" rel="noopener noreferrer">
-        Join Slack
+      <a href="https://github.com/asadahmad23cse/Zentris/discussions" target="_blank" rel="noopener noreferrer">
+        Community
       </a>
-      <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener noreferrer">
-        Star us on GitHub
+      <a href="https://github.com/asadahmad23cse/Zentris" target="_blank" rel="noopener noreferrer">
+        Star Zentris
       </a>
     </div>
   ),
@@ -219,7 +219,7 @@ describe("Navbar", () => {
 
     renderWithProviders(<Navbar {...defaultProps} />);
 
-    const logoImg = screen.getByAltText("LiteLLM Brand");
+    const logoImg = screen.getByAltText("Zentris Brand");
     expect(logoImg).toHaveAttribute("src", "https://example.com/custom-logo.png");
 
     // Reset mock

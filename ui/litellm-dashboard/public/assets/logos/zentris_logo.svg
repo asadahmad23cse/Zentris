@@ -1,0 +1,15 @@
+<svg width="228" height="48" viewBox="0 0 228 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="44" height="44" rx="22" fill="#E6F4FF"/>
+  <path d="M15 17H33L19 33H33" stroke="#1677FF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text
+    x="56"
+    y="31"
+    fill="#111827"
+    font-family="Inter, Segoe UI, Arial, sans-serif"
+    font-size="24"
+    font-weight="700"
+    letter-spacing="0"
+  >
+    Zentris
+  </text>
+</svg>
