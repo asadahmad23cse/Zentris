@@ -1,4 +1,20 @@
 services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: zentris_nginx
+    depends_on:
+      - litellm
+      - dashboard
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/templates:/etc/nginx/templates:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    environment:
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx/conf.d
+    restart: unless-stopped
+
   litellm:
     build:
       context: .
@@ -45,7 +61,7 @@ services:
     depends_on:
       - litellm
     environment:
-      NEXT_PUBLIC_BASE_URL: "http://localhost:4000"
+      NEXT_PUBLIC_BASE_URL: "http://localhost"
       NEXT_PUBLIC_USE_REWRITES: "false"
       NODE_ENV: "production"
     ports:

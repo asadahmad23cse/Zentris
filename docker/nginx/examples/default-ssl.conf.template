@@ -1,0 +1,51 @@
+upstream litellm_upstream {
+    least_conn;
+    server litellm:4000;
+}
+
+upstream dashboard_upstream {
+    least_conn;
+    server dashboard:3000;
+}
+
+server {
+    listen 80;
+    server_name ${NGINX_SERVER_NAME:-_};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name ${NGINX_SERVER_NAME:-_};
+
+    # Let's Encrypt certificate paths
+    ssl_certificate /etc/nginx/ssl/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/privkey.pem;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_tickets off;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+
+    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' http: https: ws: wss:; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+
+    location ~ ^/(v1|v2|key|team|user|model|health|metrics|compliance|chat|embeddings|responses|audio|image|moderations|assistants|threads|files|fine_tuning|batches|organization|project|guardrails|spend|budget)(/|$) {
+        proxy_pass http://litellm_upstream;
+        proxy_read_timeout 300s;
+    }
+
+    location / {
+        proxy_pass http://dashboard_upstream;
+        proxy_read_timeout 300s;
+    }
+}
