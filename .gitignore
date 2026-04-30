@@ -12,6 +12,7 @@ coverage/
 ## Frontend artifacts
 .next/
 next-env.d.ts
+ui/litellm-dashboard/out/
 
 ## Python cache
 __pycache__/

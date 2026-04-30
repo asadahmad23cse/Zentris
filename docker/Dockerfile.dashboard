@@ -1,0 +1,18 @@
+FROM node:20-alpine AS deps
+WORKDIR /app/ui/litellm-dashboard
+COPY ui/litellm-dashboard/package.json ui/litellm-dashboard/package-lock.json ./
+RUN npm ci
+
+FROM node:20-alpine AS builder
+WORKDIR /app/ui/litellm-dashboard
+COPY --from=deps /app/ui/litellm-dashboard/node_modules ./node_modules
+COPY ui/litellm-dashboard ./
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app/ui/litellm-dashboard
+ENV NODE_ENV=production
+RUN npm install -g serve@14.2.4
+COPY --from=builder /app/ui/litellm-dashboard/out ./out
+EXPOSE 3000
+CMD ["serve", "-s", "out", "-l", "3000"]

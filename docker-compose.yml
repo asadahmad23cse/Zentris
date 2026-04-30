@@ -17,10 +17,17 @@ services:
     environment:
       DATABASE_URL: "postgresql://llmproxy:dbpassword9090@db:5432/litellm"
       STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
+      REDIS_URL: "redis://redis:6379/0" # required by security middleware + replay protection
+      JWT_SECRET: "${JWT_SECRET:-change-me-in-production}"
+      CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET:-change-me-in-production}"
+      CONFIRMATION_TOKEN_TTL_SECONDS: "${CONFIRMATION_TOKEN_TTL_SECONDS:-300}"
+      STREAMING_ROLLING_BUFFER_CHARS: "${STREAMING_ROLLING_BUFFER_CHARS:-256}"
+      STREAMING_SUSPICIOUS_EVENT_LIMIT: "${STREAMING_SUSPICIOUS_EVENT_LIMIT:-3}"
     env_file:
       - .env # Load local .env file
     depends_on:
       - db  # Indicates that this service depends on the 'db' service, ensuring 'db' starts first
+      - redis
     healthcheck:  # Defines the health check configuration for the container
       test:
         - CMD-SHELL
@@ -29,6 +36,21 @@ services:
       timeout: 10s   # Health check command times out after 10 seconds
       retries: 3     # Retry up to 3 times if health check fails
       start_period: 40s  # Wait 40 seconds after container start before beginning health checks
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dashboard
+    container_name: zentris_dashboard
+    depends_on:
+      - litellm
+    environment:
+      NEXT_PUBLIC_BASE_URL: "http://localhost:4000"
+      NEXT_PUBLIC_USE_REWRITES: "false"
+      NODE_ENV: "production"
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
 
   db:
     image: postgres:16
@@ -48,6 +70,20 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    container_name: zentris_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   prometheus:
     image: prom/prometheus
     volumes:
@@ -66,3 +102,5 @@ volumes:
     driver: local
   postgres_data:
     name: litellm_postgres_data # Named volume for Postgres data persistence
+  redis_data:
+    driver: local
