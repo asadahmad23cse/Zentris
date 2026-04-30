@@ -152,7 +152,10 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
   const ragSecurityGuard = new RagSecurityGuard();
   const pipeline = new ZentrisPipeline();
   const streamingClient = new StreamingClient();
-  const streamingGuard = new StreamingGuard();
+  const streamingGuard = new StreamingGuard(
+    config.STREAMING_ROLLING_BUFFER_CHARS,
+    config.STREAMING_SUSPICIOUS_EVENT_LIMIT
+  );
 
   app.post<{ Body: ChatRouteBody }>(
     "/v1/chat",
@@ -289,6 +292,8 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
       reply.hijack();
 
       const response = reply.raw;
+      const streamId = `${requestId}:${Date.now().toString(36)}`;
+      const streamState = streamingGuard.createState();
       response.writeHead(200, {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
@@ -297,7 +302,6 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
         "X-Risk-Level": guardOutcome.riskLevel
       });
 
-      let accumulatedRaw = "";
       let streamClosed = false;
 
       const sendSse = (payload: Record<string, unknown>): void => {
@@ -317,32 +321,44 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
 
       const disconnectHandler = (): void => {
         streamClosed = true;
-        streamingClient.abortCurrentStream();
+        streamingClient.abortStream(streamId);
       };
 
       request.raw.socket.on("close", disconnectHandler);
 
       await streamingClient.streamChat(
+        streamId,
         guardOutcome.llmMessages,
         {},
         (chunk) => {
-          const inspection = streamingGuard.inspect(chunk, accumulatedRaw);
+          const inspection = streamingGuard.inspectChunk(chunk, streamState);
           if (inspection.terminate) {
             sendSse({
               error: "stream_terminated",
               reason: inspection.reason ?? "sensitive_pattern"
             });
-            streamingClient.abortCurrentStream();
+            streamingClient.abortStream(streamId);
             closeStream();
             return;
           }
 
-          accumulatedRaw += chunk;
-          if (inspection.redactedChunk.length > 0) {
-            sendSse({ chunk: inspection.redactedChunk });
+          for (const safeChunk of inspection.redactedChunks) {
+            sendSse({ chunk: safeChunk });
           }
         },
         () => {
+          const flushInspection = streamingGuard.flush(streamState);
+          if (flushInspection.terminate) {
+            sendSse({
+              error: "stream_terminated",
+              reason: flushInspection.reason ?? "sensitive_pattern"
+            });
+            closeStream();
+            return;
+          }
+          for (const safeChunk of flushInspection.redactedChunks) {
+            sendSse({ chunk: safeChunk });
+          }
           sendSse({ done: true });
           closeStream();
         },

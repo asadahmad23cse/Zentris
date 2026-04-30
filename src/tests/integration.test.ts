@@ -570,10 +570,12 @@ describe("Zentris integration", () => {
   });
 
   test("Test 16: streaming chunks are redacted before emit", async () => {
-    sandbox.stub(StreamingClient.prototype, "streamChat").callsFake(async (_messages, _options, onChunk, onEnd) => {
-      onChunk("output sk-1234567890ABCDEFGHIJKLMNOPQRST");
-      onEnd();
-    });
+    sandbox
+      .stub(StreamingClient.prototype, "streamChat")
+      .callsFake(async (_streamId, _messages, _options, onChunk, onEnd) => {
+        onChunk("output sk-1234567890ABCDEFGHIJKLMNOPQRST");
+        onEnd();
+      });
 
     const response = await app.inject({
       method: "POST",
@@ -591,11 +593,13 @@ describe("Zentris integration", () => {
   });
 
   test("Test 17: cross-chunk secret pattern terminates stream", async () => {
-    sandbox.stub(StreamingClient.prototype, "streamChat").callsFake(async (_messages, _options, onChunk, onEnd) => {
-      onChunk("sk-1234567890");
-      onChunk("ABCDEFGHIJKLMNOPQRST");
-      onEnd();
-    });
+    sandbox
+      .stub(StreamingClient.prototype, "streamChat")
+      .callsFake(async (_streamId, _messages, _options, onChunk, onEnd) => {
+        onChunk("sk-1234567890");
+        onChunk("ABCDEFGHIJKLMNOPQRST");
+        onEnd();
+      });
 
     const response = await app.inject({
       method: "POST",
@@ -767,5 +771,65 @@ describe("Zentris integration", () => {
     const blockedBody = blocked.json();
     assert.match(blockedBody.reason, /tool_confirmation_rejected/);
     assert.equal(llmStub.callCount, 0);
+  });
+
+  test("Test 22: per-request stream control uses unique stream IDs", async () => {
+    const observedStreamIds: string[] = [];
+    sandbox
+      .stub(StreamingClient.prototype, "streamChat")
+      .callsFake(async (streamId, _messages, _options, onChunk, onEnd) => {
+        observedStreamIds.push(streamId);
+        onChunk("ok");
+        onEnd();
+      });
+
+    const first = await app.inject({
+      method: "POST",
+      url: "/v1/chat/stream",
+      payload: {
+        sessionId: "sess-stream-req-1",
+        message: "first stream"
+      },
+      headers: authHeader("user-stream-ctrl", "operator")
+    });
+    const second = await app.inject({
+      method: "POST",
+      url: "/v1/chat/stream",
+      payload: {
+        sessionId: "sess-stream-req-2",
+        message: "second stream"
+      },
+      headers: authHeader("user-stream-ctrl", "operator")
+    });
+
+    assert.equal(first.statusCode, 200);
+    assert.equal(second.statusCode, 200);
+    assert.equal(observedStreamIds.length, 2);
+    assert.notEqual(observedStreamIds[0], observedStreamIds[1]);
+  });
+
+  test("Test 23: suspicious stream circuit breaker terminates repeated leaks", async () => {
+    sandbox
+      .stub(StreamingClient.prototype, "streamChat")
+      .callsFake(async (_streamId, _messages, _options, onChunk, onEnd) => {
+        onChunk("leak sk-1234567890ABCDEFGHIJKLMNOPQRST");
+        onChunk("leak sk-1234567890ABCDEFGHIJKLMNOPQRST");
+        onChunk("leak sk-1234567890ABCDEFGHIJKLMNOPQRST");
+        onEnd();
+      });
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat/stream",
+      payload: {
+        sessionId: "sess-stream-breaker-1",
+        message: "stream"
+      },
+      headers: authHeader("user-stream-breaker", "operator")
+    });
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.payload.includes("stream_terminated"), true);
+    assert.equal(response.payload.includes("suspicious_stream_circuit_open"), true);
   });
 });

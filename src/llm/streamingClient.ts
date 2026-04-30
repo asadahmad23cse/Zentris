@@ -37,15 +37,18 @@ const extractContent = (value: unknown): string => {
 };
 
 export class StreamingClient {
-  private activeAbortController: AbortController | null = null;
+  private readonly abortControllersByStreamId = new Map<string, AbortController>();
 
-  public abortCurrentStream(): void {
-    if (this.activeAbortController) {
-      this.activeAbortController.abort();
+  public abortStream(streamId: string): void {
+    const abortController = this.abortControllersByStreamId.get(streamId);
+    if (abortController) {
+      abortController.abort();
+      this.abortControllersByStreamId.delete(streamId);
     }
   }
 
   public async streamChat(
+    streamId: string,
     messages: ChatMessage[],
     options: LLMOptions,
     onChunk: (chunk: string) => void,
@@ -54,7 +57,7 @@ export class StreamingClient {
   ): Promise<void> {
     const url = `${config.LITELLM_BASE_URL.replace(/\/$/, "")}/chat/completions`;
     const abortController = new AbortController();
-    this.activeAbortController = abortController;
+    this.abortControllersByStreamId.set(streamId, abortController);
 
     try {
       const response = await fetch(url, {
@@ -141,7 +144,7 @@ export class StreamingClient {
       const normalizedError = error instanceof Error ? error : new Error("streaming_failed");
       onError(normalizedError);
     } finally {
-      this.activeAbortController = null;
+      this.abortControllersByStreamId.delete(streamId);
     }
   }
 }
