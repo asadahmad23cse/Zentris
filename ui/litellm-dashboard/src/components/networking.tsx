@@ -8048,6 +8048,70 @@ export const updateGuardrailCall = async (
   }
 };
 
+export interface SecurityGuardrailSettings {
+  dlp_regex_patterns: string[];
+  ml_injection_detection_by_model: Record<string, boolean>;
+  updated_at?: string | null;
+}
+
+export const getSecurityGuardrailSettings = async (
+  accessToken: string,
+): Promise<SecurityGuardrailSettings> => {
+  try {
+    const url = proxyBaseUrl
+      ? `${proxyBaseUrl}/guardrails/security/settings`
+      : `/guardrails/security/settings`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        [globalLitellmHeaderName]: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(deriveErrorMessage(errorData));
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to get security guardrail settings:", error);
+    throw error;
+  }
+};
+
+export const updateSecurityGuardrailSettings = async (
+  accessToken: string,
+  payload: Partial<SecurityGuardrailSettings>,
+): Promise<SecurityGuardrailSettings> => {
+  try {
+    const url = proxyBaseUrl
+      ? `${proxyBaseUrl}/guardrails/security/settings`
+      : `/guardrails/security/settings`;
+
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        [globalLitellmHeaderName]: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(deriveErrorMessage(errorData));
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to update security guardrail settings:", error);
+    throw error;
+  }
+};
+
 export const applyGuardrail = async (
   accessToken: string,
   guardrailName: string,

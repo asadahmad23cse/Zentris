@@ -142,6 +142,8 @@ const routeFor = (slug: string): string => {
       return "settings/admin-settings";
     case "ui-theme":
       return "settings/ui-theme";
+    case "security-settings":
+      return "settings/security-settings";
 
     default:
       // treat as already a relative path
@@ -317,6 +319,13 @@ const menuItems: MenuItemCfg[] = [
         page: "ui-theme",
         label: "UI Theme",
         icon: <SettingOutlined style={{ fontSize: 18 }} />,
+        roles: all_admin_roles,
+      },
+      {
+        key: "29",
+        page: "security-settings",
+        label: "Security Settings",
+        icon: <SafetyOutlined style={{ fontSize: 18 }} />,
         roles: all_admin_roles,
       },
     ],

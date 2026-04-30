@@ -5,6 +5,7 @@ CRUD ENDPOINTS FOR GUARDRAILS
 import concurrent.futures
 import inspect
 import json
+import re
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, cast
 from urllib.parse import urlparse
@@ -52,6 +53,17 @@ from litellm.types.guardrails import (
 
 router = APIRouter()
 GUARDRAIL_REGISTRY = GuardrailRegistry()
+
+
+class SecurityGuardrailSettingsResponse(BaseModel):
+    dlp_regex_patterns: List[str] = []
+    ml_injection_detection_by_model: Dict[str, bool] = {}
+    updated_at: Optional[str] = None
+
+
+class SecurityGuardrailSettingsUpdateRequest(BaseModel):
+    dlp_regex_patterns: Optional[List[str]] = None
+    ml_injection_detection_by_model: Optional[Dict[str, bool]] = None
 
 
 def _get_guardrails_list_response(
@@ -1742,6 +1754,131 @@ def _get_fields_from_model(model_class: Type[BaseModel]) -> Dict[str, Any]:
     """
 
     return _extract_fields_recursive(model_class, depth=0)
+
+
+@router.get(
+    "/guardrails/security/settings",
+    tags=["Guardrails"],
+    dependencies=[Depends(user_api_key_auth)],
+    response_model=SecurityGuardrailSettingsResponse,
+)
+async def get_security_guardrail_settings(
+    user_api_key_dict: UserAPIKeyAuth = Depends(user_api_key_auth),
+):
+    """
+    Get centralized security guardrail settings used by the dashboard:
+    - dlp_regex_patterns: list of custom regex patterns for DLP
+    - ml_injection_detection_by_model: model->enabled map for injection detection
+    """
+    from litellm.proxy.proxy_server import prisma_client
+
+    if user_api_key_dict.user_role != LitellmUserRoles.PROXY_ADMIN:
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required to view security settings",
+        )
+
+    if prisma_client is None:
+        raise HTTPException(status_code=500, detail="Prisma client not initialized")
+
+    row = await prisma_client.db.litellm_config.find_first(
+        where={"param_name": "security_guardrails_settings"}
+    )
+
+    if row is None or row.param_value is None:
+        return SecurityGuardrailSettingsResponse()
+
+    value = row.param_value
+    settings = dict(value) if isinstance(value, dict) else json.loads(str(value))
+    return SecurityGuardrailSettingsResponse(
+        dlp_regex_patterns=settings.get("dlp_regex_patterns", []),
+        ml_injection_detection_by_model=settings.get(
+            "ml_injection_detection_by_model", {}
+        ),
+        updated_at=settings.get("updated_at"),
+    )
+
+
+@router.patch(
+    "/guardrails/security/settings",
+    tags=["Guardrails"],
+    dependencies=[Depends(user_api_key_auth)],
+    response_model=SecurityGuardrailSettingsResponse,
+)
+async def update_security_guardrail_settings(
+    data: SecurityGuardrailSettingsUpdateRequest,
+    user_api_key_dict: UserAPIKeyAuth = Depends(user_api_key_auth),
+):
+    """
+    Update centralized security guardrail settings in DB.
+    This provides real-time persistence for the dashboard controls.
+    """
+    from litellm.proxy.proxy_server import prisma_client
+
+    if user_api_key_dict.user_role != LitellmUserRoles.PROXY_ADMIN:
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required to update security settings",
+        )
+
+    if prisma_client is None:
+        raise HTTPException(status_code=500, detail="Prisma client not initialized")
+
+    existing_row = await prisma_client.db.litellm_config.find_first(
+        where={"param_name": "security_guardrails_settings"}
+    )
+    current_settings: Dict[str, Any] = {}
+    if existing_row is not None and existing_row.param_value is not None:
+        raw = existing_row.param_value
+        current_settings = (
+            dict(raw) if isinstance(raw, dict) else json.loads(str(raw))
+        )
+
+    if data.dlp_regex_patterns is not None:
+        cleaned_patterns = [p.strip() for p in data.dlp_regex_patterns if p.strip()]
+        for pattern in cleaned_patterns:
+            try:
+                re.compile(pattern)
+            except re.error as e:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid regex pattern '{pattern}': {str(e)}",
+                )
+        current_settings["dlp_regex_patterns"] = cleaned_patterns
+
+    if data.ml_injection_detection_by_model is not None:
+        for model_name, enabled in data.ml_injection_detection_by_model.items():
+            if not isinstance(enabled, bool):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid toggle value for model '{model_name}'. Expected boolean.",
+                )
+        current_settings["ml_injection_detection_by_model"] = (
+            data.ml_injection_detection_by_model
+        )
+
+    current_settings["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+    await prisma_client.db.litellm_config.upsert(
+        where={"param_name": "security_guardrails_settings"},
+        data={
+            "create": {
+                "param_name": "security_guardrails_settings",
+                "param_value": safe_dumps(current_settings),
+            },
+            "update": {
+                "param_value": safe_dumps(current_settings),
+            },
+        },
+    )
+
+    return SecurityGuardrailSettingsResponse(
+        dlp_regex_patterns=current_settings.get("dlp_regex_patterns", []),
+        ml_injection_detection_by_model=current_settings.get(
+            "ml_injection_detection_by_model", {}
+        ),
+        updated_at=current_settings.get("updated_at"),
+    )
 
 
 @router.get(
