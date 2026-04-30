@@ -145,7 +145,7 @@ const createRedisStubs = (sandbox: SinonSandbox): RedisMemoryState => {
 
   sandbox.stub(redisClient, "expire").callsFake(async () => 1);
 
-  sandbox.stub(redisClient, "incrby").callsFake(async (key: unknown, increment: number) => {
+  sandbox.stub(redisClient, "incrby").callsFake(async (key: unknown, increment: string | number) => {
     const normalizedKey = String(key);
     const current = Number.parseInt(state.kv.get(normalizedKey) ?? "0", 10);
     const next = current + Number(increment);

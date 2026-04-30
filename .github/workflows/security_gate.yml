@@ -1,0 +1,60 @@
+name: Security Gate
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  security-gate:
+    name: Lint, Test, Scan, and Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Linting (TypeScript strict compile check)
+        run: npx tsc -p tsconfig.json --noEmit
+
+      - name: Unit Tests
+        run: npm test
+
+      - name: Security Gate - Required tests must exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f src/tests/injectionDetector.test.ts
+          test -f src/tests/auth.test.ts
+
+      - name: Security Gate - injectionDetector.test.ts
+        run: npx tsx --test src/tests/injectionDetector.test.ts
+
+      - name: Security Gate - auth.test.ts
+        run: npx tsx --test src/tests/auth.test.ts
+
+      - name: Secret Scanning (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Dependency Audit (npm audit high+)
+        run: npm audit --audit-level=high
