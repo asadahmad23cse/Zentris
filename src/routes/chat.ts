@@ -282,7 +282,7 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
         "X-Risk-Level": guardOutcome.riskLevel
       });
 
-      let accumulated = "";
+      let accumulatedRaw = "";
       let streamClosed = false;
 
       const sendSse = (payload: Record<string, unknown>): void => {
@@ -311,7 +311,7 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
         guardOutcome.llmMessages,
         {},
         (chunk) => {
-          const inspection = streamingGuard.inspect(chunk, accumulated);
+          const inspection = streamingGuard.inspect(chunk, accumulatedRaw);
           if (inspection.terminate) {
             sendSse({
               error: "stream_terminated",
@@ -322,8 +322,10 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
             return;
           }
 
-          accumulated += chunk;
-          sendSse({ chunk });
+          accumulatedRaw += chunk;
+          if (inspection.redactedChunk.length > 0) {
+            sendSse({ chunk: inspection.redactedChunk });
+          }
         },
         () => {
           sendSse({ done: true });

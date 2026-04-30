@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { afterEach, before, beforeEach, describe, test } from "node:test";
 import sinon, { type SinonSandbox } from "sinon";
+import { scanAndRedactSensitiveData } from "../guards/dlpGuard";
 import { type UserRole } from "../types";
 
 const FALLBACK_RESPONSE = "The assistant is temporarily unavailable. Please retry in a moment.";
@@ -14,6 +15,7 @@ interface RedisMemoryState {
 let buildServer: typeof import("../server").buildServer;
 let redisClient: typeof import("../services/redisClient").redisClient;
 let LiteLLMClient: typeof import("../llm/litellmClient").LiteLLMClient;
+let StreamingClient: typeof import("../llm/streamingClient").StreamingClient;
 let jwtSecret: string;
 
 const toBase64Url = (value: string): string =>
@@ -186,6 +188,7 @@ describe("Zentris integration", () => {
     ({ buildServer } = await import("../server"));
     ({ redisClient } = await import("../services/redisClient"));
     ({ LiteLLMClient } = await import("../llm/litellmClient"));
+    ({ StreamingClient } = await import("../llm/streamingClient"));
   });
 
   beforeEach(async () => {
@@ -479,5 +482,133 @@ describe("Zentris integration", () => {
     assert.equal(modelPayload.includes("<TRUST_LEVEL>untrusted</TRUST_LEVEL>"), true);
     assert.equal(modelPayload.includes("<CHUNK_ID>rag-1</CHUNK_ID>"), true);
     assert.equal(modelPayload.includes(safeChunk), true);
+  });
+
+  test("Test 12: secrets inside code blocks are redacted", async () => {
+    sandbox
+      .stub(LiteLLMClient.prototype, "chat")
+      .callsFake(async (messages) => messages[messages.length - 1]?.content ?? "");
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        sessionId: "sess-code-secret-1",
+        message: "```env\nOPENAI_API_KEY=sk-1234567890ABCDEFGHIJKLMNOPQRST\n```"
+      },
+      headers: authHeader("user-code-secret", "admin")
+    });
+
+    assert.equal(response.statusCode, 200);
+    const body = response.json();
+    assert.match(body.response, /\[REDACTED:[A-Z_]+\]/);
+    assert.equal(body.response.includes("sk-1234567890ABCDEFGHIJKLMNOPQRST"), false);
+  });
+
+  test("Test 13: private key and database URL are redacted", async () => {
+    sandbox
+      .stub(LiteLLMClient.prototype, "chat")
+      .callsFake(async (messages) => messages[messages.length - 1]?.content ?? "");
+
+    const privateKey = [
+      "-----BEGIN PRIVATE KEY-----",
+      "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC7example",
+      "-----END PRIVATE KEY-----"
+    ].join("\n");
+    const dbUrl = "postgres://user:superSecretPass@db.internal:5432/prod";
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        sessionId: "sess-dlp-patterns-1",
+        message: `${privateKey}\n${dbUrl}`
+      },
+      headers: authHeader("user-dlp-patterns", "operator")
+    });
+
+    assert.equal(response.statusCode, 200);
+    const body = response.json();
+    assert.match(body.response, /\[REDACTED:PRIVATE_KEY\]/);
+    assert.match(body.response, /\[REDACTED:DATABASE_URL\]/);
+    assert.equal(body.response.includes(dbUrl), false);
+  });
+
+  test("Test 14: entropy-based unknown secret detection redacts high-entropy tokens", async () => {
+    const entropySecret = "xk9Q/2mL+7pR_v1T=8nHs4Zy0aWd6CfB";
+    const scanResult = scanAndRedactSensitiveData(`id=${entropySecret}`);
+
+    assert.equal(scanResult.detectedTypes.includes("HIGH_ENTROPY_SECRET"), true);
+    assert.equal(scanResult.redacted.includes(entropySecret), false);
+    assert.match(scanResult.redacted, /\[REDACTED:HIGH_ENTROPY_SECRET\]/);
+  });
+
+  test("Test 15: audit logs persist only sanitized data", async () => {
+    sandbox
+      .stub(LiteLLMClient.prototype, "chat")
+      .callsFake(async (messages) => messages[messages.length - 1]?.content ?? "");
+
+    const rawSecret = "Bearer 1234567890abcdefghijklmnop";
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        sessionId: "sess-audit-dlp-1",
+        message: `token is ${rawSecret}`
+      },
+      headers: authHeader("user-audit-dlp", "operator")
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const auditEntries = redisState.lists.get("audit:sess-audit-dlp-1") ?? [];
+    assert.equal(auditEntries.length > 0, true);
+
+    const parsed = JSON.parse(auditEntries[0] ?? "{}") as { input?: string; normalizedInput?: string };
+    assert.equal((parsed.input ?? "").includes(rawSecret), false);
+    assert.equal((parsed.normalizedInput ?? "").includes(rawSecret), false);
+    assert.match(parsed.input ?? "", /\[REDACTED:BEARER_TOKEN\]/);
+  });
+
+  test("Test 16: streaming chunks are redacted before emit", async () => {
+    sandbox.stub(StreamingClient.prototype, "streamChat").callsFake(async (_messages, _options, onChunk, onEnd) => {
+      onChunk("output sk-1234567890ABCDEFGHIJKLMNOPQRST");
+      onEnd();
+    });
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat/stream",
+      payload: {
+        sessionId: "sess-stream-redact-1",
+        message: "stream"
+      },
+      headers: authHeader("user-stream-redact", "operator")
+    });
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.payload.includes("sk-1234567890ABCDEFGHIJKLMNOPQRST"), false);
+    assert.equal(response.payload.includes("[REDACTED:OPENAI_KEY]"), true);
+  });
+
+  test("Test 17: cross-chunk secret pattern terminates stream", async () => {
+    sandbox.stub(StreamingClient.prototype, "streamChat").callsFake(async (_messages, _options, onChunk, onEnd) => {
+      onChunk("sk-1234567890");
+      onChunk("ABCDEFGHIJKLMNOPQRST");
+      onEnd();
+    });
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat/stream",
+      payload: {
+        sessionId: "sess-stream-cross-chunk-1",
+        message: "stream"
+      },
+      headers: authHeader("user-stream-cross", "operator")
+    });
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.payload.includes("stream_terminated"), true);
+    assert.equal(response.payload.includes("cross_chunk_sensitive_pattern"), true);
   });
 });

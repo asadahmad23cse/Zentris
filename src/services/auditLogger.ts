@@ -1,6 +1,7 @@
 import { type AuditLogEntry } from "../types";
 import { redisClient } from "./redisClient";
 import { logger } from "../utils/logger";
+import { sanitizeForLogging } from "../guards/dlpGuard";
 
 const AUDIT_TTL_SECONDS = 60 * 60 * 24;
 const AUDIT_MAX_ENTRIES = 1000;
@@ -15,18 +16,22 @@ export class AuditLogger {
       ...entry,
       timestamp: Date.now()
     };
+    const sanitizedEntry = sanitizeForLogging(withTimestamp);
 
-    logger.info({ auditEntry: withTimestamp }, "audit_entry_recorded");
+    logger.info({ auditEntry: sanitizedEntry }, "audit_entry_recorded");
 
     try {
-      const key = auditKey(withTimestamp.sessionId);
+      const key = auditKey(sanitizedEntry.sessionId);
       const pipeline = redisClient.multi();
-      pipeline.lpush(key, JSON.stringify(withTimestamp));
+      pipeline.lpush(key, JSON.stringify(sanitizedEntry));
       pipeline.ltrim(key, 0, AUDIT_MAX_ENTRIES - 1);
       pipeline.expire(key, AUDIT_TTL_SECONDS);
       await pipeline.exec();
     } catch (error) {
-      logger.error({ err: error, sessionId: withTimestamp.sessionId }, "audit_entry_persist_failed");
+      logger.error(
+        sanitizeForLogging({ err: error, sessionId: sanitizedEntry.sessionId }),
+        "audit_entry_persist_failed"
+      );
     }
   }
 
