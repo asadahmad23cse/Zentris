@@ -1,4 +1,6 @@
 import { type GuardResult } from "../types";
+import { logger } from "../utils/logger";
+import { classifyPromptInjectionThreat } from "./localThreatClassifier";
 
 interface DetectionRule {
   id: string;
@@ -90,115 +92,127 @@ export class InjectionDetector {
       ruleIds.length > 0 ? `Triggered rules: ${ruleIds.join(", ")}` : "Triggered rules: none"
     );
     reasonParts.push(`Semantic: ${semantic.label} (${semantic.confidence.toFixed(2)})`);
+    if (semantic.matchedSignals.length > 0) {
+      reasonParts.push(`Semantic signals: ${semantic.matchedSignals.join(", ")}`);
+    }
 
     if (highMatches > 0) {
-      return {
+      const decision: GuardResult = {
         safe: false,
         risk: "high",
         action: "block",
         reason: reasonParts.join(" | ")
       };
+      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
+      return decision;
     }
 
     if (mediumMatches >= 2) {
-      return {
+      const decision: GuardResult = {
         safe: false,
         risk: "high",
         action: "block",
         reason: reasonParts.join(" | ")
       };
+      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
+      return decision;
     }
 
     if (mediumMatches === 1 && semantic.label === "malicious") {
-      return {
+      const decision: GuardResult = {
         safe: false,
         risk: "high",
         action: "block",
         reason: reasonParts.join(" | ")
       };
+      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
+      return decision;
     }
 
     if (mediumMatches === 1 && semantic.label === "suspicious") {
-      return {
+      const decision: GuardResult = {
         safe: false,
         risk: "medium",
         action: "sanitize",
         reason: reasonParts.join(" | ")
       };
+      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
+      return decision;
     }
 
     if (lowMatches > 0 && semantic.label === "safe") {
-      return {
+      const decision: GuardResult = {
         safe: true,
         risk: "low",
         action: "allow",
         reason: reasonParts.join(" | ")
       };
+      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
+      return decision;
     }
 
     if (semantic.label === "malicious") {
-      return {
+      const decision: GuardResult = {
         safe: false,
         risk: "high",
         action: "block",
         reason: reasonParts.join(" | ")
       };
+      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
+      return decision;
     }
 
     if (semantic.label === "suspicious" || mediumMatches === 1) {
-      return {
+      const decision: GuardResult = {
         safe: false,
         risk: "medium",
         action: "sanitize",
         reason: reasonParts.join(" | ")
       };
+      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
+      return decision;
     }
 
-    return {
+    const decision: GuardResult = {
       safe: true,
       risk: "low",
       action: "allow",
       reason: reasonParts.join(" | ")
     };
+    this.logTelemetry(semantic.label, semantic.confidence, decision.action);
+    return decision;
   }
 
   public async semanticClassify(
     text: string
-  ): Promise<{ label: "safe" | "suspicious" | "malicious"; confidence: number }> {
-    // TODO: Replace with local distilbert classifier or LiteLLM call to guard model
+  ): Promise<{ label: "safe" | "suspicious" | "malicious"; confidence: number; matchedSignals: string[] }> {
     const normalized = text.trim().toLowerCase();
 
     if (normalized.length < 20) {
-      return { label: "safe", confidence: 0.75 };
+      return { label: "safe", confidence: 0.75, matchedSignals: [] };
     }
 
-    let safeSignals = 0;
-    let suspiciousSignals = 0;
-
-    if (QUESTION_WORD_PATTERN.test(normalized) && !IMPERATIVE_VERB_PATTERN.test(normalized)) {
-      safeSignals += 1;
+    const mlClassification = classifyPromptInjectionThreat(normalized);
+    if (mlClassification.label === "safe" && IMPERATIVE_VERB_PATTERN.test(normalized) && !QUESTION_WORD_PATTERN.test(normalized)) {
+      return {
+        label: "suspicious",
+        confidence: 0.7,
+        matchedSignals: mlClassification.matchedSignals
+      };
     }
 
-    if (IMPERATIVE_VERB_PATTERN.test(normalized)) {
-      suspiciousSignals += 1;
-    }
+    return mlClassification;
+  }
 
-    if (/\b(?:system\s+prompt|role\s+override|jailbreak|unrestricted|bypass\s+policy)\b/im.test(normalized)) {
-      suspiciousSignals += 1;
-    }
-
-    if (/\b(?:new\s+session|forget\s+everything|ignore\s+all)\b/im.test(normalized)) {
-      suspiciousSignals += 1;
-    }
-
-    if (normalized.length < 120 && suspiciousSignals >= 2) {
-      return { label: "malicious", confidence: 0.75 };
-    }
-
-    if (suspiciousSignals > safeSignals) {
-      return { label: "suspicious", confidence: 0.75 };
-    }
-
-    return { label: "safe", confidence: 0.75 };
+  private logTelemetry(label: "safe" | "suspicious" | "malicious", confidence: number, actionTaken: GuardResult["action"]): void {
+    logger.info(
+      {
+        classifier: "prompt_injection_ml_gate",
+        intent: label,
+        confidenceScore: Number(confidence.toFixed(2)),
+        actionTaken
+      },
+      "classification_event"
+    );
   }
 }

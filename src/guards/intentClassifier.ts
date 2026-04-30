@@ -1,4 +1,6 @@
 import { type ChatMessage, type IntentClassificationResult, type IntentType } from "../types";
+import { logger } from "../utils/logger";
+import { classifyIntentThreat } from "./localThreatClassifier";
 
 const INTENT_KEYWORDS: Record<IntentType, ReadonlyArray<string>> = {
   read: [
@@ -141,9 +143,9 @@ const detectEscalatingHistory = (history: ChatMessage[]): boolean => {
 
 export class IntentClassifier {
   public classify(normalizedInput: string, history: ChatMessage[]): IntentClassificationResult {
-    // TODO: Replace keyword scoring with a local ML classifier once model infra is available.
     const text = normalizedInput.toLowerCase();
     const scores = classifyIntentByKeywords(text);
+    const threatClassification = classifyIntentThreat(text);
     const ranked = (["read", "write", "delete", "execute"] as const)
       .map((intent) => ({ intent, score: scores[intent] }))
       .sort((a, b) => b.score - a.score);
@@ -158,6 +160,11 @@ export class IntentClassifier {
     if (top && top.score > 0 && (!second || top.score > second.score)) {
       intent = top.intent;
       confidence = Math.min(0.99, top.score / Math.max(1, totalScore));
+    }
+
+    if (threatClassification.category === "system_prompt_probing" || threatClassification.category === "jailbreak_attempt") {
+      intent = "unknown";
+      confidence = Math.max(confidence, threatClassification.confidence);
     }
 
     let riskScore = INTENT_BASE_RISK[intent];
@@ -175,10 +182,37 @@ export class IntentClassifier {
       riskScore += 20;
     }
 
+    if (threatClassification.category === "system_prompt_probing") {
+      riskScore = Math.max(riskScore, 85);
+    }
+
+    if (threatClassification.category === "jailbreak_attempt") {
+      riskScore = Math.max(riskScore, 95);
+    }
+
+    const finalRiskScore = Math.min(100, riskScore);
+    const actionTaken = finalRiskScore >= 90 ? "block" : finalRiskScore >= 60 ? "sanitize" : "allow";
+    const telemetryConfidence =
+      threatClassification.category === "none"
+        ? confidence
+        : Math.max(confidence, threatClassification.confidence);
+
+    logger.info(
+      {
+        classifier: "intent_ml_gate",
+        intent:
+          threatClassification.category !== "none" ? threatClassification.category : intent,
+        confidenceScore: Number(telemetryConfidence.toFixed(2)),
+        actionTaken,
+        riskScore: finalRiskScore
+      },
+      "classification_event"
+    );
+
     return {
       intent,
       confidence: Number(confidence.toFixed(2)),
-      riskScore: Math.min(100, riskScore)
+      riskScore: finalRiskScore
     };
   }
 }
