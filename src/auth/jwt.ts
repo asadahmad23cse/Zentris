@@ -4,6 +4,8 @@ import { type AuthenticatedIdentity, type UserRole } from "../types";
 interface JwtPayload {
   sub?: unknown;
   role?: unknown;
+  tenantId?: unknown;
+  orgId?: unknown;
   exp?: unknown;
   nbf?: unknown;
 }
@@ -32,6 +34,17 @@ const parseRole = (role: unknown): UserRole | null => {
     return role;
   }
   return null;
+};
+
+const parseScopeId = (value: unknown): string | null => {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const normalized = value.trim();
+  if (normalized.length < 1 || normalized.length > 128) {
+    return null;
+  }
+  return normalized;
 };
 
 export const verifyAccessToken = (token: string, secret: string): AuthenticatedIdentity => {
@@ -80,6 +93,9 @@ export const verifyAccessToken = (token: string, secret: string): AuthenticatedI
     throw new Error("token_role_invalid");
   }
 
+  const tenantId = parseScopeId(payload.tenantId);
+  const orgId = parseScopeId(payload.orgId);
+
   const nowEpochSeconds = Math.floor(Date.now() / 1000);
   const exp = asFiniteNumber(payload.exp);
   const nbf = asFiniteNumber(payload.nbf);
@@ -92,5 +108,5 @@ export const verifyAccessToken = (token: string, secret: string): AuthenticatedI
     throw new Error("token_not_active");
   }
 
-  return { userId, userRole };
+  return { userId, userRole, tenantId, orgId };
 };

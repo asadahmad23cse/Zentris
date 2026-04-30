@@ -26,16 +26,26 @@ const toBase64Url = (value: string): string =>
     .replace(/\//g, "_")
     .replace(/=+$/g, "");
 
-const signJwt = (subject: string, role: UserRole): string => {
+const signJwt = (subject: string, role: UserRole, tenantId: string | null = "tenant_a"): string => {
   const now = Math.floor(Date.now() / 1000);
   const headerSegment = toBase64Url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const payloadSegment = toBase64Url(
-    JSON.stringify({
-      sub: subject,
-      role,
-      iat: now,
-      exp: now + 3600
-    })
+    JSON.stringify(
+      tenantId
+        ? {
+            sub: subject,
+            role,
+            tenantId,
+            iat: now,
+            exp: now + 3600
+          }
+        : {
+            sub: subject,
+            role,
+            iat: now,
+            exp: now + 3600
+          }
+    )
   );
 
   const signature = createHmac("sha256", jwtSecret)
@@ -48,8 +58,8 @@ const signJwt = (subject: string, role: UserRole): string => {
   return `${headerSegment}.${payloadSegment}.${signature}`;
 };
 
-const authHeader = (subject: string, role: UserRole): Record<string, string> => ({
-  authorization: `Bearer ${signJwt(subject, role)}`
+const authHeader = (subject: string, role: UserRole, tenantId: string | null = "tenant_a"): Record<string, string> => ({
+  authorization: `Bearer ${signJwt(subject, role, tenantId)}`
 });
 
 const resolveRange = (length: number, start: number, end: number): { start: number; end: number } => {
@@ -691,6 +701,64 @@ describe("Zentris integration", () => {
     assert.equal(response.statusCode, 400);
     const body = response.json();
     assert.match(body.reason, /unauthorized: risk_exceeds_role_limit|tool_policy_violation:tool_role_forbidden/);
+    assert.equal(llmStub.callCount, 0);
+  });
+
+  test("Test 19b: tool tenant scope mismatch is blocked as privilege escalation", async () => {
+    const llmStub = sandbox.stub(LiteLLMClient.prototype, "chat").resolves("should not execute");
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        sessionId: "sess-tool-tenant-mismatch-1",
+        message: "search tenant data",
+        toolInvocation: {
+          toolName: "knowledge.search",
+          arguments: {
+            query: "find customer data",
+            topK: 5
+          },
+          resourceScope: {
+            tenantId: "tenant_b"
+          }
+        }
+      },
+      headers: authHeader("user-tool-admin", "admin", "tenant_a")
+    });
+
+    assert.equal(response.statusCode, 400);
+    const body = response.json();
+    assert.equal(body.reason, "tool_scope_privilege_escalation_attempt");
+    assert.equal(llmStub.callCount, 0);
+  });
+
+  test("Test 19c: tool call without identity tenant claim is blocked", async () => {
+    const llmStub = sandbox.stub(LiteLLMClient.prototype, "chat").resolves("should not execute");
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        sessionId: "sess-tool-tenant-missing-1",
+        message: "search tenant data",
+        toolInvocation: {
+          toolName: "knowledge.search",
+          arguments: {
+            query: "find customer data",
+            topK: 5
+          },
+          resourceScope: {
+            tenantId: "tenant_a"
+          }
+        }
+      },
+      headers: authHeader("user-tool-admin", "admin", null)
+    });
+
+    assert.equal(response.statusCode, 400);
+    const body = response.json();
+    assert.equal(body.reason, "tool_scope_ownership_unverifiable");
     assert.equal(llmStub.callCount, 0);
   });
 

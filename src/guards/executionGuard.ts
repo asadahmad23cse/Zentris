@@ -7,6 +7,7 @@ import {
 } from "../types";
 import { ToolConfirmationTokenService } from "../services/toolConfirmationTokenService";
 import { ToolRegistry } from "../services/toolRegistry";
+import { logger } from "../utils/logger";
 
 interface DecisionInputs {
   injectionResult: GuardResult;
@@ -78,6 +79,58 @@ export class ExecutionGuard {
             risk: validation.risk === "low" ? "medium" : validation.risk,
             action: "block",
             reason: `tool_policy_violation:${validation.reason}`
+          };
+        }
+
+        const scopeTenantId =
+          typeof context.request.toolInvocation.resourceScope.tenantId === "string"
+            ? context.request.toolInvocation.resourceScope.tenantId.trim()
+            : "";
+        const identityTenantId = context.request.identity.tenantId ?? context.request.identity.orgId;
+
+        if (!identityTenantId || scopeTenantId.length === 0) {
+          logger.warn(
+            {
+              securityEvent: "Privilege Escalation Attempt",
+              reason: "ownership_verification_failed",
+              userId: context.request.identity.userId,
+              userRole: context.request.identity.userRole,
+              identityTenantId: identityTenantId ?? null,
+              scopeTenantId: scopeTenantId || null,
+              sessionId: context.request.sessionId,
+              toolName: context.request.toolInvocation.toolName,
+              resourceScope: context.request.toolInvocation.resourceScope
+            },
+            "tool_scope_ownership_verification_failed"
+          );
+          return {
+            safe: false,
+            risk: "high",
+            action: "block",
+            reason: "tool_scope_ownership_unverifiable"
+          };
+        }
+
+        if (scopeTenantId !== identityTenantId) {
+          logger.warn(
+            {
+              securityEvent: "Privilege Escalation Attempt",
+              reason: "tenant_scope_mismatch",
+              userId: context.request.identity.userId,
+              userRole: context.request.identity.userRole,
+              identityTenantId,
+              scopeTenantId,
+              sessionId: context.request.sessionId,
+              toolName: context.request.toolInvocation.toolName,
+              resourceScope: context.request.toolInvocation.resourceScope
+            },
+            "tool_scope_privilege_escalation_attempt"
+          );
+          return {
+            safe: false,
+            risk: "high",
+            action: "block",
+            reason: "tool_scope_privilege_escalation_attempt"
           };
         }
 

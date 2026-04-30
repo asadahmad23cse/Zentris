@@ -11,6 +11,8 @@ export interface ChatMessage {
 export interface AuthenticatedIdentity {
   userId: string;
   userRole: UserRole;
+  tenantId: string | null;
+  orgId: string | null;
 }
 
 export interface ToolInvocation {
