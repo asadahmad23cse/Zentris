@@ -1,6 +1,6 @@
 import { config } from "../config";
 import { ContextGuard } from "../guards/contextGuard";
-import { ExecutionGuard } from "../guards/executionGuard";
+import { ExecutionGuard, type ExecutionGuardResult } from "../guards/executionGuard";
 import { InjectionDetector } from "../guards/injectionDetector";
 import { InputNormalizer } from "../guards/inputNormalizer";
 import { IntentClassifier } from "../guards/intentClassifier";
@@ -63,6 +63,7 @@ export interface PipelineGuardOutcome {
   decisions: GuardResult[];
   intentResult: IntentClassificationResult;
   llmMessages: ChatMessage[];
+  confirmationToken?: string;
 }
 
 export interface PipelineRunResult {
@@ -71,6 +72,7 @@ export interface PipelineRunResult {
   guardResult: GuardResult;
   response?: string;
   error?: string;
+  confirmationToken?: string;
 }
 
 export class ZentrisPipeline {
@@ -118,7 +120,7 @@ export class ZentrisPipeline {
       decisions = [injectionResult, contextResult];
     }
 
-    const finalDecision = this.executionGuard.decide({
+    const finalDecision: ExecutionGuardResult = this.executionGuard.decide({
       ...baseContext,
       guardResults: decisions,
       injectionResult,
@@ -145,7 +147,8 @@ export class ZentrisPipeline {
       piiDetected,
       decisions: allDecisions,
       intentResult,
-      llmMessages
+      llmMessages,
+      confirmationToken: finalDecision.confirmationToken
     };
   }
 
@@ -171,7 +174,8 @@ export class ZentrisPipeline {
           action: "require_confirmation",
           riskLevel: guardOutcome.riskLevel,
           guardResult: guardOutcome.guardResult,
-          error: "High risk action requires confirmation"
+          error: "High risk action requires confirmation",
+          confirmationToken: guardOutcome.confirmationToken
         };
       }
 

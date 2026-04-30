@@ -6,7 +6,7 @@ import { wrapUntrustedData } from "../guards/ragWrapper";
 import { StreamingClient } from "../llm/streamingClient";
 import { ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
-import { type AuthenticatedIdentity, type ChatMessage, type ZentrisRequest } from "../types";
+import { type AuthenticatedIdentity, type ChatMessage, type ToolInvocation, type ZentrisRequest } from "../types";
 
 interface ClientMessage {
   role: "system" | "user" | "assistant";
@@ -20,6 +20,7 @@ interface ChatRouteBody {
   history?: ClientMessage[];
   ragContext?: string;
   ragChunks?: RagChunkInput[];
+  toolInvocation?: ToolInvocation;
 }
 
 const SESSION_ID_REGEX = /^[A-Za-z0-9-]{1,64}$/;
@@ -43,6 +44,17 @@ const bodySchema = {
           content: { type: "string", minLength: 1, maxLength: 8000 },
           source: { type: "string", maxLength: 128 }
         }
+      }
+    },
+    toolInvocation: {
+      type: "object",
+      additionalProperties: false,
+      required: ["toolName", "arguments", "resourceScope"],
+      properties: {
+        toolName: { type: "string", minLength: 1, maxLength: 128 },
+        arguments: { type: "object", additionalProperties: true },
+        resourceScope: { type: "object", additionalProperties: true },
+        confirmationToken: { type: "string", minLength: 1, maxLength: 4096 }
       }
     },
     history: {
@@ -118,7 +130,8 @@ const toZentrisRequest = async (
     sessionId: body.sessionId,
     identity,
     rawInput: body.message,
-    messages: boundedHistory
+    messages: boundedHistory,
+    toolInvocation: body.toolInvocation
   };
 };
 
@@ -196,7 +209,8 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
           .header("X-Risk-Level", pipelineResult.riskLevel)
           .send({
             requiresConfirmation: true,
-            message: "High risk action requires confirmation"
+            message: "High risk action requires confirmation",
+            confirmationToken: pipelineResult.confirmationToken ?? null
           });
       }
 
@@ -267,7 +281,8 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
           .header("X-Risk-Level", guardOutcome.riskLevel)
           .send({
             requiresConfirmation: true,
-            message: "High risk action requires confirmation"
+            message: "High risk action requires confirmation",
+            confirmationToken: guardOutcome.confirmationToken ?? null
           });
       }
 

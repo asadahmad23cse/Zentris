@@ -13,11 +13,19 @@ export interface AuthenticatedIdentity {
   userRole: UserRole;
 }
 
+export interface ToolInvocation {
+  toolName: string;
+  arguments: Record<string, unknown>;
+  resourceScope: Record<string, unknown>;
+  confirmationToken?: string;
+}
+
 export interface ZentrisRequest {
   sessionId: string;
   identity: AuthenticatedIdentity;
   rawInput: string;
   messages: ChatMessage[];
+  toolInvocation?: ToolInvocation;
 }
 
 export interface GuardResult {

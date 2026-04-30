@@ -1,0 +1,82 @@
+{
+  "version": "1.0",
+  "defaultAction": "deny",
+  "tools": [
+    {
+      "name": "knowledge.search",
+      "risk": "low",
+      "allowedRoles": ["admin", "operator", "viewer", "anonymous"],
+      "arguments": {
+        "required": ["query"],
+        "properties": {
+          "query": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "topK": { "type": "number", "min": 1, "max": 50 }
+        }
+      },
+      "resourceScope": {
+        "required": ["tenantId"],
+        "properties": {
+          "tenantId": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{3,64}$" }
+        }
+      }
+    },
+    {
+      "name": "ticket.update",
+      "risk": "medium",
+      "allowedRoles": ["admin", "operator"],
+      "arguments": {
+        "required": ["ticketId", "status"],
+        "properties": {
+          "ticketId": { "type": "string", "pattern": "^TKT-[0-9]{3,12}$" },
+          "status": { "type": "string", "enum": ["open", "in_progress", "resolved", "closed"] },
+          "comment": { "type": "string", "maxLength": 1024 }
+        }
+      },
+      "resourceScope": {
+        "required": ["tenantId", "projectId"],
+        "properties": {
+          "tenantId": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{3,64}$" },
+          "projectId": { "type": "string", "pattern": "^[A-Z0-9_-]{2,32}$" }
+        }
+      }
+    },
+    {
+      "name": "deployment.execute",
+      "risk": "high",
+      "allowedRoles": ["admin"],
+      "arguments": {
+        "required": ["service", "environment", "version"],
+        "properties": {
+          "service": { "type": "string", "pattern": "^[a-z0-9-]{2,40}$" },
+          "environment": { "type": "string", "enum": ["staging", "production"] },
+          "version": { "type": "string", "pattern": "^[a-zA-Z0-9._-]{1,64}$" }
+        }
+      },
+      "resourceScope": {
+        "required": ["tenantId", "clusterId"],
+        "properties": {
+          "tenantId": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{3,64}$" },
+          "clusterId": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{2,64}$" }
+        }
+      }
+    },
+    {
+      "name": "billing.refund",
+      "risk": "high",
+      "allowedRoles": ["admin"],
+      "arguments": {
+        "required": ["invoiceId", "amountUsd"],
+        "properties": {
+          "invoiceId": { "type": "string", "pattern": "^INV-[0-9]{4,16}$" },
+          "amountUsd": { "type": "number", "min": 0.01, "max": 100000 }
+        }
+      },
+      "resourceScope": {
+        "required": ["tenantId"],
+        "properties": {
+          "tenantId": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{3,64}$" }
+        }
+      }
+    }
+  ]
+}

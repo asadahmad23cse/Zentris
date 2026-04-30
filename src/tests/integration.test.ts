@@ -611,4 +611,161 @@ describe("Zentris integration", () => {
     assert.equal(response.payload.includes("stream_terminated"), true);
     assert.equal(response.payload.includes("cross_chunk_sensitive_pattern"), true);
   });
+
+  test("Test 18: unknown tool is blocked by allowlist", async () => {
+    const llmStub = sandbox.stub(LiteLLMClient.prototype, "chat").resolves("should not execute");
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        sessionId: "sess-tool-unknown-1",
+        message: "run unknown tool",
+        toolInvocation: {
+          toolName: "tool.unknown",
+          arguments: { value: "x" },
+          resourceScope: { tenantId: "tenant_a" }
+        }
+      },
+      headers: authHeader("user-tool-admin", "admin")
+    });
+
+    assert.equal(response.statusCode, 400);
+    const body = response.json();
+    assert.match(body.reason, /tool_policy_violation:unknown_tool_name/);
+    assert.equal(llmStub.callCount, 0);
+  });
+
+  test("Test 19: role-based tool access is enforced", async () => {
+    const llmStub = sandbox.stub(LiteLLMClient.prototype, "chat").resolves("should not execute");
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        sessionId: "sess-tool-rbac-1",
+        message: "execute deployment",
+        toolInvocation: {
+          toolName: "deployment.execute",
+          arguments: {
+            service: "api-core",
+            environment: "production",
+            version: "v1.2.3"
+          },
+          resourceScope: {
+            tenantId: "tenant_a",
+            clusterId: "cluster_1"
+          }
+        }
+      },
+      headers: authHeader("user-tool-operator", "operator")
+    });
+
+    assert.equal(response.statusCode, 400);
+    const body = response.json();
+    assert.match(body.reason, /unauthorized: risk_exceeds_role_limit|tool_policy_violation:tool_role_forbidden/);
+    assert.equal(llmStub.callCount, 0);
+  });
+
+  test("Test 20: high-risk tool requires signed confirmation token", async () => {
+    const llmStub = sandbox.stub(LiteLLMClient.prototype, "chat").resolves("deployment accepted");
+
+    const payload = {
+      sessionId: "sess-tool-confirm-1",
+      message: "deploy now",
+      toolInvocation: {
+        toolName: "deployment.execute",
+        arguments: {
+          service: "api-core",
+          environment: "production",
+          version: "v1.2.3"
+        },
+        resourceScope: {
+          tenantId: "tenant_a",
+          clusterId: "cluster_1"
+        }
+      }
+    };
+
+    const confirmation = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload,
+      headers: authHeader("user-tool-admin", "admin")
+    });
+
+    assert.equal(confirmation.statusCode, 202);
+    const challengeBody = confirmation.json();
+    assert.equal(challengeBody.requiresConfirmation, true);
+    assert.equal(typeof challengeBody.confirmationToken, "string");
+    assert.equal(challengeBody.confirmationToken.length > 32, true);
+    assert.equal(llmStub.callCount, 0);
+
+    const approved = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        ...payload,
+        toolInvocation: {
+          ...payload.toolInvocation,
+          confirmationToken: challengeBody.confirmationToken
+        }
+      },
+      headers: authHeader("user-tool-admin", "admin")
+    });
+
+    assert.equal(approved.statusCode, 200);
+    const approvedBody = approved.json();
+    assert.equal(approvedBody.response, "deployment accepted");
+    assert.equal(llmStub.callCount, 1);
+  });
+
+  test("Test 21: tampered confirmation token is blocked", async () => {
+    const llmStub = sandbox.stub(LiteLLMClient.prototype, "chat").resolves("should not execute");
+
+    const payload = {
+      sessionId: "sess-tool-confirm-tamper-1",
+      message: "deploy now",
+      toolInvocation: {
+        toolName: "deployment.execute",
+        arguments: {
+          service: "api-core",
+          environment: "staging",
+          version: "v1.2.3"
+        },
+        resourceScope: {
+          tenantId: "tenant_a",
+          clusterId: "cluster_1"
+        }
+      }
+    };
+
+    const confirmation = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload,
+      headers: authHeader("user-tool-admin", "admin")
+    });
+    assert.equal(confirmation.statusCode, 202);
+    const token = confirmation.json().confirmationToken as string;
+    const tamperedToken = `${token}x`;
+
+    const blocked = await app.inject({
+      method: "POST",
+      url: "/v1/chat",
+      payload: {
+        ...payload,
+        toolInvocation: {
+          ...payload.toolInvocation,
+          confirmationToken: tamperedToken
+        }
+      },
+      headers: authHeader("user-tool-admin", "admin")
+    });
+
+    assert.equal(blocked.statusCode, 400);
+    const blockedBody = blocked.json();
+    assert.match(blockedBody.reason, /tool_confirmation_rejected/);
+    assert.equal(llmStub.callCount, 0);
+  });
 });

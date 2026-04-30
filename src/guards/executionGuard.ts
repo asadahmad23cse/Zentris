@@ -5,6 +5,8 @@ import {
   type IntentClassificationResult,
   type PipelineContext
 } from "../types";
+import { ToolConfirmationTokenService } from "../services/toolConfirmationTokenService";
+import { ToolRegistry } from "../services/toolRegistry";
 
 interface DecisionInputs {
   injectionResult: GuardResult;
@@ -12,6 +14,10 @@ interface DecisionInputs {
   intentResult: IntentClassificationResult;
   authResult: AuthorizationResult;
   piiDetected: string[];
+}
+
+export interface ExecutionGuardResult extends GuardResult {
+  confirmationToken?: string;
 }
 
 const assertDecisionInputs = (context: PipelineContext): DecisionInputs => {
@@ -29,7 +35,10 @@ const assertDecisionInputs = (context: PipelineContext): DecisionInputs => {
 };
 
 export class ExecutionGuard {
-  public decide(context: PipelineContext): GuardResult {
+  private readonly toolRegistry = new ToolRegistry();
+  private readonly confirmationService = new ToolConfirmationTokenService();
+
+  public decide(context: PipelineContext): ExecutionGuardResult {
     try {
       const { injectionResult, contextResult, intentResult, authResult, piiDetected } =
         assertDecisionInputs(context);
@@ -61,6 +70,50 @@ export class ExecutionGuard {
         };
       }
 
+      if (context.request.toolInvocation) {
+        const validation = this.toolRegistry.validate(context.request.toolInvocation, context.request.identity.userRole);
+        if (!validation.allowed) {
+          return {
+            safe: false,
+            risk: validation.risk === "low" ? "medium" : validation.risk,
+            action: "block",
+            reason: `tool_policy_violation:${validation.reason}`
+          };
+        }
+
+        if (validation.risk === "high") {
+          const confirmationToken = context.request.toolInvocation.confirmationToken;
+          if (!confirmationToken) {
+            return {
+              safe: false,
+              risk: "high",
+              action: "require_confirmation",
+              reason: "high_risk_tool_confirmation_required",
+              confirmationToken: this.confirmationService.issue({
+                userId: context.request.identity.userId,
+                userRole: context.request.identity.userRole,
+                toolInvocation: context.request.toolInvocation
+              })
+            };
+          }
+
+          const verification = this.confirmationService.verify(confirmationToken, {
+            userId: context.request.identity.userId,
+            userRole: context.request.identity.userRole,
+            toolInvocation: context.request.toolInvocation
+          });
+
+          if (!verification.valid) {
+            return {
+              safe: false,
+              risk: "high",
+              action: "block",
+              reason: `tool_confirmation_rejected:${verification.reason}`
+            };
+          }
+        }
+      }
+
       if (injectionResult.risk === "medium" || contextResult.riskScore >= 40) {
         return {
           safe: false,
@@ -70,7 +123,7 @@ export class ExecutionGuard {
         };
       }
 
-      if (intentResult.intent === "execute" && intentResult.riskScore >= 50) {
+      if (!context.request.toolInvocation && intentResult.intent === "execute" && intentResult.riskScore >= 50) {
         return {
           safe: false,
           risk: "medium",
