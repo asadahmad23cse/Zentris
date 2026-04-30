@@ -49,7 +49,7 @@ services:
       NEXT_PUBLIC_USE_REWRITES: "false"
       NODE_ENV: "production"
     ports:
-      - "3001:3000"
+      - "3000:3000"
     restart: unless-stopped
 
   db:
