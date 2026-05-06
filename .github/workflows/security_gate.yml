@@ -38,6 +38,9 @@ jobs:
       - name: Unit Tests
         run: npm test
 
+      - name: Prompt Injection Hook Tests
+        run: python -m unittest tests.test_prompt_injection_detection
+
       - name: Security Gate - Required tests must exist
         shell: bash
         run: |
