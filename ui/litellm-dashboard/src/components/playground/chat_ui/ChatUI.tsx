@@ -403,7 +403,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
         if (!uniqueModels.length) {
           setSelectedModel(undefined);
         } else if (!hasSelection) {
-          setSelectedModel(undefined);
+          setSelectedModel(uniqueModels[0].model_group);
         }
       } catch (error) {
         console.error("Error fetching model info:", error);
