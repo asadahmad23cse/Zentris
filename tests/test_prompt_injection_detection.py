@@ -48,6 +48,16 @@ class PromptInjectionDetectionTests(unittest.TestCase):
         parsed = json.loads(completed.stdout)
         self.assertEqual(parsed["action"], "block")
 
+    def test_red_team_corpus_expectations(self) -> None:
+        corpus_path = ROOT / "tests" / "prompt_injection_corpus.json"
+        cases = json.loads(corpus_path.read_text(encoding="utf-8"))
+
+        for case in cases:
+            with self.subTest(case=case["id"]):
+                result = detect_prompt_injection(case["prompt"])
+                self.assertEqual(result.action, case["expected_action"])
+                self.assertEqual(result.risk, case["expected_risk"])
+
 
 if __name__ == "__main__":
     unittest.main()
