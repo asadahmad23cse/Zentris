@@ -104,6 +104,8 @@ const routeFor = (slug: string): string => {
       return "logs";
     case "guardrails":
       return "guardrails";
+    case "zentris-security":
+      return "zentris-security";
     case "policies":
       return "policies";
     case "chat":
@@ -209,6 +211,13 @@ const menuItems: MenuItemCfg[] = [
     key: "11",
     page: "guardrails",
     label: "Guardrails",
+    icon: <SafetyOutlined style={{ fontSize: 18 }} />,
+    roles: all_admin_roles,
+  },
+  {
+    key: "30",
+    page: "zentris-security",
+    label: "Zentris Security",
     icon: <SafetyOutlined style={{ fontSize: 18 }} />,
     roles: all_admin_roles,
   },

@@ -15,6 +15,7 @@ import GeneralSettings from "@/components/general_settings";
 import GuardrailsMonitorView from "@/components/GuardrailsMonitor/GuardrailsMonitorView";
 import GuardrailsPanel from "@/components/guardrails";
 import PoliciesPanel from "@/components/policies";
+import ZentrisSecurityDashboard from "@/components/ZentrisSecurityDashboard";
 import { Team } from "@/components/key_team_helpers/key_list";
 import { MCPServers } from "@/components/mcp_tools";
 import ModelHubTable from "@/components/AIHub/ModelHubTable";
@@ -563,6 +564,8 @@ function CreateKeyPageContent() {
                     <BudgetPanel accessToken={accessToken} />
                   ) : page == "guardrails" ? (
                     <GuardrailsPanel accessToken={accessToken} userRole={userRole} />
+                  ) : page == "zentris-security" ? (
+                    <ZentrisSecurityDashboard />
                   ) : page == "policies" ? (
                     <PoliciesPanel accessToken={accessToken} userRole={userRole} />
                   ) : page == "agents" ? (

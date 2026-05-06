@@ -140,6 +140,13 @@ const menuGroups: MenuGroup[] = [
         roles: all_admin_roles,
       },
       {
+        key: "zentris-security",
+        page: "zentris-security",
+        label: "Zentris Security",
+        icon: <SafetyOutlined />,
+        roles: all_admin_roles,
+      },
+      {
         key: "policies",
         page: "policies",
         label: (

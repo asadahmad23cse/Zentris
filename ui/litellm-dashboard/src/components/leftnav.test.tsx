@@ -72,6 +72,7 @@ describe("Sidebar (leftnav)", () => {
       "Agents",
       "MCP Servers",
       "Guardrails",
+      "Zentris Security",
       "Policies",
       "Tools",
       "Usage",
