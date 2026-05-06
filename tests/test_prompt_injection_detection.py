@@ -50,7 +50,7 @@ class PromptInjectionDetectionTests(unittest.TestCase):
 
     def test_red_team_corpus_expectations(self) -> None:
         corpus_path = ROOT / "tests" / "prompt_injection_corpus.json"
-        cases = json.loads(corpus_path.read_text(encoding="utf-8"))
+        cases = json.loads(corpus_path.read_text(encoding="utf-8-sig"))
 
         for case in cases:
             with self.subTest(case=case["id"]):
