@@ -1,6 +1,5 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react";
 import type { FormInstance } from "antd";
-import { Form } from "antd";
 import type { UploadProps } from "antd/es/upload";
 import React from "react";
 import type { Team } from "../key_team_helpers/key_list";
@@ -8,7 +7,6 @@ import { type CredentialItem } from "../networking";
 import { Providers } from "../provider_info_helpers";
 import AddAutoRouterTab from "./add_auto_router_tab";
 import AddModelForm from "./AddModelForm";
-import { handleAddAutoRouterSubmit } from "./handle_add_auto_router_submit";
 
 interface AddModelTabProps {
   form: FormInstance; // For the Add Model tab
@@ -43,20 +41,6 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
   accessToken,
   userRole,
 }) => {
-  // Create separate form instance for auto router
-  const [autoRouterForm] = Form.useForm();
-
-  const handleAutoRouterOk = () => {
-    autoRouterForm
-      .validateFields()
-      .then((values) => {
-        handleAddAutoRouterSubmit(values, accessToken, autoRouterForm, handleOk);
-      })
-      .catch((error) => {
-        console.error("Validation failed:", error);
-      });
-  };
-
   return (
     <>
       <TabGroup className="w-full">
@@ -83,8 +67,7 @@ const AddModelTab: React.FC<AddModelTabProps> = ({
           </TabPanel>
           <TabPanel>
             <AddAutoRouterTab
-              form={autoRouterForm}
-              handleOk={handleAutoRouterOk}
+              handleOk={handleOk}
               accessToken={accessToken}
               userRole={userRole}
             />

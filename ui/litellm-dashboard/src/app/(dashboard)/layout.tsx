@@ -32,6 +32,31 @@ function withBase(path: string): string {
  */
 const MIGRATED_PAGES: Record<string, string> = {
   "api-reference": "api-reference",
+  "api-keys": "virtual-keys",
+  "llm-playground": "test-key",
+  models: "models-and-endpoints",
+  "mcp-servers": "tools/mcp-servers",
+  guardrails: "guardrails",
+  "zentris-security": "zentris-security",
+  policies: "policies",
+  "new_usage": "usage",
+  logs: "logs",
+  teams: "teams",
+  users: "users",
+  organizations: "organizations",
+  "model-hub-table": "model-hub",
+  "vector-stores": "tools/vector-stores",
+  caching: "experimental/caching",
+  prompts: "experimental/prompts",
+  budgets: "experimental/budgets",
+  "transform-request": "experimental/api-playground",
+  "tag-management": "experimental/tag-management",
+  "claude-code-plugins": "experimental/claude-code-plugins",
+  usage: "experimental/old-usage",
+  "router-settings": "settings/router-settings",
+  "logging-and-alerts": "settings/logging-and-alerts",
+  "admin-panel": "settings/admin-settings",
+  "ui-theme": "settings/ui-theme",
 };
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
@@ -65,7 +90,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider accessToken={""}>
-      <div className="flex flex-col min-h-screen">
+      <div className="zentris-dashboard-shell flex flex-col min-h-screen">
         <Navbar
           isPublicPage={false}
           sidebarCollapsed={sidebarCollapsed}
@@ -81,15 +106,17 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           toggleDarkMode={() => { }}
         />
         <DebugWarningBanner />
-        <div className="flex flex-1 overflow-auto">
-          <div className="mt-2">
+        <div className="flex flex-1 overflow-hidden">
+          <div className="flex-shrink-0">
             <SidebarProvider
               setPage={handleSetPage}
               defaultSelectedKey={page}
               sidebarCollapsed={sidebarCollapsed}
             />
           </div>
-          <main className="flex-1">{children}</main>
+          <main className="zentris-main-surface flex-1 overflow-auto">
+            <div className="zentris-page-frame">{children}</div>
+          </main>
         </div>
       </div>
     </ThemeProvider>
