@@ -40,6 +40,22 @@
 
 ## Use Zentris for
 
+## Zentris AI Security Runtime
+
+Zentris now includes a project-owned AI security runtime under `zentris_security/` for free local and enterprise-style AI gateway deployments. It adds direct and indirect prompt injection detection, RAG poisoning checks, agent tool-call enforcement, MCP exposure checks, unsafe output scoring, policy decisions, JSONL audit replay, OWASP LLM Top 10 mapping, MITRE ATLAS mapping, and a red-team simulator.
+
+Run the local security regression suite:
+
+```shell
+python -m pytest tests/test_zentris_security_pipeline.py tests/test_zentris_security_detectors.py tests/test_zentris_security_audit_simulator.py tests/test_prompt_injection_detection.py
+```
+
+Run the red-team simulator:
+
+```shell
+python -m zentris_security.cli simulate zentris_security/data/red_team_attacks.json
+```
+
 <details open>
 <summary><b>LLMs</b> - Call 100+ LLMs (Python SDK + AI Gateway)</summary>
 
