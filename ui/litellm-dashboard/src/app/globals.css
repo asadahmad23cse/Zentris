@@ -170,6 +170,18 @@ body {
   box-shadow: none !important;
 }
 
+@media (max-width: 768px) {
+  .zentris-kpi {
+    border-left: 0;
+    border-top: 1px solid var(--zentris-line);
+    padding-top: 0.75rem;
+  }
+
+  .zentris-page-frame {
+    max-width: 100%;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
