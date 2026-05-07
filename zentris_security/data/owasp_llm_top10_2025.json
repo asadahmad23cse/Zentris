@@ -1,0 +1,52 @@
+[
+  {
+    "id": "LLM01:2025",
+    "name": "Prompt Injection",
+    "zentris_controls": ["ZPI-001", "ZII-001", "streaming-inspection", "policy-gated-tool-use"]
+  },
+  {
+    "id": "LLM02:2025",
+    "name": "Sensitive Information Disclosure",
+    "zentris_controls": ["ZOR-001", "ZTR-001", "audit-redaction"]
+  },
+  {
+    "id": "LLM03:2025",
+    "name": "Supply Chain",
+    "zentris_controls": ["ZMC-001", "trusted-server-policy", "model-provenance-checks"]
+  },
+  {
+    "id": "LLM04:2025",
+    "name": "Data and Model Poisoning",
+    "zentris_controls": ["ZRP-001", "retrieval-source-scoring", "semantic-drift-checks"]
+  },
+  {
+    "id": "LLM05:2025",
+    "name": "Improper Output Handling",
+    "zentris_controls": ["ZOR-001", "structured-output-validation"]
+  },
+  {
+    "id": "LLM06:2025",
+    "name": "Excessive Agency",
+    "zentris_controls": ["ZTR-001", "ZMC-001", "approval-gates"]
+  },
+  {
+    "id": "LLM07:2025",
+    "name": "System Prompt Leakage",
+    "zentris_controls": ["ZOR-001", "ZPI-001"]
+  },
+  {
+    "id": "LLM08:2025",
+    "name": "Vector and Embedding Weaknesses",
+    "zentris_controls": ["ZRP-001", "retrieval-trust-scoring"]
+  },
+  {
+    "id": "LLM09:2025",
+    "name": "Misinformation",
+    "zentris_controls": ["multi-model-consensus", "claim-risk-scoring"]
+  },
+  {
+    "id": "LLM10:2025",
+    "name": "Unbounded Consumption",
+    "zentris_controls": ["latency-budget", "token-budget-policy"]
+  }
+]
