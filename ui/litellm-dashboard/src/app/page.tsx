@@ -108,8 +108,8 @@ function CreateKeyPageContent() {
   const [authLoading, setAuthLoading] = useState(true);
   const [userID, setUserID] = useState<string | null>(null);
 
-  // Survey state - always show by default
-  const [showSurveyPrompt, setShowSurveyPrompt] = useState(true);
+  // Zentris removes upstream feedback nudges from the branded dashboard.
+  const [showSurveyPrompt, setShowSurveyPrompt] = useState(false);
   const [showSurveyModal, setShowSurveyModal] = useState(false);
 
   // Claude Code feedback state
@@ -656,29 +656,6 @@ function CreateKeyPageContent() {
                   )}
                 </div>
 
-                {/* Survey Components */}
-                <SurveyPrompt
-                  isVisible={showSurveyPrompt}
-                  onOpen={handleOpenSurvey}
-                  onDismiss={handleDismissSurveyPrompt}
-                />
-                <SurveyModal
-                  isOpen={showSurveyModal}
-                  onClose={handleSurveyModalClose}
-                  onComplete={handleSurveyComplete}
-                />
-
-                {/* Claude Code Components */}
-                <ClaudeCodePrompt
-                  isVisible={showClaudeCodePrompt}
-                  onOpen={handleOpenClaudeCode}
-                  onDismiss={handleDismissClaudeCodePrompt}
-                />
-                <ClaudeCodeModal
-                  isOpen={showClaudeCodeModal}
-                  onClose={handleClaudeCodeModalClose}
-                  onComplete={handleClaudeCodeComplete}
-                />
               </div>
             )}
           </ThemeProvider>

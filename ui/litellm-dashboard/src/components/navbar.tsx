@@ -9,7 +9,6 @@ import { MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined } from 
 import { Button, Switch, Tag } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { CommunityEngagementButtons } from "./Navbar/CommunityEngagementButtons/CommunityEngagementButtons";
 import UserDropdown from "./Navbar/UserDropdown/UserDropdown";
 import WorkerDropdown from "./Navbar/WorkerDropdown/WorkerDropdown";
 
@@ -44,13 +43,13 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const baseUrl = getProxyBaseUrl();
   const [logoutUrl, setLogoutUrl] = useState("");
-  const { logoUrl } = useTheme();
+  useTheme();
   const { data: healthData } = useHealthReadiness();
   const version = healthData?.Zentris_version;
   const disableBouncingIcon = useDisableBouncingIcon();
 
   // Simple logo URL: use custom logo if available, otherwise default
-  const imageUrl = logoUrl || "/assets/logos/zentris_logo.svg";
+  const imageUrl = "/assets/logos/zentris_logo.svg";
 
   useEffect(() => {
     const initializeProxySettings = async () => {
@@ -141,7 +140,6 @@ const Navbar: React.FC<NavbarProps> = ({
           {/* Right side nav items */}
           <div className="flex items-center space-x-5 ml-auto">
             <WorkerDropdown onWorkerSwitch={handleWorkerSwitch} />
-            <CommunityEngagementButtons />
             {/* Dark mode is currently a work in progress. To test, you can change 'false' to 'true' below.
             Do not set this to true by default until all components are confirmed to support dark mode styles. */}
             {false && (
