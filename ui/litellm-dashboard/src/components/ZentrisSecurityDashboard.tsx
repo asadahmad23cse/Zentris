@@ -37,10 +37,24 @@ const milestones: SecurityMilestone[] = [
   },
   {
     key: "runtime",
-    capability: "Runtime Visibility",
-    status: "Visible in UI",
-    artifact: "ui/Zentris-dashboard/src/components/ZentrisSecurityDashboard.tsx",
-    coverage: "Dashboard status page added for implementation-plan progress",
+    capability: "Multi-Stage Security Runtime",
+    status: "Implemented",
+    artifact: "zentris_security/pipeline.py",
+    coverage: "Input, retrieval, tool-call, MCP, and output inspection with latency-aware policy decisions",
+  },
+  {
+    key: "rag",
+    capability: "Indirect Injection + RAG Poisoning",
+    status: "Implemented",
+    artifact: "zentris_security/detectors/",
+    coverage: "External content instruction detection, source trust scoring, hidden prompt markers, poisoned retrieval signals",
+  },
+  {
+    key: "soc",
+    capability: "Audit Replay + Red-Team Simulator",
+    status: "Implemented",
+    artifact: "zentris_security/audit.py",
+    coverage: "JSONL audit events, replay, OWASP/MITRE mapped red-team simulation, CLI verification",
   },
 ];
 
@@ -77,57 +91,58 @@ export default function ZentrisSecurityDashboard() {
         <Space direction="vertical" size={24} className="w-full">
           <div>
             <Title level={2} className="!mb-2">
-              Zentris AI Security Implementation
+              Zentris AI Security Runtime
             </Title>
             <Paragraph className="!mb-0 max-w-4xl text-slate-600">
-              Visible status for the security architecture transformation work currently implemented from the plan.
+              Project-owned AI runtime security layer for prompt injection, RAG, tool calls, MCP, output risk, audit replay,
+              and red-team verification.
             </Paragraph>
           </div>
 
           <Row gutter={[16, 16]}>
             <Col xs={24} md={8}>
               <Card>
-                <Text type="secondary">Prompt injection hook</Text>
+                <Text type="secondary">Runtime detectors</Text>
                 <Title level={3} className="!mb-2 !mt-2">
-                  Active
+                  6
                 </Title>
-                <Tag color="green">Implemented</Tag>
+                <Tag color="green">Zentris owned</Tag>
               </Card>
             </Col>
             <Col xs={24} md={8}>
               <Card>
-                <Text type="secondary">Implementation commits pushed</Text>
+                <Text type="secondary">Red-team simulator</Text>
                 <Title level={3} className="!mb-2 !mt-2">
-                  30
+                  9/9
                 </Title>
-                <Tag color="blue">GitHub main</Tag>
+                <Tag color="blue">Passing</Tag>
               </Card>
             </Col>
             <Col xs={24} md={8}>
               <Card>
-                <Text type="secondary">Local verification</Text>
+                <Text type="secondary">Local model backend</Text>
                 <Title level={3} className="!mb-2 !mt-2">
-                  Passing
+                  Ollama
                 </Title>
-                <Tag color="green">Python + TypeScript</Tag>
+                <Tag color="green">Free stack</Tag>
               </Card>
             </Col>
           </Row>
 
-          <Card title="Phase 1 Progress">
+          <Card title="Security Platform Coverage">
             <Row gutter={[24, 24]} align="middle">
               <Col xs={24} md={8}>
-                <Progress type="dashboard" percent={35} strokeColor="#1677ff" />
+                <Progress type="dashboard" percent={68} strokeColor="#1677ff" />
               </Col>
               <Col xs={24} md={16}>
                 <Space direction="vertical" size={12}>
                   <Text strong>Completed in this slice</Text>
-                  <Text>Dependency-free Python prompt injection hook with scoring and structured output.</Text>
-                  <Text>Red-team benchmark corpus committed as separate auditable cases.</Text>
-                  <Text>CI security gate now runs the hook test suite.</Text>
+                  <Text>Dependency-free Zentris runtime package with policy decisions and structured findings.</Text>
+                  <Text>Direct, indirect, RAG, tool-call, MCP, and output-risk detector families.</Text>
+                  <Text>OWASP LLM Top 10 and MITRE ATLAS mapped red-team simulation with audit replay.</Text>
                   <Text type="secondary">
-                    Remaining Phase 1 work: deeper runtime integration, semantic model service, and dashboard telemetry
-                    backed by live audit data.
+                    Remaining production hardening: inline LiteLLM middleware enforcement, streaming token inspection,
+                    persistent SOC telemetry, and multi-model consensus.
                   </Text>
                 </Space>
               </Col>
@@ -141,21 +156,21 @@ export default function ZentrisSecurityDashboard() {
           <Card title="Running Local Services">
             <Row gutter={[16, 16]}>
               <Col xs={24} md={8}>
-                <Text type="secondary">Dashboard</Text>
+                <Text type="secondary">Zentris Admin UI</Text>
                 <Paragraph copyable className="!mt-2">
-                  http://127.0.0.1:3001
+                  http://localhost:4000/ui/
                 </Paragraph>
               </Col>
               <Col xs={24} md={8}>
-                <Text type="secondary">Zentris API</Text>
+                <Text type="secondary">Zentris Local Model</Text>
                 <Paragraph copyable className="!mt-2">
-                  http://127.0.0.1:3000
+                  zentris-local-qwen
                 </Paragraph>
               </Col>
               <Col xs={24} md={8}>
-                <Text type="secondary">Zentris Admin Proxy</Text>
+                <Text type="secondary">Zentris Proxy</Text>
                 <Paragraph copyable className="!mt-2">
-                  http://127.0.0.1:4000
+                  http://localhost:4000
                 </Paragraph>
               </Col>
             </Row>
