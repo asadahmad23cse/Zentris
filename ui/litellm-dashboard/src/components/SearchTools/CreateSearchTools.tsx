@@ -277,7 +277,7 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
 
           <div className="flex justify-between items-center pt-6 border-t border-gray-100">
             <Tooltip title="Get help on our github">
-              <Typography.Link href="https://github.com/BerriAI/Zentris/issues" target="_blank">
+              <Typography.Link href="https://github.com/asadahmad23cse/Zentris/issues" target="_blank">
                 Need Help?
               </Typography.Link>
             </Tooltip>
@@ -333,6 +333,7 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
 };
 
 export default CreateSearchTool;
+
 
 
 

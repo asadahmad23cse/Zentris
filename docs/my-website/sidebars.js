@@ -266,7 +266,7 @@ const sidebars = {
             {
               type: "link",
               label: "All Supported Endpoints →",
-              href: "https://docs.litellm.ai/docs/supported_endpoints",
+              href: "https://github.com/asadahmad23cse/Zentris/docs/supported_endpoints",
             },
           ],
         },
@@ -528,7 +528,7 @@ const sidebars = {
         {
           type: "link",
           label: "Load Balancing, Routing, Fallbacks",
-          href: "https://docs.litellm.ai/docs/routing-load-balancing",
+          href: "https://github.com/asadahmad23cse/Zentris/docs/routing-load-balancing",
         },
         "traffic_mirroring",
         {
@@ -1469,3 +1469,4 @@ const learnSidebar = {
 };
 
 module.exports = { ...sidebars, ...learnSidebar };
+ { ...sidebars, ...learnSidebar };

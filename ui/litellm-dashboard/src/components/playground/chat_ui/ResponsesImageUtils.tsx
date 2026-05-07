@@ -66,3 +66,4 @@ export const shouldShowAttachedImage = (message: MessageType): boolean => {
 };
 
 
+

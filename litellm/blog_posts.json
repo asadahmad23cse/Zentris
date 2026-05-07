@@ -4,7 +4,7 @@
       "title": "Realtime WebRTC HTTP Endpoints",
       "description": "Use the LiteLLM proxy to route OpenAI-style WebRTC realtime via HTTP: client_secrets and SDP exchange.",
       "date": "2026-03-12",
-      "url": "https://docs.litellm.ai/blog/realtime_webrtc_http_endpoints"
+      "url": "https://github.com/asadahmad23cse/Zentris/blog/realtime_webrtc_http_endpoints"
     }
   ]
 }

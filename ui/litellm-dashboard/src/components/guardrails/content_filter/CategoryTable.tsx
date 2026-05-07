@@ -147,3 +147,4 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
 export default CategoryTable;
 
 
+

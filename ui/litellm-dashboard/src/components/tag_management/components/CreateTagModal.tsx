@@ -107,7 +107,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ visible, onCancel, onSu
               <p className="text-sm text-gray-600">
                 TPM/RPM limits for tags are not currently supported. If you need this feature, please{" "}
                 <a
-                  href="https://github.com/BerriAI/Zentris/issues/new"
+                  href="https://github.com/asadahmad23cse/Zentris/issues/new"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:text-blue-800 underline"
@@ -129,5 +129,6 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ visible, onCancel, onSu
 };
 
 export default CreateTagModal;
+
 
 

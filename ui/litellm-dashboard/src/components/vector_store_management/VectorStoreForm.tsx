@@ -163,8 +163,8 @@ const VectorStoreForm: React.FC<VectorStoreFormProps> = ({
                 <ol style={{ marginLeft: "16px", marginTop: "8px" }}>
                   <li>
                     Deploy the Zentris-pgvector server from:{" "}
-                    <a href="https://github.com/BerriAI/Zentris-pgvector" target="_blank" rel="noopener noreferrer">
-                      https://github.com/BerriAI/Zentris-pgvector
+                    <a href="https://github.com/asadahmad23cse/Zentris-pgvector" target="_blank" rel="noopener noreferrer">
+                      https://github.com/asadahmad23cse/Zentris-pgvector
                     </a>
                   </li>
                   <li>Configure your PostgreSQL database with pgvector extension</li>
@@ -365,5 +365,6 @@ const VectorStoreForm: React.FC<VectorStoreFormProps> = ({
 };
 
 export default VectorStoreForm;
+
 
 

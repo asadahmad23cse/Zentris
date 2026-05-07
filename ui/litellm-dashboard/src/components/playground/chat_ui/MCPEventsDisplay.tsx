@@ -232,3 +232,4 @@ const MCPEventsDisplay: React.FC<MCPEventsDisplayProps> = ({ events, className }
 export default MCPEventsDisplay;
 
 
+

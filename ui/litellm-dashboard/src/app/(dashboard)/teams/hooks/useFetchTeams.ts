@@ -30,3 +30,4 @@ const useFetchTeams = ({ currentOrg, setTeams }: useFetchTeamsProps) => {
 export default useFetchTeams;
 
 
+

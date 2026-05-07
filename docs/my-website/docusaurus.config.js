@@ -49,7 +49,7 @@ const config = {
   favicon: '/img/favicon.ico', 
 
   // Set the production url of your site here
-  url: 'https://docs.litellm.ai/',
+  url: 'https://github.com/asadahmad23cse/Zentris/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
@@ -312,7 +312,7 @@ const config = {
             items: [
               {
                 label: 'Getting Started',
-                to: 'https://docs.litellm.ai/docs/',
+                to: 'https://github.com/asadahmad23cse/Zentris/docs/',
               },
             ],
           },

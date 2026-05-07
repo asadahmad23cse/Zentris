@@ -75,3 +75,4 @@ export const shouldShowChatAttachedImage = (message: MessageType): boolean => {
 };
 
 
+

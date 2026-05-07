@@ -127,7 +127,7 @@ export default function EditCredentialsModal({
         {/* Modal Footer */}
         <div className="flex justify-between items-center">
           <Tooltip title="Get help on our github">
-            <Link href="https://github.com/BerriAI/Zentris/issues">Need Help?</Link>
+            <Link href="https://github.com/asadahmad23cse/Zentris/issues">Need Help?</Link>
           </Tooltip>
 
           <div>
@@ -147,5 +147,6 @@ export default function EditCredentialsModal({
     </Modal>
   );
 }
+
 
 

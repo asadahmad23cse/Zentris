@@ -1342,3 +1342,4 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
 export default TeamInfoView;
 
 
+

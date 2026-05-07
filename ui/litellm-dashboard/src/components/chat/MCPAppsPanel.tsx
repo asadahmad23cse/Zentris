@@ -579,3 +579,4 @@ const MCPAppsPanel: React.FC<Props> = ({ accessToken, selectedServers, onChange 
 export default MCPAppsPanel;
 
 
+

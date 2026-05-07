@@ -729,7 +729,7 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
               </div>
               <Button
                 size="xs"
-                onClick={() => window.open('https://github.com/BerriAI/Zentris-guardrails', '_blank')}
+                onClick={() => window.open('https://github.com/asadahmad23cse/Zentris-guardrails', '_blank')}
                 icon={ExportOutlined}
                 className="bg-blue-600 hover:bg-blue-700 text-white border-0"
               >
@@ -830,5 +830,6 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
 };
 
 export default CustomCodeModal;
+
 
 

@@ -242,3 +242,4 @@ const MCPToolPermissions: React.FC<MCPToolPermissionsProps> = ({
 export default MCPToolPermissions;
 
 
+

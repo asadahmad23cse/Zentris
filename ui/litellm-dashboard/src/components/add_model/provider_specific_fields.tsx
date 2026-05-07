@@ -282,7 +282,7 @@ const ProviderSpecificFields: React.FC<ProviderSpecificFieldsProps> = ({ selecte
                 <Text className="mb-2">
                   The actual model your azure deployment uses. Used for accurate cost tracking. Select name from{" "}
                   <Link
-                    href="https://github.com/BerriAI/Zentris/blob/main/model_prices_and_context_window.json"
+                    href="https://github.com/asadahmad23cse/Zentris/blob/main/model_prices_and_context_window.json"
                     target="_blank"
                   >
                     here
@@ -298,5 +298,6 @@ const ProviderSpecificFields: React.FC<ProviderSpecificFieldsProps> = ({ selecte
 };
 
 export default ProviderSpecificFields;
+
 
 

@@ -148,3 +148,4 @@ const MemberPermissions: React.FC<MemberPermissionsProps> = ({ teamId, accessTok
 export default MemberPermissions;
 
 
+

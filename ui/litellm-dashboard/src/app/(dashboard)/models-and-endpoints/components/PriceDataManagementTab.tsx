@@ -35,3 +35,4 @@ const PriceDataManagementTab = () => {
 export default PriceDataManagementTab;
 
 
+

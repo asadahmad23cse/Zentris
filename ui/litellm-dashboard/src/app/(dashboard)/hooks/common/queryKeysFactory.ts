@@ -35,3 +35,4 @@ export function createQueryKeys<T extends string>(resource: T) {
 }
 
 
+

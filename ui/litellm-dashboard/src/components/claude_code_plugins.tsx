@@ -169,3 +169,4 @@ const ClaudeCodePluginsPanel: React.FC<ClaudeCodePluginsPanelProps> = ({
 export default ClaudeCodePluginsPanel;
 
 
+

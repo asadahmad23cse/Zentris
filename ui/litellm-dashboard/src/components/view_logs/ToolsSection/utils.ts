@@ -179,3 +179,4 @@ export function hasTools(log: LogEntry): boolean {
 }
 
 
+

@@ -17,3 +17,4 @@ const PoliciesPage = () => {
 export default PoliciesPage;
 
 
+
