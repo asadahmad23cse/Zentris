@@ -94,6 +94,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 onClick={onToggleSidebar}
                 className="flex items-center justify-center w-10 h-10 mr-3 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
                 <span className="text-lg">{sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</span>
               </button>
@@ -142,7 +143,11 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
           {/* Right side nav items */}
           <div className="flex items-center gap-3 ml-auto">
-            <div className="hidden lg:flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
+            <div
+              className="hidden lg:flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700"
+              role="status"
+              aria-label="Zentris services are live"
+            >
               <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.14)]" />
               Live
             </div>
