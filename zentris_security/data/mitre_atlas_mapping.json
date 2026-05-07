@@ -1,0 +1,44 @@
+[
+  {
+    "id": "AML.T0048",
+    "name": "External Harms",
+    "zentris_stage": "retrieval",
+    "controls": ["ZRP-001", "source-trust-scoring"]
+  },
+  {
+    "id": "AML.T0049",
+    "name": "Supply Chain Compromise",
+    "zentris_stage": "mcp",
+    "controls": ["ZMC-001", "trusted-server-policy"]
+  },
+  {
+    "id": "AML.T0051",
+    "name": "LLM Prompt Injection",
+    "zentris_stage": "input",
+    "controls": ["ZPI-001", "ZII-001"]
+  },
+  {
+    "id": "AML.T0052",
+    "name": "LLM Tool Manipulation",
+    "zentris_stage": "tool_call",
+    "controls": ["ZTR-001", "ZMC-001"]
+  },
+  {
+    "id": "AML.T0053",
+    "name": "Indirect Prompt Injection",
+    "zentris_stage": "retrieval",
+    "controls": ["ZII-001", "ZRP-001"]
+  },
+  {
+    "id": "AML.T0054",
+    "name": "Prompt Extraction",
+    "zentris_stage": "output",
+    "controls": ["ZOR-001", "ZPI-001"]
+  },
+  {
+    "id": "AML.T0057",
+    "name": "Data Exfiltration",
+    "zentris_stage": "tool_call",
+    "controls": ["ZTR-001", "ZOR-001"]
+  }
+]
