@@ -27,7 +27,7 @@ export function DataTable<TData, TValue>({
   renderChildRows,
   getRowCanExpand,
   isLoading = false,
-  loadingMessage = "🚅 Loading logs...",
+  loadingMessage = "Loading logs...",
   noDataMessage = "No logs found",
   enableSorting = false,
 }: DataTableProps<TData, TValue>) {
@@ -55,8 +55,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="rounded-lg custom-border overflow-x-auto w-full max-w-full box-border">
-      <Table className="[&_td]:py-0.5 [&_th]:py-1 table-fixed w-full box-border" style={{ minWidth: "400px" }}>
+    <div className="zentris-table-shell overflow-x-auto w-full max-w-full box-border">
+      <Table className="[&_td]:py-2 [&_th]:py-2 table-fixed w-full box-border" style={{ minWidth: "400px" }}>
         <TableHead>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -67,7 +67,7 @@ export function DataTable<TData, TValue>({
                 return (
                   <TableHeaderCell 
                     key={header.id} 
-                    className={`py-1 h-8 ${canSort ? 'cursor-pointer select-none hover:bg-gray-50' : ''}`}
+                    className={`h-10 px-4 text-xs uppercase tracking-normal ${canSort ? 'cursor-pointer select-none hover:bg-slate-100' : ''}`}
                     onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
                   >
                     {header.isPlaceholder ? null : (
@@ -89,9 +89,9 @@ export function DataTable<TData, TValue>({
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-8 text-center">
+              <TableCell colSpan={columns.length} className="h-24 text-center">
                 <div className="text-center text-gray-500">
-                  <p>{loadingMessage}</p>
+                  <p className="text-sm font-medium text-slate-500">{loadingMessage}</p>
                 </div>
               </TableCell>
             </TableRow>
@@ -99,11 +99,11 @@ export function DataTable<TData, TValue>({
             table.getRowModel().rows.map((row) => (
               <Fragment key={row.id}>
                 <TableRow
-                  className={`h-8 ${onRowClick ? "cursor-pointer hover:bg-gray-50" : ""}`}
+                  className={`h-11 ${onRowClick ? "cursor-pointer hover:bg-slate-50" : ""}`}
                   onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-0.5 max-h-8 overflow-hidden text-ellipsis whitespace-nowrap">
+                    <TableCell key={cell.id} className="px-4 py-2 max-h-10 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-700">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -126,9 +126,12 @@ export function DataTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-8 text-center">
-                <div className="text-center text-gray-500">
-                  <p>{noDataMessage}</p>
+              <TableCell colSpan={columns.length} className="h-52 text-center">
+                <div className="zentris-empty-state flex flex-col items-center justify-center text-center text-slate-500">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400">
+                    --
+                  </div>
+                  <p className="max-w-xl text-sm font-medium text-slate-600">{noDataMessage}</p>
                 </div>
               </TableCell>
             </TableRow>
