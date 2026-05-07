@@ -46,6 +46,31 @@ const { Sider } = Layout;
  */
 const MIGRATED_PAGES: Record<string, string> = {
   "api-reference": "api-reference",
+  "api-keys": "virtual-keys",
+  "llm-playground": "test-key",
+  models: "models-and-endpoints",
+  "mcp-servers": "tools/mcp-servers",
+  guardrails: "guardrails",
+  "zentris-security": "zentris-security",
+  policies: "policies",
+  "new_usage": "usage",
+  logs: "logs",
+  teams: "teams",
+  users: "users",
+  organizations: "organizations",
+  "model-hub-table": "model-hub",
+  "vector-stores": "tools/vector-stores",
+  caching: "experimental/caching",
+  prompts: "experimental/prompts",
+  budgets: "experimental/budgets",
+  "transform-request": "experimental/api-playground",
+  "tag-management": "experimental/tag-management",
+  "claude-code-plugins": "experimental/claude-code-plugins",
+  usage: "experimental/old-usage",
+  "router-settings": "settings/router-settings",
+  "logging-and-alerts": "settings/logging-and-alerts",
+  "admin-panel": "settings/admin-settings",
+  "ui-theme": "settings/ui-theme",
 };
 
 /** Build an absolute href for a migrated page, respecting base URL + serverRootPath. */
@@ -607,20 +632,44 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapse
     return "api-keys";
   };
 
-  const selectedMenuKey = findMenuItemKey(defaultSelectedKey);
+  const findMenuItemKeyFromPath = (): string | null => {
+    if (typeof window === "undefined") return null;
+    const path = window.location.pathname.replace(/^\/+|\/+$/g, "");
+    const normalizedPath = path.startsWith("ui/") ? path.slice(3) : path;
+
+    for (const group of menuGroups) {
+      for (const item of group.items) {
+        const route = MIGRATED_PAGES[item.page];
+        if (route && (normalizedPath === route || normalizedPath.startsWith(`${route}/`))) return item.key;
+        if (item.children) {
+          const child = item.children.find((childItem) => {
+            const childRoute = MIGRATED_PAGES[childItem.page];
+            return childRoute && (normalizedPath === childRoute || normalizedPath.startsWith(`${childRoute}/`));
+          });
+          if (child) return child.key;
+        }
+      }
+    }
+    return null;
+  };
+
+  const selectedMenuKey = findMenuItemKeyFromPath() ?? findMenuItemKey(defaultSelectedKey);
 
   return (
     <Layout>
       <Sider
         theme="light"
-        width={220}
+        width={240}
         collapsed={collapsed}
-        collapsedWidth={80}
+        collapsedWidth={72}
         collapsible
         trigger={null}
+        className="zentris-sidebar"
         style={{
           transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           position: "relative",
+          minHeight: "calc(100vh - 64px)",
+          overflow: "hidden",
         }}
       >
         <ConfigProvider
@@ -631,11 +680,15 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapse
                 fontSize: 13,
                 itemMarginInline: 4,
                 itemPaddingInline: 8,
-                itemHeight: 30,
-                itemBorderRadius: 6,
-                subMenuItemBorderRadius: 6,
+                itemHeight: 34,
+                itemBorderRadius: 8,
+                subMenuItemBorderRadius: 8,
                 groupTitleFontSize: 10,
                 groupTitleLineHeight: 1.5,
+                itemSelectedBg: "rgba(37, 99, 235, 0.10)",
+                itemSelectedColor: "#2563eb",
+                itemHoverBg: "rgba(37, 99, 235, 0.06)",
+                itemHoverColor: "#182230",
               },
             },
           }}
@@ -650,7 +703,9 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, defaultSelectedKey, collapse
               borderRight: 0,
               backgroundColor: "transparent",
               fontSize: "13px",
-              paddingTop: "4px",
+              padding: "10px 8px 96px",
+              height: "calc(100vh - 64px)",
+              overflowY: "auto",
             }}
             items={buildMenuItems()}
           />
