@@ -6,7 +6,7 @@ import { clearTokenCookies } from "@/utils/cookieUtils";
 import { clearStoredReturnUrl } from "@/utils/returnUrlUtils";
 import { fetchProxySettings } from "@/utils/proxyUtils";
 import { MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
-import { Button, Switch, Tag } from "antd";
+import { Switch, Tag } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import UserDropdown from "./Navbar/UserDropdown/UserDropdown";
@@ -85,30 +85,33 @@ const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <nav className="bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm backdrop-blur-md bg-opacity-80">
-      <div className="bg-gradient-to-r from-blue-50 to-transparent absolute inset-0 -z-10 opacity-30" />
+    <nav className="zentris-navbar sticky top-0 z-20">
       <div className="w-full">
-        <div className="flex items-center h-14 px-4">
+        <div className="flex items-center h-16 px-4">
           <div className="flex items-center flex-shrink-0">
             {onToggleSidebar && (
               <button
                 onClick={onToggleSidebar}
-                className="flex items-center justify-center w-10 h-10 mr-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                className="flex items-center justify-center w-10 h-10 mr-3 text-slate-600 hover:text-slate-950 hover:bg-slate-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
                 <span className="text-lg">{sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</span>
               </button>
             )}
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Link href={baseUrl ? baseUrl : "/"} className="flex items-center">
-                <div className="relative">
-                  <div className="h-10 max-w-48 flex items-center justify-center overflow-hidden">
+                <div className="relative flex items-center gap-3">
+                  <div className="h-10 max-w-48 flex items-center justify-center overflow-hidden rounded-lg bg-white/70 ring-1 ring-slate-200">
                     <img
                       src={imageUrl}
                       alt="Zentris Brand"
                       className="max-w-full max-h-full w-auto h-auto object-contain"
                     />
+                  </div>
+                  <div className="hidden sm:block">
+                    <div className="text-[11px] font-semibold uppercase text-slate-500">AI Gateway</div>
+                    <div className="text-sm font-semibold text-slate-950">Enterprise Control Plane</div>
                   </div>
                 </div>
               </Link>
@@ -123,7 +126,7 @@ const Navbar: React.FC<NavbarProps> = ({
                       🌑
                     </span>
                   )}
-                  <Tag className="relative text-xs font-medium cursor-pointer z-10">
+                  <Tag className="relative text-xs font-medium cursor-pointer z-10 border-slate-200 bg-slate-50 text-slate-700">
                     <a
                       href="https://github.com/asadahmad23cse/Zentris/releases"
                       target="_blank"
@@ -138,7 +141,11 @@ const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
           {/* Right side nav items */}
-          <div className="flex items-center space-x-5 ml-auto">
+          <div className="flex items-center gap-3 ml-auto">
+            <div className="hidden lg:flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.14)]" />
+              Live
+            </div>
             <WorkerDropdown onWorkerSwitch={handleWorkerSwitch} />
             {/* Dark mode is currently a work in progress. To test, you can change 'false' to 'true' below.
             Do not set this to true by default until all components are confirmed to support dark mode styles. */}
