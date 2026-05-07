@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { Form } from "antd";
 import { describe, expect, it } from "vitest";
 import { getPlaceholder, Providers } from "../provider_info_helpers";
-import ZentrisModelNameField from "./Zentris_model_name";
+import ZentrisModelNameField from "./litellm_model_name";
 
 describe("ZentrisModelNameField", () => {
   it("should render", () => {
