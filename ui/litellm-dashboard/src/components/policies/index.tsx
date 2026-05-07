@@ -386,7 +386,7 @@ const PoliciesPanel: React.FC<PoliciesPanelProps> = ({
                     <li>Inherit from existing policies and override what you need</li>
                   </ul>
                   <a
-                    href="https://docs.litellm.ai/docs/proxy/guardrails/guardrail_policies"
+                    href="https://docs.Zentris.ai/docs/proxy/guardrails/guardrail_policies"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-800 underline inline-block mt-1"
@@ -424,7 +424,7 @@ const PoliciesPanel: React.FC<PoliciesPanelProps> = ({
                     <li>Inherit from existing policies and override what you need</li>
                   </ul>
                   <a
-                    href="https://docs.litellm.ai/docs/proxy/guardrails/guardrail_policies"
+                    href="https://docs.Zentris.ai/docs/proxy/guardrails/guardrail_policies"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-800 underline inline-block mt-1"
@@ -542,7 +542,7 @@ const PoliciesPanel: React.FC<PoliciesPanelProps> = ({
                     <li><strong>Tags</strong> - Matches tags from key/team <code>metadata.tags</code> or tags passed dynamically in the request body (<code>metadata.tags</code>). Use this to enforce policies across groups, e.g. &quot;all keys tagged <code>healthcare</code> get HIPAA guardrails.&quot; Supports wildcards (<code>prod-*</code>).</li>
                   </ul>
                   <a
-                    href="https://docs.litellm.ai/docs/proxy/guardrails/guardrail_policies#attachments"
+                    href="https://docs.Zentris.ai/docs/proxy/guardrails/guardrail_policies#attachments"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-800 underline inline-block mt-1"
@@ -560,7 +560,7 @@ const PoliciesPanel: React.FC<PoliciesPanelProps> = ({
 
             <Alert
               message="Enterprise Feature Notice"
-              description="Parts of policy attachments will be on LiteLLM Enterprise in subsequent releases."
+              description="Parts of policy attachments will be on Zentris Enterprise in subsequent releases."
               type="warning"
               showIcon
               closable
@@ -654,3 +654,5 @@ const PoliciesPanel: React.FC<PoliciesPanelProps> = ({
 };
 
 export default PoliciesPanel;
+
+

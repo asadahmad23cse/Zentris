@@ -25,3 +25,5 @@ describe("ChartLoader", () => {
     expect(screen.queryByText("Fetching your data")).not.toBeInTheDocument();
   });
 });
+
+

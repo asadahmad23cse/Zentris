@@ -17,12 +17,12 @@ export const prepareModelAddRequest = async (formValues: Record<string, any>, ac
       const customProviderKey = formValues["custom_llm_provider"] as string;
       const mappedProvider =
         provider_map[customProviderKey as keyof typeof provider_map] ?? customProviderKey.toLowerCase();
-      const litellm_custom_provider = mappedProvider;
-      const wildcardModel = litellm_custom_provider + "/*";
+      const Zentris_custom_provider = mappedProvider;
+      const wildcardModel = Zentris_custom_provider + "/*";
       formValues["model_name"] = wildcardModel;
       modelMappings.push({
         public_name: wildcardModel,
-        litellm_model: wildcardModel,
+        Zentris_model: wildcardModel,
       });
       formValues["model"] = wildcardModel;
     }
@@ -30,12 +30,12 @@ export const prepareModelAddRequest = async (formValues: Record<string, any>, ac
     // Create a deployment for each mapping
     const deployments = [];
     for (const mapping of modelMappings) {
-      const litellmParamsObj: Record<string, any> = {};
+      const ZentrisParamsObj: Record<string, any> = {};
       const modelInfoObj: Record<string, any> = {};
 
-      // Set the model name and litellm model from the mapping
+      // Set the model name and Zentris model from the mapping
       const modelName = mapping.public_name;
-      litellmParamsObj["model"] = mapping.litellm_model;
+      ZentrisParamsObj["model"] = mapping.Zentris_model;
 
       // Handle pricing conversion before processing other fields
       // Use explicit checks to allow 0 (zero cost models for budget bypass)
@@ -48,7 +48,7 @@ export const prepareModelAddRequest = async (formValues: Record<string, any>, ac
       // Keep input_cost_per_second as is, no conversion needed
 
       // Iterate through the key-value pairs in formValues
-      litellmParamsObj["model"] = mapping.litellm_model;
+      ZentrisParamsObj["model"] = mapping.Zentris_model;
       console.log("formValues add deployment:", formValues);
       for (const [key, value] of Object.entries(formValues)) {
         if (value === "") {
@@ -59,12 +59,12 @@ export const prepareModelAddRequest = async (formValues: Record<string, any>, ac
           continue;
         }
         if (key == "model_name") {
-          litellmParamsObj["model"] = value;
+          ZentrisParamsObj["model"] = value;
         } else if (key == "custom_llm_provider") {
           console.log("custom_llm_provider:", value);
           const providerKey = value as string;
           const mappingResult = provider_map[providerKey as keyof typeof provider_map] ?? providerKey.toLowerCase();
-          litellmParamsObj["custom_llm_provider"] = mappingResult;
+          ZentrisParamsObj["custom_llm_provider"] = mappingResult;
           console.log("custom_llm_provider mappingResult:", mappingResult);
         } else if (key == "model") {
           continue;
@@ -81,25 +81,25 @@ export const prepareModelAddRequest = async (formValues: Record<string, any>, ac
           console.log("placing mode in modelInfo");
           modelInfoObj["mode"] = value;
 
-          // remove "mode" from litellmParams
-          delete litellmParamsObj["mode"];
+          // remove "mode" from ZentrisParams
+          delete ZentrisParamsObj["mode"];
         } else if (key === "custom_model_name") {
-          litellmParamsObj["model"] = value;
-        } else if (key == "litellm_extra_params") {
-          console.log("litellm_extra_params:", value);
-          let litellmExtraParams = {};
+          ZentrisParamsObj["model"] = value;
+        } else if (key == "Zentris_extra_params") {
+          console.log("Zentris_extra_params:", value);
+          let ZentrisExtraParams = {};
           if (value && value != undefined) {
             try {
-              litellmExtraParams = JSON.parse(value);
-              if ("litellm_credential_name" in litellmExtraParams) {
-                delete litellmExtraParams.litellm_credential_name;
+              ZentrisExtraParams = JSON.parse(value);
+              if ("Zentris_credential_name" in ZentrisExtraParams) {
+                delete ZentrisExtraParams.Zentris_credential_name;
               }
             } catch (error) {
-              NotificationManager.fromBackend("Failed to parse LiteLLM Extra Params: " + error);
-              throw new Error("Failed to parse litellm_extra_params: " + error);
+              NotificationManager.fromBackend("Failed to parse Zentris Extra Params: " + error);
+              throw new Error("Failed to parse Zentris_extra_params: " + error);
             }
-            for (const [key, value] of Object.entries(litellmExtraParams)) {
-              litellmParamsObj[key] = value;
+            for (const [key, value] of Object.entries(ZentrisExtraParams)) {
+              ZentrisParamsObj[key] = value;
             }
           }
         } else if (key == "model_info_params") {
@@ -109,8 +109,8 @@ export const prepareModelAddRequest = async (formValues: Record<string, any>, ac
             try {
               modelInfoParams = JSON.parse(value);
             } catch (error) {
-              NotificationManager.fromBackend("Failed to parse LiteLLM Extra Params: " + error);
-              throw new Error("Failed to parse litellm_extra_params: " + error);
+              NotificationManager.fromBackend("Failed to parse Zentris Extra Params: " + error);
+              throw new Error("Failed to parse Zentris_extra_params: " + error);
             }
             for (const [key, value] of Object.entries(modelInfoParams)) {
               modelInfoObj[key] = value;
@@ -121,19 +121,19 @@ export const prepareModelAddRequest = async (formValues: Record<string, any>, ac
         // Handle the pricing fields
         else if (key === "input_cost_per_token" || key === "output_cost_per_token" || key === "input_cost_per_second") {
           if (value !== undefined && value !== null && value !== "") {
-            litellmParamsObj[key] = Number(value);
+            ZentrisParamsObj[key] = Number(value);
           }
           continue;
         }
 
         // Check if key is any of the specified API related keys
         else {
-          // Add key-value pair to litellm_params dictionary
-          litellmParamsObj[key] = value;
+          // Add key-value pair to Zentris_params dictionary
+          ZentrisParamsObj[key] = value;
         }
       }
 
-      deployments.push({ litellmParamsObj, modelInfoObj, modelName });
+      deployments.push({ ZentrisParamsObj, modelInfoObj, modelName });
     }
 
     return deployments;
@@ -152,11 +152,11 @@ export const handleAddModelSubmit = async (values: any, accessToken: string, for
 
     // Create each deployment
     for (const deployment of deployments) {
-      const { litellmParamsObj, modelInfoObj, modelName } = deployment;
+      const { ZentrisParamsObj, modelInfoObj, modelName } = deployment;
 
       const new_model: Model = {
         model_name: modelName,
-        litellm_params: litellmParamsObj,
+        Zentris_params: ZentrisParamsObj,
         model_info: modelInfoObj,
       };
 
@@ -170,3 +170,5 @@ export const handleAddModelSubmit = async (values: any, accessToken: string, for
     NotificationManager.fromBackend("Failed to add model: " + error);
   }
 };
+
+

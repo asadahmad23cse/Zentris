@@ -206,7 +206,7 @@ function SubmissionRulesPanel({ requiredFields, onChange, onSave, isSaving }: Su
         <div className="border-t border-gray-100 px-4 pt-4 pb-4">
           <p className="text-xs text-gray-500 mb-4">
             Select which fields must be filled in before a submission is considered compliant.
-            LiteLLM will show ✓ / ✗ for each rule on every submission card below.
+            Zentris will show ✓ / ✗ for each rule on every submission card below.
           </p>
           <div className="grid grid-cols-2 gap-x-8 gap-y-5">
             {FIELD_GROUPS.map((group) => (
@@ -658,3 +658,5 @@ export function MCPSubmissionsTab({ accessToken }: MCPSubmissionsTabProps) {
     </div>
   );
 }
+
+

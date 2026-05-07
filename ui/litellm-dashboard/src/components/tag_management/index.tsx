@@ -11,7 +11,7 @@ import CreateTagModal from "./components/CreateTagModal";
 
 interface ModelInfo {
   model_name: string;
-  litellm_params: {
+  Zentris_params: {
     model: string;
   };
   model_info: {
@@ -149,7 +149,7 @@ const TagManagement: React.FC<TagProps> = ({ accessToken, userID, userRole }) =>
             <p>
               You can use tags to restrict the usage of certain LLMs based on tags passed in the request. Read more
               about tag routing{" "}
-              <a href="https://docs.litellm.ai/docs/proxy/tag_routing" target="_blank" rel="noopener noreferrer">
+              <a href="https://docs.Zentris.ai/docs/proxy/tag_routing" target="_blank" rel="noopener noreferrer">
                 here
               </a>
               .
@@ -224,3 +224,5 @@ const TagManagement: React.FC<TagProps> = ({ accessToken, userID, userRole }) =>
 };
 
 export default TagManagement;
+
+

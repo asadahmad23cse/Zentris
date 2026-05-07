@@ -380,3 +380,5 @@ describe("CustomLegend", () => {
     expect(colorIndicators[2]).toHaveStyle({ backgroundColor: "#ef4444" });
   });
 });
+
+

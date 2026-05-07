@@ -13,12 +13,12 @@ vi.mock("@/components/networking", () => ({
 // Mock data
 const mockModelCostData: Record<string, any> = {
   "gpt-3.5-turbo": {
-    litellm_provider: "openai",
+    Zentris_provider: "openai",
     input_cost_per_token: 0.0015,
     output_cost_per_token: 0.002,
   },
   "claude-3-sonnet-20240229": {
-    litellm_provider: "anthropic",
+    Zentris_provider: "anthropic",
     input_cost_per_token: 0.003,
     output_cost_per_token: 0.015,
   },
@@ -142,3 +142,5 @@ describe("useModelCostMap", () => {
     expect(result.current).toHaveProperty("error");
   });
 });
+
+

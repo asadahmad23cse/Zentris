@@ -28,7 +28,7 @@ const mockTags: TagListResponse = {
     updated_at: "2024-01-01T00:00:00Z",
     created_by: "user-1",
     updated_by: "user-1",
-    litellm_budget_table: {
+    Zentris_budget_table: {
       max_budget: 1000,
       soft_budget: 800,
       tpm_limit: 100000,
@@ -47,7 +47,7 @@ const mockTags: TagListResponse = {
     updated_at: "2024-01-02T00:00:00Z",
     created_by: "user-2",
     updated_by: "user-2",
-    litellm_budget_table: {
+    Zentris_budget_table: {
       max_budget: 2000,
       soft_budget: 1500,
       tpm_limit: 200000,
@@ -281,3 +281,5 @@ describe("useTags", () => {
     expect(result.current.data).toBeUndefined();
   });
 });
+
+

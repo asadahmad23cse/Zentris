@@ -8,7 +8,7 @@ import * as networking from "@/components/networking";
 
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: vi.fn(() => "http://proxy.example"),
-  getGlobalLitellmHeaderName: vi.fn(() => "Authorization"),
+  getGlobalZentrisHeaderName: vi.fn(() => "Authorization"),
   deriveErrorMessage: vi.fn((data: unknown) => (data as { detail?: string })?.detail ?? "Unknown error"),
   handleError: vi.fn(),
 }));
@@ -59,7 +59,7 @@ describe("useAccessGroups", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.mocked(networking.getProxyBaseUrl).mockReturnValue("http://proxy.example");
-    vi.mocked(networking.getGlobalLitellmHeaderName).mockReturnValue("Authorization");
+    vi.mocked(networking.getGlobalZentrisHeaderName).mockReturnValue("Authorization");
 
     const useAuthorizedModule = await import("@/app/(dashboard)/hooks/useAuthorized");
     vi.mocked(useAuthorizedModule.default).mockReturnValue({
@@ -240,3 +240,5 @@ describe("useAccessGroups", () => {
     expect(result.current.data).toBeUndefined();
   });
 });
+
+

@@ -91,3 +91,5 @@ export function checkHasVectorStoreData(metadata: Record<string, any>): boolean 
     metadata.vector_store_request_metadata.length > 0
   );
 }
+
+

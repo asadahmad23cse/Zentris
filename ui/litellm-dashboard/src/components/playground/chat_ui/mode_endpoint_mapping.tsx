@@ -1,4 +1,4 @@
-// litellmMapping.ts
+// ZentrisMapping.ts
 
 // Define an enum for the modes as returned in model_info
 export enum ModelMode {
@@ -31,7 +31,7 @@ export enum EndpointType {
 }
 
 // Create a mapping between the model mode and the corresponding endpoint type
-export const litellmModeMapping: Record<ModelMode, EndpointType> = {
+export const ZentrisModeMapping: Record<ModelMode, EndpointType> = {
   [ModelMode.IMAGE_GENERATION]: EndpointType.IMAGE,
   [ModelMode.VIDEO_GENERATION]: EndpointType.VIDEO,
   [ModelMode.CHAT]: EndpointType.CHAT,
@@ -47,7 +47,7 @@ export const getEndpointType = (mode: string): EndpointType => {
   // Check if the string mode exists as a key in ModelMode enum
   console.log("getEndpointType:", mode);
   if (Object.values(ModelMode).includes(mode as ModelMode)) {
-    const endpointType = litellmModeMapping[mode as ModelMode];
+    const endpointType = ZentrisModeMapping[mode as ModelMode];
     console.log("endpointType:", endpointType);
     return endpointType;
   }
@@ -55,3 +55,5 @@ export const getEndpointType = (mode: string): EndpointType => {
   // else default to chat
   return EndpointType.CHAT;
 };
+
+

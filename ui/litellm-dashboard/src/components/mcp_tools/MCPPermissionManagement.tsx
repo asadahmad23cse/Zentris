@@ -70,7 +70,7 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
           <div className="flex items-start justify-between gap-4">
             <div>
               <span className="text-sm font-medium text-gray-700 flex items-center">
-                Allow All LiteLLM Keys
+                Allow All Zentris Keys
                 <Tooltip title="When enabled, every API key can access this MCP server.">
                   <InfoCircleOutlined className="ml-2 text-blue-400 hover:text-blue-600 cursor-help" />
                 </Tooltip>
@@ -227,3 +227,5 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
 };
 
 export default MCPPermissionManagement;
+
+

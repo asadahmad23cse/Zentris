@@ -2,12 +2,12 @@ import { Agent } from "./types";
 import { AgentCreateInfo } from "../networking";
 
 /**
- * Detects the agent type from an agent's litellm_params.
+ * Detects the agent type from an agent's Zentris_params.
  * Returns the agent_type string (e.g., "langgraph", "azure_ai_foundry", "bedrock_agentcore", or "a2a")
  */
 export const detectAgentType = (agent: Agent): string => {
-  const model = agent.litellm_params?.model || "";
-  const customProvider = agent.litellm_params?.custom_llm_provider;
+  const model = agent.Zentris_params?.model || "";
+  const customProvider = agent.Zentris_params?.custom_llm_provider;
 
   // Check by custom_llm_provider first
   if (customProvider === "langgraph") return "langgraph";
@@ -25,7 +25,7 @@ export const detectAgentType = (agent: Agent): string => {
 
 /**
  * Parses agent data for dynamic form fields (non-A2A agents).
- * Extracts values from litellm_params based on the agent type metadata.
+ * Extracts values from Zentris_params based on the agent type metadata.
  */
 export const parseDynamicAgentForForm = (
   agent: Agent,
@@ -36,14 +36,14 @@ export const parseDynamicAgentForForm = (
     description: agent.agent_card_params?.description || "",
   };
 
-  // Extract credential field values from litellm_params
+  // Extract credential field values from Zentris_params
   for (const field of agentTypeInfo.credential_fields) {
-    if (field.include_in_litellm_params !== false) {
-      values[field.key] = agent.litellm_params?.[field.key] || field.default_value || "";
+    if (field.include_in_Zentris_params !== false) {
+      values[field.key] = agent.Zentris_params?.[field.key] || field.default_value || "";
     } else {
-      // For fields not in litellm_params (like agent_id), try to extract from model string
-      if (agentTypeInfo.model_template && agent.litellm_params?.model) {
-        const model = agent.litellm_params.model;
+      // For fields not in Zentris_params (like agent_id), try to extract from model string
+      if (agentTypeInfo.model_template && agent.Zentris_params?.model) {
+        const model = agent.Zentris_params.model;
         const templateParts = agentTypeInfo.model_template.split("/");
         const modelParts = model.split("/");
         
@@ -58,10 +58,12 @@ export const parseDynamicAgentForForm = (
   }
 
   // Extract cost configuration
-  values.cost_per_query = agent.litellm_params?.cost_per_query;
-  values.input_cost_per_token = agent.litellm_params?.input_cost_per_token;
-  values.output_cost_per_token = agent.litellm_params?.output_cost_per_token;
+  values.cost_per_query = agent.Zentris_params?.cost_per_query;
+  values.input_cost_per_token = agent.Zentris_params?.input_cost_per_token;
+  values.output_cost_per_token = agent.Zentris_params?.output_cost_per_token;
 
   return values;
 };
+
+
 

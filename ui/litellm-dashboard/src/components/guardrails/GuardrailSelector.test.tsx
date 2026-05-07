@@ -35,11 +35,11 @@ describe("GuardrailSelector", () => {
     const mockGuardrails = [
       {
         guardrail_name: "pii-guard",
-        litellm_params: { guardrail: "presidio", mode: "pre_call", default_on: false },
+        Zentris_params: { guardrail: "presidio", mode: "pre_call", default_on: false },
       },
       {
         guardrail_name: "content-filter",
-        litellm_params: { guardrail: "lakera", mode: "post_call", default_on: true },
+        Zentris_params: { guardrail: "lakera", mode: "post_call", default_on: true },
       },
     ];
 
@@ -55,3 +55,5 @@ describe("GuardrailSelector", () => {
     });
   });
 });
+
+

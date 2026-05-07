@@ -5,7 +5,7 @@ import NotificationsManager from "@/components/molecules/notifications_manager";
 
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: vi.fn(() => ""),
-  getGlobalLitellmHeaderName: vi.fn(() => "Authorization"),
+  getGlobalZentrisHeaderName: vi.fn(() => "Authorization"),
 }));
 
 vi.mock("./provider_display_helpers", () => ({
@@ -242,3 +242,5 @@ describe("useDiscountConfig", () => {
     });
   });
 });
+
+

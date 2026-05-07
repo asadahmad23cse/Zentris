@@ -17,7 +17,7 @@ const extractTeamIdFromApiKeyBreakdown = (apiKeyBreakdown: Record<string, any> |
   return null;
 };
 
-// Mirrors backend SpendMetrics fields (litellm/types/activity_tracking.py).
+// Mirrors backend SpendMetrics fields (Zentris/types/activity_tracking.py).
 // If the backend adds a field, add it here too.
 const METRIC_KEYS = [
   "spend", "api_requests", "successful_requests", "failed_requests",
@@ -387,3 +387,5 @@ export const handleExportJSON = (
   document.body.removeChild(a);
   window.URL.revokeObjectURL(url);
 };
+
+

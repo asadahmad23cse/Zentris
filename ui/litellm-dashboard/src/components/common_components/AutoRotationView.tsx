@@ -123,3 +123,5 @@ const AutoRotationView: React.FC<AutoRotationViewProps> = ({
 };
 
 export default AutoRotationView;
+
+

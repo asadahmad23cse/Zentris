@@ -24,7 +24,7 @@ interface GuardrailsPanelProps {
 interface GuardrailItem {
   guardrail_id?: string;
   guardrail_name: string | null;
-  litellm_params: {
+  Zentris_params: {
     guardrail: string;
     mode: string;
     default_on: boolean;
@@ -129,8 +129,8 @@ const GuardrailsPanel: React.FC<GuardrailsPanelProps> = ({ accessToken, userRole
   };
 
   const providerDisplayName =
-    guardrailToDelete && guardrailToDelete.litellm_params
-      ? getGuardrailLogoAndName(guardrailToDelete.litellm_params.guardrail).displayName
+    guardrailToDelete && guardrailToDelete.Zentris_params
+      ? getGuardrailLogoAndName(guardrailToDelete.Zentris_params.guardrail).displayName
       : undefined;
 
   return (
@@ -223,10 +223,10 @@ const GuardrailsPanel: React.FC<GuardrailsPanelProps> = ({ accessToken, userRole
                 { label: "Name", value: guardrailToDelete?.guardrail_name },
                 { label: "ID", value: guardrailToDelete?.guardrail_id, code: true },
                 { label: "Provider", value: providerDisplayName },
-                { label: "Mode", value: guardrailToDelete?.litellm_params.mode },
+                { label: "Mode", value: guardrailToDelete?.Zentris_params.mode },
                 {
                   label: "Default On",
-                  value: guardrailToDelete?.litellm_params.default_on ? "Yes" : "No",
+                  value: guardrailToDelete?.Zentris_params.default_on ? "Yes" : "No",
                 },
               ]}
               onCancel={handleDeleteCancel}
@@ -256,3 +256,5 @@ const GuardrailsPanel: React.FC<GuardrailsPanelProps> = ({ accessToken, userRole
 };
 
 export default GuardrailsPanel;
+
+

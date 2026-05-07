@@ -59,21 +59,21 @@ describe("VersionHistorySidePanel", () => {
   const mockPromptVersions: PromptSpec[] = [
     {
       prompt_id: "test-prompt.v2",
-      litellm_params: { prompt_id: "test-prompt.v2" },
+      Zentris_params: { prompt_id: "test-prompt.v2" },
       prompt_info: { prompt_type: "db" },
       version: 2,
       created_at: "2024-01-15T10:30:00Z",
     },
     {
       prompt_id: "test-prompt.v1",
-      litellm_params: { prompt_id: "test-prompt.v1" },
+      Zentris_params: { prompt_id: "test-prompt.v1" },
       prompt_info: { prompt_type: "db" },
       version: 1,
       created_at: "2024-01-10T09:00:00Z",
     },
     {
       prompt_id: "test-prompt.v3",
-      litellm_params: { prompt_id: "test-prompt.v3" },
+      Zentris_params: { prompt_id: "test-prompt.v3" },
       prompt_info: { prompt_type: "config" },
       version: 3,
       created_at: "2024-01-20T14:15:00Z",
@@ -83,13 +83,13 @@ describe("VersionHistorySidePanel", () => {
   const mockPromptVersionsWithoutExplicitVersion = [
     {
       prompt_id: "test-prompt.v2",
-      litellm_params: { prompt_id: "test-prompt.v2" },
+      Zentris_params: { prompt_id: "test-prompt.v2" },
       prompt_info: { prompt_type: "db" },
       created_at: "2024-01-15T10:30:00Z",
     },
     {
       prompt_id: "test-prompt.v1",
-      litellm_params: { prompt_id: "test-prompt.v1" },
+      Zentris_params: { prompt_id: "test-prompt.v1" },
       prompt_info: { prompt_type: "db" },
       created_at: "2024-01-10T09:00:00Z",
     },
@@ -243,7 +243,7 @@ describe("VersionHistorySidePanel", () => {
       const versionsWithUnderscore = [
         {
           prompt_id: "test-prompt_v2",
-          litellm_params: { prompt_id: "test-prompt_v2" },
+          Zentris_params: { prompt_id: "test-prompt_v2" },
           prompt_info: { prompt_type: "db" },
           created_at: "2024-01-15T10:30:00Z",
         },
@@ -264,7 +264,7 @@ describe("VersionHistorySidePanel", () => {
       const versionWithoutVersionInfo = [
         {
           prompt_id: "test-prompt",
-          litellm_params: { prompt_id: "test-prompt" },
+          Zentris_params: { prompt_id: "test-prompt" },
           prompt_info: { prompt_type: "db" },
           created_at: "2024-01-15T10:30:00Z",
         },
@@ -298,7 +298,7 @@ describe("VersionHistorySidePanel", () => {
       const versionsWithoutDates = [
         {
           prompt_id: "test-prompt.v1",
-          litellm_params: { prompt_id: "test-prompt.v1" },
+          Zentris_params: { prompt_id: "test-prompt.v1" },
           prompt_info: { prompt_type: "db" },
           version: 1,
         },
@@ -441,7 +441,7 @@ describe("VersionHistorySidePanel", () => {
       const versionsWithUnderscore = [
         {
           prompt_id: "test-prompt_v2",
-          litellm_params: { prompt_id: "test-prompt_v2" },
+          Zentris_params: { prompt_id: "test-prompt_v2" },
           prompt_info: { prompt_type: "db" },
           version: 2,
           created_at: "2024-01-15T10:30:00Z",
@@ -471,3 +471,5 @@ describe("VersionHistorySidePanel", () => {
     });
   });
 });
+
+

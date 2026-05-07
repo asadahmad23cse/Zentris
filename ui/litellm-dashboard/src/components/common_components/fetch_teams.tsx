@@ -18,3 +18,5 @@ export const fetchTeams = async (
 
   setTeams(givenTeams);
 };
+
+

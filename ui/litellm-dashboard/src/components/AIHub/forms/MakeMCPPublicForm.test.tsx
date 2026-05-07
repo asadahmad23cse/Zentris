@@ -560,3 +560,5 @@ describe("MakeMCPPublicForm", () => {
     expect(selectAllCheckbox).toHaveAttribute("data-indeterminate", "true");
   });
 });
+
+

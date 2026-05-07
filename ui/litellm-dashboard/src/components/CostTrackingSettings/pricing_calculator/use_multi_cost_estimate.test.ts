@@ -6,7 +6,7 @@ import type { CostEstimateResponse } from "../types";
 
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: vi.fn(() => ""),
-  getGlobalLitellmHeaderName: vi.fn(() => "Authorization"),
+  getGlobalZentrisHeaderName: vi.fn(() => "Authorization"),
 }));
 
 function makeEntry(overrides: Partial<ModelEntry> = {}): ModelEntry {
@@ -340,3 +340,5 @@ describe("useMultiCostEstimate", () => {
     });
   });
 });
+
+

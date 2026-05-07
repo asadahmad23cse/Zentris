@@ -33,3 +33,5 @@ export function TruncatedValue({ value, maxWidth = DEFAULT_MAX_WIDTH }: Truncate
     </Tooltip>
   );
 }
+
+

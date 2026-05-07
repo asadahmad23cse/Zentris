@@ -43,3 +43,5 @@ describe("AddSSOSettingsModal", () => {
     expect(screen.getAllByText("Add SSO")).toHaveLength(2); // Title and button
   });
 });
+
+

@@ -200,19 +200,19 @@ const GuardrailSelectionModal: React.FC<GuardrailSelectionModalProps> = ({
                   {/* Show guardrail type and mode */}
                   <div className="flex gap-2 mt-2">
                     <Tag className="text-xs">
-                      {guardrail.definition?.litellm_params?.guardrail || "unknown"}
+                      {guardrail.definition?.Zentris_params?.guardrail || "unknown"}
                     </Tag>
                     <Tag className="text-xs" color="blue">
-                      {guardrail.definition?.litellm_params?.mode || "unknown"}
+                      {guardrail.definition?.Zentris_params?.mode || "unknown"}
                     </Tag>
-                    {guardrail.definition?.litellm_params?.patterns && (
+                    {guardrail.definition?.Zentris_params?.patterns && (
                       <Tag className="text-xs" color="purple">
-                        {guardrail.definition.litellm_params.patterns.length} pattern(s)
+                        {guardrail.definition.Zentris_params.patterns.length} pattern(s)
                       </Tag>
                     )}
-                    {guardrail.definition?.litellm_params?.categories && (
+                    {guardrail.definition?.Zentris_params?.categories && (
                       <Tag className="text-xs" color="orange">
-                        {guardrail.definition.litellm_params.categories.length} category/categories
+                        {guardrail.definition.Zentris_params.categories.length} category/categories
                       </Tag>
                     )}
                   </div>
@@ -281,3 +281,5 @@ const GuardrailSelectionModal: React.FC<GuardrailSelectionModalProps> = ({
 };
 
 export default GuardrailSelectionModal;
+
+

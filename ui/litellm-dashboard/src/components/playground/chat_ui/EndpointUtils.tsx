@@ -20,3 +20,5 @@ export const determineEndpointType = (selectedModel: string, modelInfo: ModelGro
   // Default to chat endpoint if no match is found
   return EndpointType.CHAT;
 };
+
+

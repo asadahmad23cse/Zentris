@@ -121,7 +121,7 @@ describe("daily activity helpers", () => {
     await Networking.teamDailyActivityCall("token", startTime, endTime, 1, null);
     const urlWithoutTeams = new URL(mockFetchWithoutTeams.mock.calls[0][0] as string, "http://example.com");
 
-    expect(urlWithoutTeams.searchParams.get("exclude_team_ids")).toBe("litellm-dashboard");
+    expect(urlWithoutTeams.searchParams.get("exclude_team_ids")).toBe("Zentris-dashboard");
     expect(urlWithoutTeams.searchParams.has("team_ids")).toBe(false);
 
     const mockFetchWithTeams = setupSuccessfulFetch();
@@ -129,7 +129,7 @@ describe("daily activity helpers", () => {
     const urlWithTeams = new URL(mockFetchWithTeams.mock.calls[0][0] as string, "http://example.com");
 
     expect(urlWithTeams.searchParams.get("team_ids")).toBe("team-a,team-b");
-    expect(urlWithTeams.searchParams.get("exclude_team_ids")).toBe("litellm-dashboard");
+    expect(urlWithTeams.searchParams.get("exclude_team_ids")).toBe("Zentris-dashboard");
   });
 });
 
@@ -169,7 +169,7 @@ describe("UI config and public endpoints", () => {
     };
 
     const mockFetch = setupMockFetch([
-      { url: "/litellm/.well-known/litellm-ui-config", data: uiConfig },
+      { url: "/Zentris/.well-known/Zentris-ui-config", data: uiConfig },
       { url: "/public/providers/fields", data: [] },
     ]);
 
@@ -195,7 +195,7 @@ describe("UI config and public endpoints", () => {
     };
 
     const mockFetch = setupMockFetch([
-      { url: "/litellm/.well-known/litellm-ui-config", data: uiConfig },
+      { url: "/Zentris/.well-known/Zentris-ui-config", data: uiConfig },
       { url: "/public/model_hub/info", data: {} },
     ]);
 
@@ -218,7 +218,7 @@ describe("UI config and public endpoints", () => {
     };
 
     const mockFetch = setupMockFetch([
-      { url: "/litellm/.well-known/litellm-ui-config", data: uiConfig },
+      { url: "/Zentris/.well-known/Zentris-ui-config", data: uiConfig },
       { url: "/public/model_hub", data: [] },
     ]);
 
@@ -241,7 +241,7 @@ describe("UI config and public endpoints", () => {
     };
 
     const mockFetch = setupMockFetch([
-      { url: "/litellm/.well-known/litellm-ui-config", data: uiConfig },
+      { url: "/Zentris/.well-known/Zentris-ui-config", data: uiConfig },
       { url: "/public/agent_hub", data: [] },
     ]);
 
@@ -262,7 +262,7 @@ describe("UI config and public endpoints", () => {
     };
 
     const mockFetch = setupMockFetch([
-      { url: "/litellm/.well-known/litellm-ui-config", data: uiConfig },
+      { url: "/Zentris/.well-known/Zentris-ui-config", data: uiConfig },
       { url: "/public/mcp_hub", data: [] },
     ]);
 
@@ -283,7 +283,7 @@ describe("UI config and public endpoints", () => {
     };
 
     const mockFetch = setupMockFetch([
-      { url: "/litellm/.well-known/litellm-ui-config", data: uiConfig },
+      { url: "/Zentris/.well-known/Zentris-ui-config", data: uiConfig },
       { url: "/public/providers/fields", data: [] },
     ]);
 
@@ -305,14 +305,14 @@ describe("UI config and public endpoints", () => {
       proxy_base_url: "https://example.com",
     };
 
-    const mockFetch = setupMockFetch([{ url: "/litellm/.well-known/litellm-ui-config", data: uiConfig }]);
+    const mockFetch = setupMockFetch([{ url: "/Zentris/.well-known/Zentris-ui-config", data: uiConfig }]);
 
     const result = await Networking.getUiConfig();
 
     expect(mockFetch).toHaveBeenCalledOnce();
     expect(result).toEqual(uiConfig);
     const configCall = mockFetch.mock.calls.find((call) =>
-      (call[0] as string).includes("/litellm/.well-known/litellm-ui-config"),
+      (call[0] as string).includes("/Zentris/.well-known/Zentris-ui-config"),
     );
     expect(configCall).toBeDefined();
   });
@@ -371,3 +371,5 @@ describe("individualModelHealthCheckCall", () => {
     expect(parsed.searchParams.get("model_id")).toBe("id/with/slashes");
   });
 });
+
+

@@ -149,3 +149,5 @@ describe("TeamsFilters", () => {
     expect(within(filtersButton).queryByTestId("active-filter-indicator")).not.toBeInTheDocument();
   });
 });
+
+

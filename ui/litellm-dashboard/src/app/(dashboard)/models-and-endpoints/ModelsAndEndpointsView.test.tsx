@@ -206,7 +206,7 @@ describe("ModelsAndEndpointsView", () => {
     expect(queryByText("Missing a provider?")).not.toBeInTheDocument();
 
     // Compact Request Provider button should be visible in header
-    const requestProviderLinks = document.querySelectorAll('a[href="https://models.litellm.ai/?request=true"]');
+    const requestProviderLinks = document.querySelectorAll('a[href="https://models.Zentris.ai/?request=true"]');
     // There should be a compact button when banner is hidden
     expect(requestProviderLinks.length).toBeGreaterThan(0);
   }, 15000);
@@ -250,3 +250,5 @@ describe("ModelsAndEndpointsView", () => {
     expect(healthCheckProps.all_models_on_proxy).not.toContain("gpt-4");
   });
 });
+
+

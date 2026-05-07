@@ -21,7 +21,7 @@ const credentialsInfoPopoverContent = (
             <Title level={5} style={{ margin: 0, color: "#1890ff" }}>Reusable</Title>
           </Flex>
           <Text type="secondary">
-            Credentials saved in LiteLLM that can be added to models repeatedly.
+            Credentials saved in Zentris that can be added to models repeatedly.
           </Text>
         </Space>
       </Flex>
@@ -121,15 +121,15 @@ export const columns = (
 
               <Space direction="vertical" size={2}>
                 <Text type="secondary" style={{ fontSize: 11 }}>
-                  LiteLLM Model Name
+                  Zentris Model Name
                 </Text>
                 <Text
                   style={{ fontSize: 13 }}
-                  copyable={{ text: model.litellm_model_name || "-" }}
+                  copyable={{ text: model.Zentris_model_name || "-" }}
                   ellipsis
-                  title={model.litellm_model_name || "-"}
+                  title={model.Zentris_model_name || "-"}
                 >
-                  {model.litellm_model_name || "-"}
+                  {model.Zentris_model_name || "-"}
                 </Text>
               </Space>
             </Space>
@@ -156,7 +156,7 @@ export const columns = (
                   {displayName}
                 </Text>
                 <Text ellipsis type="secondary" style={{ fontSize: 12, lineHeight: '16px', marginTop: 2 }}>
-                  {model.litellm_model_name || "-"}
+                  {model.Zentris_model_name || "-"}
                 </Text>
               </div>
             </div>
@@ -180,13 +180,13 @@ export const columns = (
           </Popover>
         </span>
       ),
-      accessorKey: "litellm_credential_name",
+      accessorKey: "Zentris_credential_name",
       enableSorting: false,
       size: 180,
       minSize: 100,
       cell: ({ row }) => {
         const model = row.original;
-        const credentialName = model.litellm_params?.litellm_credential_name;
+        const credentialName = model.Zentris_params?.Zentris_credential_name;
         const isReusable = !!credentialName;
 
         return (
@@ -431,3 +431,5 @@ export const columns = (
       },
     },
   ];
+
+

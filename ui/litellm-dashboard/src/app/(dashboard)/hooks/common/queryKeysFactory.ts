@@ -33,3 +33,5 @@ export function createQueryKeys<T extends string>(resource: T) {
     detail: (uid: string) => [...all, "detail", uid] as const,
   };
 }
+
+

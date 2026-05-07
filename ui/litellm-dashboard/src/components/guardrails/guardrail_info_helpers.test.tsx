@@ -24,7 +24,7 @@ describe("guardrail_info_helpers", () => {
       "PresidioPII",
       "Bedrock",
       "Lakera",
-      "LitellmContentFilter",
+      "ZentrisContentFilter",
       "ToolPermission",
       "BlockCodeExecution",
     ]);
@@ -112,15 +112,15 @@ describe("guardrail_info_helpers", () => {
   });
 
   describe("shouldRenderContentFilterConfigSettings", () => {
-    it("should return true when dynamic providers include LiteLLM Content Filter", () => {
+    it("should return true when dynamic providers include Zentris Content Filter", () => {
       populateGuardrailProviders({
-        litellm_content_filter: {
-          ui_friendly_name: "LiteLLM Content Filter",
+        Zentris_content_filter: {
+          ui_friendly_name: "Zentris Content Filter",
         },
       });
 
       expect(
-        shouldRenderContentFilterConfigSettings("LitellmContentFilter")
+        shouldRenderContentFilterConfigSettings("ZentrisContentFilter")
       ).toBe(true);
     });
 
@@ -200,3 +200,5 @@ describe("guardrail_info_helpers", () => {
     });
   });
 });
+
+

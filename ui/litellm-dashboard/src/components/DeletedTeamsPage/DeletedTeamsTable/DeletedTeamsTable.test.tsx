@@ -42,3 +42,5 @@ it("should display team information correctly", () => {
   expect(screen.getByText("team-1")).toBeInTheDocument();
   expect(screen.getByText("Showing 1 team")).toBeInTheDocument();
 });
+
+

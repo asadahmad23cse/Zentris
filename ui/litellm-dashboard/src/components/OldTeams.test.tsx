@@ -905,7 +905,7 @@ describe("OldTeams - organization alias display", () => {
         created_by: "user-1",
         updated_at: new Date().toISOString(),
         updated_by: "user-1",
-        litellm_budget_table: null,
+        Zentris_budget_table: null,
         teams: null,
         users: null,
         members: null,
@@ -1018,3 +1018,5 @@ describe("OldTeams - organization alias display", () => {
     });
   });
 });
+
+

@@ -58,7 +58,7 @@ const createMockTeamData = (overrides: Partial<TeamData> = {}): TeamData => ({
     max_parallel_requests: null,
     budget_reset_at: null,
     model_id: null,
-    litellm_model_table: null,
+    Zentris_model_table: null,
     created_at: "2024-01-01T00:00:00Z",
     team_member_budget_table: null,
   },
@@ -69,7 +69,7 @@ const createMockTeamData = (overrides: Partial<TeamData> = {}): TeamData => ({
       team_id: "team-123",
       budget_id: "budget1",
       spend: 100.5,
-      litellm_budget_table: {
+      Zentris_budget_table: {
         budget_id: "budget1",
         soft_budget: null,
         max_budget: 1000,
@@ -384,3 +384,5 @@ describe("TeamMembersComponent", () => {
     expect(screen.queryByTestId("delete-member")).not.toBeInTheDocument();
   });
 });
+
+

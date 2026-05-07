@@ -68,11 +68,11 @@ const EditAutoRouterModal: React.FC<EditAutoRouterModalProps> = ({
     try {
       // Parse the auto_router_config if it exists and is a string
       let parsedConfig = null;
-      if (modelData.litellm_params?.auto_router_config) {
-        if (typeof modelData.litellm_params.auto_router_config === "string") {
-          parsedConfig = JSON.parse(modelData.litellm_params.auto_router_config);
+      if (modelData.Zentris_params?.auto_router_config) {
+        if (typeof modelData.Zentris_params.auto_router_config === "string") {
+          parsedConfig = JSON.parse(modelData.Zentris_params.auto_router_config);
         } else {
-          parsedConfig = modelData.litellm_params.auto_router_config;
+          parsedConfig = modelData.Zentris_params.auto_router_config;
         }
       }
 
@@ -81,15 +81,15 @@ const EditAutoRouterModal: React.FC<EditAutoRouterModalProps> = ({
       // Set form values
       form.setFieldsValue({
         auto_router_name: modelData.model_name,
-        auto_router_default_model: modelData.litellm_params?.auto_router_default_model || "",
-        auto_router_embedding_model: modelData.litellm_params?.auto_router_embedding_model || "",
+        auto_router_default_model: modelData.Zentris_params?.auto_router_default_model || "",
+        auto_router_embedding_model: modelData.Zentris_params?.auto_router_embedding_model || "",
         model_access_group: modelData.model_info?.access_groups || [],
       });
 
       // Check if using custom models
       const allModelGroups = new Set(modelInfo.map((model) => model.model_group));
-      setShowCustomDefaultModel(!allModelGroups.has(modelData.litellm_params?.auto_router_default_model));
-      setShowCustomEmbeddingModel(!allModelGroups.has(modelData.litellm_params?.auto_router_embedding_model));
+      setShowCustomDefaultModel(!allModelGroups.has(modelData.Zentris_params?.auto_router_default_model));
+      setShowCustomEmbeddingModel(!allModelGroups.has(modelData.Zentris_params?.auto_router_embedding_model));
     } catch (error) {
       console.error("Error parsing auto router config:", error);
       NotificationsManager.fromBackend("Error loading auto router configuration");
@@ -101,9 +101,9 @@ const EditAutoRouterModal: React.FC<EditAutoRouterModalProps> = ({
       setLoading(true);
       const values = await form.validateFields();
 
-      // Prepare the updated litellm_params
-      const updatedLitellmParams = {
-        ...modelData.litellm_params,
+      // Prepare the updated Zentris_params
+      const updatedZentrisParams = {
+        ...modelData.Zentris_params,
         auto_router_config: JSON.stringify(routerConfig),
         auto_router_default_model: values.auto_router_default_model,
         auto_router_embedding_model: values.auto_router_embedding_model || undefined,
@@ -117,7 +117,7 @@ const EditAutoRouterModal: React.FC<EditAutoRouterModalProps> = ({
 
       const updateData = {
         model_name: values.auto_router_name,
-        litellm_params: updatedLitellmParams,
+        Zentris_params: updatedZentrisParams,
         model_info: updatedModelInfo,
       };
 
@@ -126,7 +126,7 @@ const EditAutoRouterModal: React.FC<EditAutoRouterModalProps> = ({
       const updatedModelData = {
         ...modelData,
         model_name: values.auto_router_name,
-        litellm_params: updatedLitellmParams,
+        Zentris_params: updatedZentrisParams,
         model_info: updatedModelInfo,
       };
 
@@ -246,3 +246,5 @@ const EditAutoRouterModal: React.FC<EditAutoRouterModalProps> = ({
 };
 
 export default EditAutoRouterModal;
+
+

@@ -14,7 +14,7 @@ import { Providers, providerLogoMap } from "../provider_info_helpers";
 import { ProviderLogo } from "../molecules/models/ProviderLogo";
 import AdvancedSettings from "./advanced_settings";
 import ConditionalPublicModelName from "./conditional_public_model_name";
-import LiteLLMModelNameField from "./litellm_model_name";
+import ZentrisModelNameField from "./Zentris_model_name";
 import ConnectionErrorDisplay from "./model_connection_test";
 import ProviderSpecificFields from "./provider_specific_fields";
 import { TEST_MODES } from "./add_model_modes";
@@ -196,7 +196,7 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
                     })}
                   </AntdSelect>
                 </Form.Item>
-                <LiteLLMModelNameField
+                <ZentrisModelNameField
                   selectedProvider={selectedProvider}
                   providerModels={providerModels}
                   getPlaceholder={getPlaceholder}
@@ -218,8 +218,8 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
                   <Col span={10}></Col>
                   <Col span={10}>
                     <Text className="mb-5 mt-1">
-                      <strong>Optional</strong> - LiteLLM endpoint to use when health checking this model{" "}
-                      <Link href="https://docs.litellm.ai/docs/proxy/health#health" target="_blank">
+                      <strong>Optional</strong> - Zentris endpoint to use when health checking this model{" "}
+                      <Link href="https://docs.Zentris.ai/docs/proxy/health#health" target="_blank">
                         Learn more
                       </Link>
                     </Text>
@@ -233,7 +233,7 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
                   </Typography.Text>
                 </div>
 
-                <Form.Item label="Existing Credentials" name="litellm_credential_name" initialValue={null}>
+                <Form.Item label="Existing Credentials" name="Zentris_credential_name" initialValue={null}>
                   <AntdSelect
                     showSearch
                     placeholder="Select or search for existing credentials"
@@ -253,12 +253,12 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
                 <Form.Item
                   noStyle
                   shouldUpdate={(prevValues, currentValues) =>
-                    prevValues.litellm_credential_name !== currentValues.litellm_credential_name ||
+                    prevValues.Zentris_credential_name !== currentValues.Zentris_credential_name ||
                     prevValues.provider !== currentValues.provider
                   }
                 >
                   {({ getFieldValue }) => {
-                    const credentialName = getFieldValue("litellm_credential_name");
+                    const credentialName = getFieldValue("Zentris_credential_name");
                     console.log("🔑 Credential Name Changed:", credentialName);
                     // Only show provider specific fields if no credentials selected
                     if (!credentialName) {
@@ -363,7 +363,7 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
             )}
             <div className="flex justify-between items-center mb-4">
               <Tooltip title="Get help on our github">
-                <Typography.Link href="https://github.com/BerriAI/litellm/issues">Need Help?</Typography.Link>
+                <Typography.Link href="https://github.com/BerriAI/Zentris/issues">Need Help?</Typography.Link>
               </Tooltip>
               <div className="space-x-2">
                 <Button onClick={handleTestConnection} loading={isTestingConnection}>
@@ -419,3 +419,5 @@ const AddModelForm: React.FC<AddModelFormProps> = ({
 };
 
 export default AddModelForm;
+
+

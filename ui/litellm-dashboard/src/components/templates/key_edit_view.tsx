@@ -94,8 +94,8 @@ export function KeyEditView({
   const team = teams?.find((team) => team.team_id === keyData.team_id);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [disabledCallbacks, setDisabledCallbacks] = useState<string[]>(
-    Array.isArray(keyData.metadata?.litellm_disabled_callbacks)
-      ? mapInternalToDisplayNames(keyData.metadata.litellm_disabled_callbacks)
+    Array.isArray(keyData.metadata?.Zentris_disabled_callbacks)
+      ? mapInternalToDisplayNames(keyData.metadata.Zentris_disabled_callbacks)
       : [],
   );
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(keyData.organization_id || null);
@@ -187,8 +187,8 @@ export function KeyEditView({
       accessGroups: keyData.object_permission?.agent_access_groups || [],
     },
     logging_settings: extractLoggingSettings(keyData.metadata),
-    disabled_callbacks: Array.isArray(keyData.metadata?.litellm_disabled_callbacks)
-      ? mapInternalToDisplayNames(keyData.metadata.litellm_disabled_callbacks)
+    disabled_callbacks: Array.isArray(keyData.metadata?.Zentris_disabled_callbacks)
+      ? mapInternalToDisplayNames(keyData.metadata.Zentris_disabled_callbacks)
       : [],
     access_group_ids: keyData.access_group_ids || [],
     auto_rotate: keyData.auto_rotate || false,
@@ -215,8 +215,8 @@ export function KeyEditView({
       },
       mcp_tool_permissions: keyData.object_permission?.mcp_tool_permissions || {},
       logging_settings: extractLoggingSettings(keyData.metadata),
-      disabled_callbacks: Array.isArray(keyData.metadata?.litellm_disabled_callbacks)
-        ? mapInternalToDisplayNames(keyData.metadata.litellm_disabled_callbacks)
+      disabled_callbacks: Array.isArray(keyData.metadata?.Zentris_disabled_callbacks)
+        ? mapInternalToDisplayNames(keyData.metadata.Zentris_disabled_callbacks)
         : [],
       access_group_ids: keyData.access_group_ids || [],
       auto_rotate: keyData.auto_rotate || false,
@@ -746,3 +746,5 @@ export function KeyEditView({
     </Form>
   );
 }
+
+

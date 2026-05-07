@@ -40,3 +40,5 @@ export const TimeCell: React.FC<TimeCellProps> = ({ utcTime }) => {
 export const getTimeZone = (): string => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
+
+

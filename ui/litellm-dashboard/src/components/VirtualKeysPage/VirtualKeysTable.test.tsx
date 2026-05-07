@@ -105,7 +105,7 @@ const mockKey: KeyResponse = {
   model_max_budget: { "gpt-3.5-turbo": 50, "gpt-4": 50 },
   soft_budget_cooldown: false,
   blocked: false,
-  litellm_budget_table: {},
+  Zentris_budget_table: {},
   organization_id: "org-1",
   created_at: "2024-11-01T10:00:00Z",
   created_by: "user-1",
@@ -167,7 +167,7 @@ const mockOrganization: Organization = {
   created_by: "user-1",
   updated_at: "2024-11-01T10:00:00Z",
   updated_by: "user-1",
-  litellm_budget_table: {},
+  Zentris_budget_table: {},
   teams: [],
   users: [],
   members: [],
@@ -974,3 +974,5 @@ describe("refetch button", () => {
     expect(screen.getByText("Fetch")).toBeInTheDocument();
   });
 });
+
+

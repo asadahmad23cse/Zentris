@@ -57,7 +57,7 @@ export interface TeamMembership {
   team_id: string;
   budget_id: string;
   spend: number;
-  litellm_budget_table: {
+  Zentris_budget_table: {
     budget_id: string;
     soft_budget: number | null;
     max_budget: number | null;
@@ -90,7 +90,7 @@ export interface TeamData {
     max_parallel_requests: number | null;
     budget_reset_at: string | null;
     model_id: string | null;
-    litellm_model_table: {
+    Zentris_model_table: {
       model_aliases: Record<string, string>;
     } | null;
     created_at: string;
@@ -343,7 +343,7 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
       let errMsg = "Failed to add team member";
 
       if (error?.raw?.detail?.error?.includes("Assigning team admins is a premium feature")) {
-        errMsg = "Assigning admins is an enterprise-only feature. Please upgrade your LiteLLM plan to enable this.";
+        errMsg = "Assigning admins is an enterprise-only feature. Please upgrade your Zentris plan to enable this.";
       } else if (error?.message) {
         errMsg = error.message;
       }
@@ -383,7 +383,7 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
     } catch (error: any) {
       let errMsg = "Failed to update team member";
       if (error?.raw?.detail?.includes("Assigning team admins is a premium feature")) {
-        errMsg = "Assigning admins is an enterprise-only feature. Please upgrade your LiteLLM plan to enable this.";
+        errMsg = "Assigning admins is an enterprise-only feature. Please upgrade your Zentris plan to enable this.";
       } else if (error?.message) {
         errMsg = error.message;
       }
@@ -941,7 +941,7 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
                           Guardrails{" "}
                           <Tooltip title="Setup your first guardrail">
                             <a
-                              href="https://docs.litellm.ai/docs/proxy/guardrails/quick_start"
+                              href="https://docs.Zentris.ai/docs/proxy/guardrails/quick_start"
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
@@ -983,7 +983,7 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
                           Policies{" "}
                           <Tooltip title="Apply policies to this team to control guardrails and other settings">
                             <a
-                              href="https://docs.litellm.ai/docs/proxy/guardrails/guardrail_policies"
+                              href="https://docs.Zentris.ai/docs/proxy/guardrails/guardrail_policies"
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
@@ -1114,7 +1114,7 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
                     >
                       <Input.TextArea
                         rows={6}
-                        placeholder='{"namespace": "admin", "mount": "secret", "path_prefix": "litellm"}'
+                        placeholder='{"namespace": "admin", "mount": "secret", "path_prefix": "Zentris"}'
                         disabled={!premiumUser}
                       />
                     </Form.Item>
@@ -1340,3 +1340,5 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
 };
 
 export default TeamInfoView;
+
+

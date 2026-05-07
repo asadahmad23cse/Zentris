@@ -1097,7 +1097,7 @@ const Teams: React.FC<TeamProps> = ({
                                   <span>
                                     Organizations can have multiple teams. Learn more about{" "}
                                     <a
-                                      href="https://docs.litellm.ai/docs/proxy/user_management_heirarchy"
+                                      href="https://docs.Zentris.ai/docs/proxy/user_management_heirarchy"
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       style={{
@@ -1308,7 +1308,7 @@ const Teams: React.FC<TeamProps> = ({
                       >
                         <Input.TextArea
                           rows={4}
-                          placeholder='{"namespace": "admin", "mount": "secret", "path_prefix": "litellm"}'
+                          placeholder='{"namespace": "admin", "mount": "secret", "path_prefix": "Zentris"}'
                           disabled={!premiumUser}
                         />
                       </Form.Item>
@@ -1318,7 +1318,7 @@ const Teams: React.FC<TeamProps> = ({
                             Guardrails{" "}
                             <Tooltip title="Setup your first guardrail">
                               <a
-                                href="https://docs.litellm.ai/docs/proxy/guardrails/quick_start"
+                                href="https://docs.Zentris.ai/docs/proxy/guardrails/quick_start"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
@@ -1372,7 +1372,7 @@ const Teams: React.FC<TeamProps> = ({
                             Policies{" "}
                             <Tooltip title="Apply policies to this team to control guardrails and other settings">
                               <a
-                                href="https://docs.litellm.ai/docs/proxy/guardrails/guardrail_policies"
+                                href="https://docs.Zentris.ai/docs/proxy/guardrails/guardrail_policies"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
@@ -1577,3 +1577,5 @@ const Teams: React.FC<TeamProps> = ({
 };
 
 export default Teams;
+
+

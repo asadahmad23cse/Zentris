@@ -39,7 +39,7 @@ const milestones: SecurityMilestone[] = [
     key: "runtime",
     capability: "Runtime Visibility",
     status: "Visible in UI",
-    artifact: "ui/litellm-dashboard/src/components/ZentrisSecurityDashboard.tsx",
+    artifact: "ui/Zentris-dashboard/src/components/ZentrisSecurityDashboard.tsx",
     coverage: "Dashboard status page added for implementation-plan progress",
   },
 ];
@@ -153,7 +153,7 @@ export default function ZentrisSecurityDashboard() {
                 </Paragraph>
               </Col>
               <Col xs={24} md={8}>
-                <Text type="secondary">LiteLLM Admin Proxy</Text>
+                <Text type="secondary">Zentris Admin Proxy</Text>
                 <Paragraph copyable className="!mt-2">
                   http://127.0.0.1:4000
                 </Paragraph>
@@ -165,3 +165,5 @@ export default function ZentrisSecurityDashboard() {
     </main>
   );
 }
+
+

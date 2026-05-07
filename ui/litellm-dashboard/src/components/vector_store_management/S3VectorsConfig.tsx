@@ -190,3 +190,5 @@ const S3VectorsConfig: React.FC<S3VectorsConfigProps> = ({
 };
 
 export default S3VectorsConfig;
+
+

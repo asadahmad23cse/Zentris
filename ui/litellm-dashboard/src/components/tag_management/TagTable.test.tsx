@@ -99,3 +99,5 @@ describe("TagTable", () => {
     expect(deleteIcon).toHaveClass("cursor-not-allowed");
   });
 });
+
+

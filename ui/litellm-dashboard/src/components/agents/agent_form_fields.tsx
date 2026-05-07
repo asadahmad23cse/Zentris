@@ -173,10 +173,10 @@ const AgentFormFields: React.FC<AgentFormFieldsProps> = ({ showAgentName = true,
         </Panel>
         )}
 
-        {/* LiteLLM Parameters */}
-        {shouldShow(AGENT_FORM_CONFIG.litellm.key) && (
-        <Panel header={AGENT_FORM_CONFIG.litellm.title} key={AGENT_FORM_CONFIG.litellm.key}>
-          {AGENT_FORM_CONFIG.litellm.fields.map((field) => (
+        {/* Zentris Parameters */}
+        {shouldShow(AGENT_FORM_CONFIG.Zentris.key) && (
+        <Panel header={AGENT_FORM_CONFIG.Zentris.title} key={AGENT_FORM_CONFIG.Zentris.key}>
+          {AGENT_FORM_CONFIG.Zentris.fields.map((field) => (
             <Form.Item
               key={field.name}
               label={field.label}
@@ -260,4 +260,6 @@ const AgentFormFields: React.FC<AgentFormFieldsProps> = ({ showAgentName = true,
 };
 
 export default AgentFormFields;
+
+
 

@@ -307,3 +307,5 @@ export default function MCPSemanticFilterSettings({ accessToken }: MCPSemanticFi
     </div>
   );
 }
+
+

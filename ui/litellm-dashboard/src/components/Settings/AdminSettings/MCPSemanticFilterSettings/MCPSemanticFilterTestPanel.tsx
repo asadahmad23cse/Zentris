@@ -127,7 +127,7 @@ export default function MCPSemanticFilterTestPanel({
             <ul style={{ paddingLeft: 20, margin: "0 0 12px 0" }}>
               <li>
                 <Typography.Text>
-                  x-litellm-semantic-filter: shows total tools → selected tools
+                  x-Zentris-semantic-filter: shows total tools → selected tools
                 </Typography.Text>
                 <Typography.Text type="secondary" style={{ display: "block" }}>
                   Example: 10→3
@@ -135,7 +135,7 @@ export default function MCPSemanticFilterTestPanel({
               </li>
               <li>
                 <Typography.Text>
-                  x-litellm-semantic-filter-tools: CSV of selected tool names
+                  x-Zentris-semantic-filter-tools: CSV of selected tool names
                 </Typography.Text>
                 <Typography.Text type="secondary" style={{ display: "block" }}>
                   Example: wikipedia-fetch,github-search,slack-post
@@ -162,3 +162,5 @@ export default function MCPSemanticFilterTestPanel({
     </Card>
   );
 }
+
+

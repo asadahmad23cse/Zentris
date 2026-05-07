@@ -236,3 +236,5 @@ describe("SpendByProvider", () => {
     expect(screen.queryByText("provider2")).not.toBeInTheDocument();
   });
 });
+
+

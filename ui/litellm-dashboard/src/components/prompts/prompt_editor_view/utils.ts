@@ -213,8 +213,8 @@ const parseDotpromptBody = (body: string): ParsedBody => {
 };
 
 export const parseExistingPrompt = (apiResponse: any): PromptType => {
-  // Extract dotprompt_content from litellm_params
-  const dotpromptContent = apiResponse?.prompt_spec?.litellm_params?.dotprompt_content || "";
+  // Extract dotprompt_content from Zentris_params
+  const dotpromptContent = apiResponse?.prompt_spec?.Zentris_params?.dotprompt_content || "";
   
   if (!dotpromptContent) {
     throw new Error("No dotprompt_content found in API response");
@@ -262,3 +262,5 @@ export const stripVersionFromPromptId = (promptId?: string): string => {
   // Remove version suffix with dot (.v), underscore (_v), or hyphen (-v) separator
   return promptId.replace(/[._-]v\d+$/, "");
 };
+
+

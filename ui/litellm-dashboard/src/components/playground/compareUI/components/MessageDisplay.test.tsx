@@ -93,3 +93,5 @@ describe("MessageDisplay", () => {
     expect(image).toHaveAttribute("src", "blob:test-image-url");
   });
 });
+
+

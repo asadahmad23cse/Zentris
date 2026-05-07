@@ -79,3 +79,5 @@ describe("PrettyMessagesView", () => {
     expect(screen.getByText("Reply")).toBeInTheDocument();
   });
 });
+
+

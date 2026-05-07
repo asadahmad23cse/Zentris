@@ -15,3 +15,5 @@ export const useBaseUrl = () => {
 };
 
 export const defaultPageSize = 25;
+
+

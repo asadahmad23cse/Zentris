@@ -59,3 +59,5 @@ describe("AntDLoadingSpinner", () => {
     expect(icon).toHaveAttribute("data-spin", "true");
   });
 });
+
+

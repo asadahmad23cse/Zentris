@@ -456,7 +456,7 @@ describe("UsagePage", () => {
       created_by: "user-123",
       updated_at: "2025-01-02T00:00:00Z",
       updated_by: "user-123",
-      litellm_budget_table: null,
+      Zentris_budget_table: null,
       teams: null,
       users: null,
       members: null,
@@ -472,7 +472,7 @@ describe("UsagePage", () => {
       allowed_model_region: null,
       default_model: null,
       budget_id: null,
-      litellm_budget_table: null,
+      Zentris_budget_table: null,
     },
   ];
 
@@ -1030,25 +1030,25 @@ describe("UsagePage", () => {
       // Default should be "groups" view showing "Top Public Model Names"
       expect(screen.getByText("Top Public Model Names")).toBeInTheDocument();
       expect(screen.getByText("Public Model Name")).toBeInTheDocument();
-      expect(screen.getByText("Litellm Model Name")).toBeInTheDocument();
+      expect(screen.getByText("Zentris Model Name")).toBeInTheDocument();
     });
 
-    it("should switch to Litellm Model Name view on toggle click", async () => {
+    it("should switch to Zentris Model Name view on toggle click", async () => {
       renderWithProviders(<UsagePage {...defaultProps} />);
 
       await waitFor(() => {
         expect(mockUserDailyActivityAggregatedCall).toHaveBeenCalled();
       });
 
-      // Click the "Litellm Model Name" toggle
-      const litellmToggle = screen.getByText("Litellm Model Name");
+      // Click the "Zentris Model Name" toggle
+      const ZentrisToggle = screen.getByText("Zentris Model Name");
       act(() => {
-        fireEvent.click(litellmToggle);
+        fireEvent.click(ZentrisToggle);
       });
 
-      // Title should change to "Top Litellm Models"
+      // Title should change to "Top Zentris Models"
       await waitFor(() => {
-        expect(screen.getByText("Top Litellm Models")).toBeInTheDocument();
+        expect(screen.getByText("Top Zentris Models")).toBeInTheDocument();
       });
     });
 
@@ -1060,13 +1060,13 @@ describe("UsagePage", () => {
       });
 
       // Switch to individual first
-      const litellmToggle = screen.getByText("Litellm Model Name");
+      const ZentrisToggle = screen.getByText("Zentris Model Name");
       act(() => {
-        fireEvent.click(litellmToggle);
+        fireEvent.click(ZentrisToggle);
       });
 
       await waitFor(() => {
-        expect(screen.getByText("Top Litellm Models")).toBeInTheDocument();
+        expect(screen.getByText("Top Zentris Models")).toBeInTheDocument();
       });
 
       // Switch back to groups
@@ -1149,3 +1149,5 @@ describe("UsagePage", () => {
     });
   });
 });
+
+

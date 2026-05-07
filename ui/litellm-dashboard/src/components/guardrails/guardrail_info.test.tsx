@@ -44,7 +44,7 @@ describe("Guardrail Info", () => {
     vi.mocked(networking.getGuardrailInfo).mockResolvedValue({
       guardrail_id: "123",
       guardrail_name: "Test Guardrail",
-      litellm_params: {
+      Zentris_params: {
         guardrail: "presidio",
         mode: "pre_call",
         default_on: true,
@@ -85,7 +85,7 @@ describe("Guardrail Info", () => {
     vi.mocked(networking.getGuardrailInfo).mockResolvedValue({
       guardrail_id: "123",
       guardrail_name: "Test Guardrail",
-      litellm_params: {
+      Zentris_params: {
         guardrail: "presidio",
         mode: "pre_call",
         default_on: true,
@@ -139,7 +139,7 @@ describe("Guardrail Info", () => {
     vi.mocked(networking.getGuardrailInfo).mockResolvedValue({
       guardrail_id: "123",
       guardrail_name: "Test Guardrail",
-      litellm_params: {
+      Zentris_params: {
         guardrail: "presidio",
         mode: "pre_call",
         default_on: true,
@@ -175,8 +175,8 @@ describe("Guardrail Info", () => {
     vi.mocked(networking.getGuardrailInfo).mockResolvedValue({
       guardrail_id: "123",
       guardrail_name: "Content Filter Guardrail",
-      litellm_params: {
-        guardrail: "litellm_content_filter",
+      Zentris_params: {
+        guardrail: "Zentris_content_filter",
         mode: "pre_call",
         default_on: true,
         patterns: ["initial_pattern"],
@@ -234,11 +234,11 @@ describe("Guardrail Info", () => {
     // Verify attributes that definitely changed
     expect(firstCallArgs.guardrail_name).toBe("Updated Name");
 
-    // litellm_params might be undefined if empty, which is correct. 
+    // Zentris_params might be undefined if empty, which is correct. 
     // If it exists, ensure patterns/blocked_words are not in it.
-    if (firstCallArgs.litellm_params) {
-      expect(firstCallArgs.litellm_params.patterns).toBeUndefined();
-      expect(firstCallArgs.litellm_params.blocked_words).toBeUndefined();
+    if (firstCallArgs.Zentris_params) {
+      expect(firstCallArgs.Zentris_params.patterns).toBeUndefined();
+      expect(firstCallArgs.Zentris_params.blocked_words).toBeUndefined();
     }
 
     // Clear mocks to reset call count
@@ -263,8 +263,10 @@ describe("Guardrail Info", () => {
 
     // Verify call INCLUDES patterns and blocked_words
     const secondCallArgs: any = vi.mocked(networking.updateGuardrailCall).mock.calls[0][2];
-    expect(secondCallArgs.litellm_params).toBeDefined();
-    expect(secondCallArgs.litellm_params.patterns).toEqual(["new_pattern"]);
-    expect(secondCallArgs.litellm_params.blocked_words).toEqual(["new_word"]);
+    expect(secondCallArgs.Zentris_params).toBeDefined();
+    expect(secondCallArgs.Zentris_params.patterns).toEqual(["new_pattern"]);
+    expect(secondCallArgs.Zentris_params.blocked_words).toEqual(["new_word"]);
   });
 });
+
+

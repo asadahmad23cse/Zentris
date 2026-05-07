@@ -7,7 +7,7 @@ import { projectKeys } from "./useProjects";
 
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: vi.fn(() => ""),
-  getGlobalLitellmHeaderName: vi.fn(() => "Authorization"),
+  getGlobalZentrisHeaderName: vi.fn(() => "Authorization"),
   deriveErrorMessage: vi.fn((data: any) => data?.error || "Error"),
   handleError: vi.fn(),
 }));
@@ -86,3 +86,5 @@ describe("useDeleteProject", () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 });
+
+

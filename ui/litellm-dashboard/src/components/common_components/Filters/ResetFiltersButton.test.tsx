@@ -27,3 +27,5 @@ describe("ResetFiltersButton", () => {
     expect(screen.getByRole("button", { name: /clear all/i })).toBeInTheDocument();
   });
 });
+
+

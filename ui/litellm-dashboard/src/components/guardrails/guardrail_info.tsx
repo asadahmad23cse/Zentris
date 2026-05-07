@@ -142,8 +142,8 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
       setGuardrailData(response);
 
       // Initialize PII configuration from guardrail data
-      if (response.litellm_params?.pii_entities_config) {
-        const piiConfig = response.litellm_params.pii_entities_config;
+      if (response.Zentris_params?.pii_entities_config) {
+        const piiConfig = response.Zentris_params.pii_entities_config;
 
         // Clear previous selections
         setSelectedPiiEntities([]);
@@ -209,23 +209,23 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
     if (guardrailData && form) {
       form.setFieldsValue({
         guardrail_name: guardrailData.guardrail_name,
-        ...guardrailData.litellm_params,
+        ...guardrailData.Zentris_params,
         guardrail_info: guardrailData.guardrail_info ? JSON.stringify(guardrailData.guardrail_info, null, 2) : "",
         // Include any optional_params if they exist
-        ...(guardrailData.litellm_params?.optional_params && {
-          optional_params: guardrailData.litellm_params.optional_params,
+        ...(guardrailData.Zentris_params?.optional_params && {
+          optional_params: guardrailData.Zentris_params.optional_params,
         }),
       });
     }
   }, [guardrailData, guardrailProviderSpecificParams, form]);
 
   const resetToolPermissionEditor = useCallback(() => {
-    if (guardrailData?.litellm_params?.guardrail === "tool_permission") {
+    if (guardrailData?.Zentris_params?.guardrail === "tool_permission") {
       setToolPermissionConfig({
-        rules: (guardrailData.litellm_params?.rules as ToolPermissionConfig["rules"]) || [],
-        default_action: ((guardrailData.litellm_params?.default_action || "deny") as ToolPermissionConfig["default_action"]).toLowerCase() as ToolPermissionConfig["default_action"],
-        on_disallowed_action: ((guardrailData.litellm_params?.on_disallowed_action || "block") as ToolPermissionConfig["on_disallowed_action"]).toLowerCase() as ToolPermissionConfig["on_disallowed_action"],
-        violation_message_template: guardrailData.litellm_params?.violation_message_template || "",
+        rules: (guardrailData.Zentris_params?.rules as ToolPermissionConfig["rules"]) || [],
+        default_action: ((guardrailData.Zentris_params?.default_action || "deny") as ToolPermissionConfig["default_action"]).toLowerCase() as ToolPermissionConfig["default_action"],
+        on_disallowed_action: ((guardrailData.Zentris_params?.on_disallowed_action || "block") as ToolPermissionConfig["on_disallowed_action"]).toLowerCase() as ToolPermissionConfig["on_disallowed_action"],
+        violation_message_template: guardrailData.Zentris_params?.violation_message_template || "",
       });
     } else {
       setToolPermissionConfig(emptyToolPermissionConfig);
@@ -265,7 +265,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
 
       // Prepare update data object - only include changed fields
       const updateData: any = {
-        litellm_params: {},
+        Zentris_params: {},
       };
 
       // Only include guardrail_name if it has changed
@@ -274,8 +274,8 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
       }
 
       // Only include default_on if it has changed
-      if (values.default_on !== guardrailData.litellm_params?.default_on) {
-        updateData.litellm_params.default_on = values.default_on;
+      if (values.default_on !== guardrailData.Zentris_params?.default_on) {
+        updateData.Zentris_params.default_on = values.default_on;
       }
 
       // Only include guardrail_info if it has changed
@@ -286,7 +286,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
       }
 
       // Only add PII entities config if there are changes
-      const originalPiiConfig = guardrailData.litellm_params?.pii_entities_config || {};
+      const originalPiiConfig = guardrailData.Zentris_params?.pii_entities_config || {};
       const newPiiEntitiesConfig: { [key: string]: string } = {};
 
       selectedPiiEntities.forEach((entity) => {
@@ -295,11 +295,11 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
 
       // Only update if PII config has changed
       if (JSON.stringify(originalPiiConfig) !== JSON.stringify(newPiiEntitiesConfig)) {
-        updateData.litellm_params.pii_entities_config = newPiiEntitiesConfig;
+        updateData.Zentris_params.pii_entities_config = newPiiEntitiesConfig;
       }
 
       // Only add Content Filter patterns if there are changes
-      if (guardrailData.litellm_params?.guardrail === "litellm_content_filter" && hasUnsavedContentFilterChanges) {
+      if (guardrailData.Zentris_params?.guardrail === "Zentris_content_filter" && hasUnsavedContentFilterChanges) {
         const formattedData = formatContentFilterDataForAPI(
           contentFilterDataRef.current.patterns || [],
           contentFilterDataRef.current.blockedWords || [],
@@ -308,35 +308,35 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
           contentFilterDataRef.current.competitorIntentConfig
         );
 
-        updateData.litellm_params.patterns = formattedData.patterns;
-        updateData.litellm_params.blocked_words = formattedData.blocked_words;
-        updateData.litellm_params.categories = formattedData.categories;
-        updateData.litellm_params.competitor_intent_config =
+        updateData.Zentris_params.patterns = formattedData.patterns;
+        updateData.Zentris_params.blocked_words = formattedData.blocked_words;
+        updateData.Zentris_params.categories = formattedData.categories;
+        updateData.Zentris_params.competitor_intent_config =
           formattedData.competitor_intent_config ?? null;
       }
 
-      if (guardrailData.litellm_params?.guardrail === "tool_permission") {
-        const originalRules = guardrailData.litellm_params?.rules || [];
+      if (guardrailData.Zentris_params?.guardrail === "tool_permission") {
+        const originalRules = guardrailData.Zentris_params?.rules || [];
         const currentRules = toolPermissionConfig.rules || [];
         const rulesChanged = JSON.stringify(originalRules) !== JSON.stringify(currentRules);
 
-        const originalDefault = (guardrailData.litellm_params?.default_action || "deny").toLowerCase();
+        const originalDefault = (guardrailData.Zentris_params?.default_action || "deny").toLowerCase();
         const currentDefault = (toolPermissionConfig.default_action || "deny").toLowerCase();
         const defaultChanged = originalDefault !== currentDefault;
 
-        const originalOnDisallowed = (guardrailData.litellm_params?.on_disallowed_action || "block").toLowerCase();
+        const originalOnDisallowed = (guardrailData.Zentris_params?.on_disallowed_action || "block").toLowerCase();
         const currentOnDisallowed = (toolPermissionConfig.on_disallowed_action || "block").toLowerCase();
         const onDisallowedChanged = originalOnDisallowed !== currentOnDisallowed;
 
-        const originalMessage = guardrailData.litellm_params?.violation_message_template || "";
+        const originalMessage = guardrailData.Zentris_params?.violation_message_template || "";
         const currentMessage = toolPermissionConfig.violation_message_template || "";
         const messageChanged = originalMessage !== currentMessage;
 
         if (toolPermissionDirty || rulesChanged || defaultChanged || onDisallowedChanged || messageChanged) {
-          updateData.litellm_params.rules = currentRules;
-          updateData.litellm_params.default_action = currentDefault;
-          updateData.litellm_params.on_disallowed_action = currentOnDisallowed;
-          updateData.litellm_params.violation_message_template = currentMessage || null;
+          updateData.Zentris_params.rules = currentRules;
+          updateData.Zentris_params.default_action = currentDefault;
+          updateData.Zentris_params.on_disallowed_action = currentOnDisallowed;
+          updateData.Zentris_params.violation_message_template = currentMessage || null;
         }
       }
 
@@ -351,14 +351,14 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
 
       // Get the current provider from the guardrail data
       const currentProvider = Object.keys(guardrail_provider_map).find(
-        (key) => guardrail_provider_map[key] === guardrailData.litellm_params?.guardrail,
+        (key) => guardrail_provider_map[key] === guardrailData.Zentris_params?.guardrail,
       );
 
       console.log("values: ", JSON.stringify(values));
       console.log("currentProvider: ", currentProvider);
 
       // Use pre-fetched provider params to copy recognised params
-      const isToolPermissionGuardrail = guardrailData.litellm_params?.guardrail === "tool_permission";
+      const isToolPermissionGuardrail = guardrailData.Zentris_params?.guardrail === "tool_permission";
       if (guardrailProviderSpecificParams && currentProvider && !isToolPermissionGuardrail) {
         const providerKey = guardrail_provider_map[currentProvider]?.toLowerCase();
         const providerSpecificParams = guardrailProviderSpecificParams[providerKey] || {};
@@ -393,7 +393,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
           }
 
           // Get the original value for comparison
-          const originalValue = guardrailData.litellm_params?.[paramName];
+          const originalValue = guardrailData.Zentris_params?.[paramName];
 
           // Check if the value has changed from the original
           const hasChanged = JSON.stringify(paramValue) !== JSON.stringify(originalValue);
@@ -402,18 +402,18 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
           if (hasChanged) {
             if (paramValue !== undefined && paramValue !== null && paramValue !== "") {
               // User set a new value
-              updateData.litellm_params[paramName] = paramValue;
+              updateData.Zentris_params[paramName] = paramValue;
             } else if (originalValue !== undefined && originalValue !== null && originalValue !== "") {
               // User cleared an existing value - set to null to indicate removal
-              updateData.litellm_params[paramName] = null;
+              updateData.Zentris_params[paramName] = null;
             }
           }
         });
       }
 
-      // Remove empty litellm_params object if no parameters were changed
-      if (Object.keys(updateData.litellm_params).length === 0) {
-        delete updateData.litellm_params;
+      // Remove empty Zentris_params object if no parameters were changed
+      if (Object.keys(updateData.Zentris_params).length === 0) {
+        delete updateData.Zentris_params;
       }
 
       // Only proceed with update if there are actual changes
@@ -450,7 +450,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
   };
 
   // Format the provider display name and logo
-  const { logo, displayName } = getGuardrailLogoAndName(guardrailData.litellm_params?.guardrail || "");
+  const { logo, displayName } = getGuardrailLogoAndName(guardrailData.Zentris_params?.guardrail || "");
 
   const copyToClipboard = async (text: string | null | undefined, key: string) => {
     const success = await utilCopyToClipboard(text);
@@ -518,9 +518,9 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
               <Card>
                 <Text>Mode</Text>
                 <div className="mt-2">
-                  <Title>{guardrailData.litellm_params?.mode || "-"}</Title>
-                  <Badge color={guardrailData.litellm_params?.default_on ? "green" : "gray"}>
-                    {guardrailData.litellm_params?.default_on ? "Default On" : "Default Off"}
+                  <Title>{guardrailData.Zentris_params?.mode || "-"}</Title>
+                  <Badge color={guardrailData.Zentris_params?.default_on ? "green" : "gray"}>
+                    {guardrailData.Zentris_params?.default_on ? "Default On" : "Default Off"}
                   </Badge>
                 </div>
               </Card>
@@ -534,20 +534,20 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
               </Card>
             </Grid>
 
-            {guardrailData.litellm_params?.pii_entities_config &&
-              Object.keys(guardrailData.litellm_params.pii_entities_config).length > 0 && (
+            {guardrailData.Zentris_params?.pii_entities_config &&
+              Object.keys(guardrailData.Zentris_params.pii_entities_config).length > 0 && (
                 <Card className="mt-6">
                   <div className="flex justify-between items-center">
                     <Text className="font-medium">PII Protection</Text>
                     <Badge color="blue">
-                      {Object.keys(guardrailData.litellm_params.pii_entities_config).length} PII entities configured
+                      {Object.keys(guardrailData.Zentris_params.pii_entities_config).length} PII entities configured
                     </Badge>
                   </div>
                 </Card>
               )}
 
-            {guardrailData.litellm_params?.pii_entities_config &&
-              Object.keys(guardrailData.litellm_params.pii_entities_config).length > 0 && (
+            {guardrailData.Zentris_params?.pii_entities_config &&
+              Object.keys(guardrailData.Zentris_params.pii_entities_config).length > 0 && (
                 <Card className="mt-6">
                   <Text className="mb-4 text-lg font-semibold">PII Entity Configuration</Text>
                   <div className="border rounded-lg overflow-hidden shadow-sm">
@@ -556,7 +556,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                       <Text className="flex-1 font-semibold text-gray-700">Configuration</Text>
                     </div>
                     <div className="max-h-[400px] overflow-y-auto">
-                      {Object.entries(guardrailData.litellm_params?.pii_entities_config).map(([key, value]) => (
+                      {Object.entries(guardrailData.Zentris_params?.pii_entities_config).map(([key, value]) => (
                         <div key={key} className="px-5 py-3 flex border-b hover:bg-gray-50 transition-colors">
                           <Text className="flex-1 font-medium text-gray-900">{key}</Text>
                           <Text className="flex-1">
@@ -575,14 +575,14 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                 </Card>
               )}
 
-            {guardrailData.litellm_params?.guardrail === "tool_permission" && (
+            {guardrailData.Zentris_params?.guardrail === "tool_permission" && (
               <Card className="mt-6">
                 <ToolPermissionRulesEditor value={toolPermissionConfig} disabled />
               </Card>
             )}
 
             {/* Custom Code Display */}
-            {guardrailData.litellm_params?.guardrail === "custom_code" && guardrailData.litellm_params?.custom_code && (
+            {guardrailData.Zentris_params?.guardrail === "custom_code" && guardrailData.Zentris_params?.custom_code && (
               <Card className="mt-6">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center gap-2">
@@ -601,7 +601,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                 </div>
                 <div className="relative rounded-lg overflow-hidden border border-gray-700 bg-[#1e1e1e]">
                   <pre className="p-4 text-sm text-gray-200 overflow-x-auto" style={{ fontFamily: "'Fira Code', 'Monaco', 'Consolas', monospace" }}>
-                    <code>{guardrailData.litellm_params.custom_code}</code>
+                    <code>{guardrailData.Zentris_params.custom_code}</code>
                   </pre>
                 </div>
               </Card>
@@ -628,7 +628,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                     </Tooltip>
                   )}
                   {!isEditing && !isConfigGuardrail && (
-                    guardrailData.litellm_params?.guardrail === "custom_code" ? (
+                    guardrailData.Zentris_params?.guardrail === "custom_code" ? (
                       <Button
                         icon={<CodeOutlined />}
                         onClick={() => setCustomCodeModalVisible(true)}
@@ -647,13 +647,13 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                     onFinish={handleGuardrailUpdate}
                     initialValues={{
                       guardrail_name: guardrailData.guardrail_name,
-                      ...guardrailData.litellm_params,
+                      ...guardrailData.Zentris_params,
                       guardrail_info: guardrailData.guardrail_info
                         ? JSON.stringify(guardrailData.guardrail_info, null, 2)
                         : "",
                       // Include any optional_params if they exist
-                      ...(guardrailData.litellm_params?.optional_params && {
-                        optional_params: guardrailData.litellm_params.optional_params,
+                      ...(guardrailData.Zentris_params?.optional_params && {
+                        optional_params: guardrailData.Zentris_params.optional_params,
                       }),
                     }}
                     layout="vertical"
@@ -673,7 +673,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                       </Select>
                     </Form.Item>
 
-                    {guardrailData.litellm_params?.guardrail === "presidio" && (
+                    {guardrailData.Zentris_params?.guardrail === "presidio" && (
                       <>
                         <Divider orientation="left">PII Protection</Divider>
                         <div className="mb-6">
@@ -701,9 +701,9 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                       onUnsavedChanges={setHasUnsavedContentFilterChanges}
                     />
 
-                    {(guardrailData.litellm_params?.guardrail === "tool_permission" || guardrailProviderSpecificParams) && <Divider orientation="left">Provider Settings</Divider>}
+                    {(guardrailData.Zentris_params?.guardrail === "tool_permission" || guardrailProviderSpecificParams) && <Divider orientation="left">Provider Settings</Divider>}
 
-                    {guardrailData.litellm_params?.guardrail === "tool_permission" ? (
+                    {guardrailData.Zentris_params?.guardrail === "tool_permission" ? (
                       <ToolPermissionRulesEditor
                         value={toolPermissionConfig}
                         onChange={setToolPermissionConfig}
@@ -714,19 +714,19 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                         <GuardrailProviderFields
                           selectedProvider={
                             Object.keys(guardrail_provider_map).find(
-                              (key) => guardrail_provider_map[key] === guardrailData.litellm_params?.guardrail,
+                              (key) => guardrail_provider_map[key] === guardrailData.Zentris_params?.guardrail,
                             ) || null
                           }
                           accessToken={accessToken}
                           providerParams={guardrailProviderSpecificParams}
-                          value={guardrailData.litellm_params}
+                          value={guardrailData.Zentris_params}
                         />
 
                         {/* Optional parameters */}
                         {guardrailProviderSpecificParams &&
                           (() => {
                             const currentProvider = Object.keys(guardrail_provider_map).find(
-                              (key) => guardrail_provider_map[key] === guardrailData.litellm_params?.guardrail,
+                              (key) => guardrail_provider_map[key] === guardrailData.Zentris_params?.guardrail,
                             );
                             if (!currentProvider) return null;
 
@@ -739,7 +739,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                               <GuardrailOptionalParams
                                 optionalParams={providerFields.optional_params}
                                 parentFieldKey="optional_params"
-                                values={guardrailData.litellm_params}
+                                values={guardrailData.Zentris_params}
                               />
                             );
                           })()}
@@ -780,22 +780,22 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                     </div>
                     <div>
                       <Text className="font-medium">Mode</Text>
-                      <div>{guardrailData.litellm_params?.mode || "-"}</div>
+                      <div>{guardrailData.Zentris_params?.mode || "-"}</div>
                     </div>
                     <div>
                       <Text className="font-medium">Default On</Text>
-                      <Badge color={guardrailData.litellm_params?.default_on ? "green" : "gray"}>
-                        {guardrailData.litellm_params?.default_on ? "Yes" : "No"}
+                      <Badge color={guardrailData.Zentris_params?.default_on ? "green" : "gray"}>
+                        {guardrailData.Zentris_params?.default_on ? "Yes" : "No"}
                       </Badge>
                     </div>
 
-                    {guardrailData.litellm_params?.pii_entities_config &&
-                      Object.keys(guardrailData.litellm_params.pii_entities_config).length > 0 && (
+                    {guardrailData.Zentris_params?.pii_entities_config &&
+                      Object.keys(guardrailData.Zentris_params.pii_entities_config).length > 0 && (
                         <div>
                           <Text className="font-medium">PII Protection</Text>
                           <div className="mt-2">
                             <Badge color="blue">
-                              {Object.keys(guardrailData.litellm_params.pii_entities_config).length} PII entities
+                              {Object.keys(guardrailData.Zentris_params.pii_entities_config).length} PII entities
                               configured
                             </Badge>
                           </div>
@@ -811,7 +811,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
                       <div>{formatDate(guardrailData.updated_at)}</div>
                     </div>
 
-                    {guardrailData.litellm_params?.guardrail === "tool_permission" && (
+                    {guardrailData.Zentris_params?.guardrail === "tool_permission" && (
                       <ToolPermissionRulesEditor value={toolPermissionConfig} disabled />
                     )}
                   </div>
@@ -834,7 +834,7 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
         editData={guardrailData ? {
           guardrail_id: guardrailData.guardrail_id,
           guardrail_name: guardrailData.guardrail_name,
-          litellm_params: guardrailData.litellm_params,
+          Zentris_params: guardrailData.Zentris_params,
         } as EditGuardrailData : null}
       />
     </div>
@@ -842,3 +842,5 @@ const GuardrailInfoView: React.FC<GuardrailInfoProps> = ({ guardrailId, onClose,
 };
 
 export default GuardrailInfoView;
+
+

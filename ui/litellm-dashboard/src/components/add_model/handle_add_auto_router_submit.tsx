@@ -15,7 +15,7 @@ export const handleAddAutoRouterSubmit = async (values: any, accessToken: string
       
       autoRouterConfig = {
         model_name: values.auto_router_name,
-        litellm_params: {
+        Zentris_params: {
           // Use special prefix for complexity router
           model: `auto_router/complexity_router`,
           // Pass the complexity router config as a JSON object (not stringified)
@@ -34,7 +34,7 @@ export const handleAddAutoRouterSubmit = async (values: any, accessToken: string
       
       autoRouterConfig = {
         model_name: values.auto_router_name,
-        litellm_params: {
+        Zentris_params: {
           model: `auto_router/${values.auto_router_name}`,
           auto_router_config: JSON.stringify(values.auto_router_config), // Convert JSON object to string as expected by backend
           auto_router_default_model: values.auto_router_default_model,
@@ -44,12 +44,12 @@ export const handleAddAutoRouterSubmit = async (values: any, accessToken: string
 
       // Add optional embedding model if provided
       if (values.auto_router_embedding_model && values.auto_router_embedding_model !== "custom") {
-        autoRouterConfig.litellm_params.auto_router_embedding_model = values.auto_router_embedding_model;
+        autoRouterConfig.Zentris_params.auto_router_embedding_model = values.auto_router_embedding_model;
       } else if (values.custom_embedding_model) {
-        autoRouterConfig.litellm_params.auto_router_embedding_model = values.custom_embedding_model;
+        autoRouterConfig.Zentris_params.auto_router_embedding_model = values.custom_embedding_model;
       }
 
-      console.log("Semantic router config (stringified):", autoRouterConfig.litellm_params.auto_router_config);
+      console.log("Semantic router config (stringified):", autoRouterConfig.Zentris_params.auto_router_config);
     }
 
     // Add team information if provided
@@ -85,3 +85,5 @@ export const handleAddAutoRouterSubmit = async (values: any, accessToken: string
     NotificationManager.fromBackend("Failed to add auto router: " + error);
   }
 };
+
+

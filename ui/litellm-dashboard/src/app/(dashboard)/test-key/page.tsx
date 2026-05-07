@@ -7,7 +7,7 @@ import { fetchProxySettings } from "@/utils/proxyUtils";
 
 interface ProxySettings {
   PROXY_BASE_URL?: string;
-  LITELLM_UI_API_DOC_BASE_URL?: string | null;
+  Zentris_UI_API_DOC_BASE_URL?: string | null;
 }
 
 const TestKeyPage = () => {
@@ -21,7 +21,7 @@ const TestKeyPage = () => {
         if (settings) {
           setProxySettings({
             PROXY_BASE_URL: settings.PROXY_BASE_URL || undefined,
-            LITELLM_UI_API_DOC_BASE_URL: settings.LITELLM_UI_API_DOC_BASE_URL,
+            Zentris_UI_API_DOC_BASE_URL: settings.Zentris_UI_API_DOC_BASE_URL,
           });
         }
       }
@@ -43,3 +43,5 @@ const TestKeyPage = () => {
 };
 
 export default TestKeyPage;
+
+

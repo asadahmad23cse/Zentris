@@ -41,16 +41,16 @@ const createMockModel = (overrides: Partial<ModelData> = {}): ModelData => ({
   },
   model_name: "test-model",
   provider: "openai",
-  litellm_model_name: "gpt-4",
+  Zentris_model_name: "gpt-4",
   input_cost: 0.01,
   output_cost: 0.03,
   max_tokens: 4096,
   max_input_tokens: 8192,
-  litellm_params: {
+  Zentris_params: {
     model: "gpt-4",
-    litellm_credential_name: "test-credential",
+    Zentris_credential_name: "test-credential",
   },
-  cleanedLitellmParams: {},
+  cleanedZentrisParams: {},
   ...overrides,
 });
 
@@ -167,7 +167,7 @@ describe("columns", () => {
     const model = createMockModel({
       model_name: "GPT-4",
       provider: "openai",
-      litellm_model_name: "gpt-4",
+      Zentris_model_name: "gpt-4",
     });
     render(<TestTable data={[model]} columns={cols} />);
 
@@ -190,9 +190,9 @@ describe("columns", () => {
     );
 
     const model = createMockModel({
-      litellm_params: {
+      Zentris_params: {
         model: "gpt-4",
-        litellm_credential_name: "my-credential",
+        Zentris_credential_name: "my-credential",
       },
     });
     render(<TestTable data={[model]} columns={cols} />);
@@ -215,7 +215,7 @@ describe("columns", () => {
     );
 
     const model = createMockModel({
-      litellm_params: {
+      Zentris_params: {
         model: "gpt-4",
       },
     });
@@ -263,9 +263,9 @@ describe("columns", () => {
       );
 
       const model = createMockModel({
-        litellm_params: {
+        Zentris_params: {
           model: "gpt-4",
-          litellm_credential_name: "my-reusable-credential",
+          Zentris_credential_name: "my-reusable-credential",
         },
       });
       render(<TestTable data={[model]} columns={cols} />);
@@ -291,7 +291,7 @@ describe("columns", () => {
       );
 
       const model = createMockModel({
-        litellm_params: {
+        Zentris_params: {
           model: "gpt-4",
         },
       });
@@ -301,7 +301,7 @@ describe("columns", () => {
       expect(screen.getByText("Manual")).toHaveClass("text-gray-500");
     });
 
-    it("should display Manual when litellm_params is undefined", () => {
+    it("should display Manual when Zentris_params is undefined", () => {
       const cols = columns(
         defaultProps.userRole,
         defaultProps.userID,
@@ -316,14 +316,14 @@ describe("columns", () => {
       );
 
       const model = createMockModel({
-        litellm_params: undefined as any,
+        Zentris_params: undefined as any,
       });
       render(<TestTable data={[model]} columns={cols} />);
 
       expect(screen.getByText("Manual")).toBeInTheDocument();
     });
 
-    it("should display Manual when litellm_credential_name is empty string", () => {
+    it("should display Manual when Zentris_credential_name is empty string", () => {
       const cols = columns(
         defaultProps.userRole,
         defaultProps.userID,
@@ -338,9 +338,9 @@ describe("columns", () => {
       );
 
       const model = createMockModel({
-        litellm_params: {
+        Zentris_params: {
           model: "gpt-4",
-          litellm_credential_name: "",
+          Zentris_credential_name: "",
         },
       });
       render(<TestTable data={[model]} columns={cols} />);
@@ -935,3 +935,5 @@ describe("columns", () => {
     expect(screen.queryByText(/In:/)).not.toBeInTheDocument();
   });
 });
+
+

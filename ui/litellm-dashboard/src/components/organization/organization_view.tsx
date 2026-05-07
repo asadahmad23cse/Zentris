@@ -153,7 +153,7 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
         organization_id: organizationId,
         organization_alias: values.organization_alias,
         models: values.models,
-        litellm_budget_table: {
+        Zentris_budget_table: {
           tpm_limit: values.tpm_limit,
           rpm_limit: values.rpm_limit,
           max_budget: values.max_budget,
@@ -297,12 +297,12 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
                     <Title>${formatNumberWithCommas(orgData.spend, 4)}</Title>
                     <Text>
                       of{" "}
-                      {orgData.litellm_budget_table.max_budget === null
+                      {orgData.Zentris_budget_table.max_budget === null
                         ? "Unlimited"
-                        : `$${formatNumberWithCommas(orgData.litellm_budget_table.max_budget, 4)}`}
+                        : `$${formatNumberWithCommas(orgData.Zentris_budget_table.max_budget, 4)}`}
                     </Text>
-                    {orgData.litellm_budget_table.budget_duration && (
-                      <Text className="text-gray-500">Reset: {orgData.litellm_budget_table.budget_duration}</Text>
+                    {orgData.Zentris_budget_table.budget_duration && (
+                      <Text className="text-gray-500">Reset: {orgData.Zentris_budget_table.budget_duration}</Text>
                     )}
                   </div>
                 </Card>
@@ -310,10 +310,10 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
                 <Card>
                   <Text>Rate Limits</Text>
                   <div className="mt-2">
-                    <Text>TPM: {orgData.litellm_budget_table.tpm_limit || "Unlimited"}</Text>
-                    <Text>RPM: {orgData.litellm_budget_table.rpm_limit || "Unlimited"}</Text>
-                    {orgData.litellm_budget_table.max_parallel_requests && (
-                      <Text>Max Parallel Requests: {orgData.litellm_budget_table.max_parallel_requests}</Text>
+                    <Text>TPM: {orgData.Zentris_budget_table.tpm_limit || "Unlimited"}</Text>
+                    <Text>RPM: {orgData.Zentris_budget_table.rpm_limit || "Unlimited"}</Text>
+                    {orgData.Zentris_budget_table.max_parallel_requests && (
+                      <Text>Max Parallel Requests: {orgData.Zentris_budget_table.max_parallel_requests}</Text>
                     )}
                   </div>
                 </Card>
@@ -395,10 +395,10 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
                     initialValues={{
                       organization_alias: orgData.organization_alias,
                       models: orgData.models,
-                      tpm_limit: orgData.litellm_budget_table.tpm_limit,
-                      rpm_limit: orgData.litellm_budget_table.rpm_limit,
-                      max_budget: orgData.litellm_budget_table.max_budget,
-                      budget_duration: orgData.litellm_budget_table.budget_duration,
+                      tpm_limit: orgData.Zentris_budget_table.tpm_limit,
+                      rpm_limit: orgData.Zentris_budget_table.rpm_limit,
+                      max_budget: orgData.Zentris_budget_table.max_budget,
+                      budget_duration: orgData.Zentris_budget_table.budget_duration,
                       metadata: orgData.metadata ? JSON.stringify(orgData.metadata, null, 2) : "",
                       vector_stores: orgData.object_permission?.vector_stores || [],
                       mcp_servers_and_groups: {
@@ -512,18 +512,18 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
                     </div>
                     <div>
                       <Text className="font-medium">Rate Limits</Text>
-                      <div>TPM: {orgData.litellm_budget_table.tpm_limit || "Unlimited"}</div>
-                      <div>RPM: {orgData.litellm_budget_table.rpm_limit || "Unlimited"}</div>
+                      <div>TPM: {orgData.Zentris_budget_table.tpm_limit || "Unlimited"}</div>
+                      <div>RPM: {orgData.Zentris_budget_table.rpm_limit || "Unlimited"}</div>
                     </div>
                     <div>
                       <Text className="font-medium">Budget</Text>
                       <div>
                         Max:{" "}
-                        {orgData.litellm_budget_table.max_budget !== null
-                          ? `$${formatNumberWithCommas(orgData.litellm_budget_table.max_budget, 4)}`
+                        {orgData.Zentris_budget_table.max_budget !== null
+                          ? `$${formatNumberWithCommas(orgData.Zentris_budget_table.max_budget, 4)}`
                           : "No Limit"}
                       </div>
-                      <div>Reset: {orgData.litellm_budget_table.budget_duration || "Never"}</div>
+                      <div>Reset: {orgData.Zentris_budget_table.budget_duration || "Never"}</div>
                     </div>
 
                     <ObjectPermissionsView
@@ -586,3 +586,5 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
 };
 
 export default OrganizationInfoView;
+
+

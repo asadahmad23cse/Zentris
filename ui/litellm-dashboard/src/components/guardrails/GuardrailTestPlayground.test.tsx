@@ -25,7 +25,7 @@ describe("GuardrailTestPlayground", () => {
     {
       guardrail_id: "guard-1",
       guardrail_name: "test-guardrail",
-      litellm_params: {
+      Zentris_params: {
         guardrail: "presidio",
         mode: "pre_call",
         default_on: false,
@@ -71,3 +71,5 @@ describe("GuardrailTestPlayground", () => {
     expect(screen.getByText("1 of 1 selected")).toBeInTheDocument();
   });
 });
+
+

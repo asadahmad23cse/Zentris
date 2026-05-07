@@ -294,3 +294,5 @@ describe("ChatMessageBubble", () => {
     expect(images.some((img) => img.getAttribute("src") === "https://example.com/generated.png")).toBe(true);
   });
 });
+
+

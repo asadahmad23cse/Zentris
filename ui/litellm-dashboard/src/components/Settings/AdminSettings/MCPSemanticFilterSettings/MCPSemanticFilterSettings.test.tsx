@@ -163,3 +163,5 @@ describe("MCPSemanticFilterSettings", () => {
     expect(screen.getByText("Failed to update settings")).toBeInTheDocument();
   });
 });
+
+

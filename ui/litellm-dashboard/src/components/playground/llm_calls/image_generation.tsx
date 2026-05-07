@@ -22,7 +22,7 @@ export async function makeOpenAIImageGenerationRequest(
     apiKey: accessToken,
     baseURL: proxyBaseUrl,
     dangerouslyAllowBrowser: true,
-    defaultHeaders: tags && tags.length > 0 ? { "x-litellm-tags": tags.join(",") } : undefined,
+    defaultHeaders: tags && tags.length > 0 ? { "x-Zentris-tags": tags.join(",") } : undefined,
   });
 
   try {
@@ -60,3 +60,5 @@ export async function makeOpenAIImageGenerationRequest(
     throw error; // Re-throw to allow the caller to handle the error
   }
 }
+
+

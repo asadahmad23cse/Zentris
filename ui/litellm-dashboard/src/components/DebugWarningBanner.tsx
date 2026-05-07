@@ -17,7 +17,7 @@ export const DebugWarningBanner: React.FC = () => {
       message="Performance Warning: Detailed Debug Mode Active"
       description={
         <>
-          Detailed debug logging (<code>LITELLM_LOG=DEBUG</code>) is currently
+          Detailed debug logging (<code>Zentris_LOG=DEBUG</code>) is currently
           enabled. This mode logs extensive diagnostic information and will
           significantly degrade performance. It should only be used for
           troubleshooting and disabled in production environments.
@@ -30,3 +30,5 @@ export const DebugWarningBanner: React.FC = () => {
     />
   );
 };
+
+

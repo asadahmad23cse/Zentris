@@ -31,7 +31,7 @@ describe("HealthCheckComponent", () => {
         {
           model_name: "gpt-4",
           model_info: { id: "deployment-1" },
-          litellm_model_name: "gpt-4",
+          Zentris_model_name: "gpt-4",
         },
       ],
     };
@@ -62,7 +62,7 @@ describe("HealthCheckComponent", () => {
         {
           model_name: "gpt-4",
           model_info: { id: "deployment-abc-123" },
-          litellm_model_name: "gpt-4",
+          Zentris_model_name: "gpt-4",
         },
       ],
     };
@@ -99,12 +99,12 @@ describe("HealthCheckComponent", () => {
           { 
             model_name: "gpt-4", 
             model_info: { id: "id-alpha" }, 
-            litellm_model_name: "gpt-4",  
+            Zentris_model_name: "gpt-4",  
           },
           { 
             model_name: "gpt-4", 
             model_info: { id: "id-beta" }, 
-            litellm_model_name: "gpt-4",
+            Zentris_model_name: "gpt-4",
           },
         ],
       };
@@ -151,7 +151,7 @@ describe("HealthCheckComponent", () => {
           {
             model_name: "gpt-4",
             model_info: { id: "current-model-id" },
-            litellm_model_name: "gpt-4",
+            Zentris_model_name: "gpt-4",
           },
         ],
       };
@@ -195,7 +195,7 @@ describe("HealthCheckComponent", () => {
           {
             model_name: "gpt-4",
             model_info: { id: "model-id-123" },
-            litellm_model_name: "gpt-4",
+            Zentris_model_name: "gpt-4",
           },
         ],
       };
@@ -229,3 +229,5 @@ describe("HealthCheckComponent", () => {
     });
   });
 });
+
+

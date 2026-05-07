@@ -9,7 +9,7 @@ import NotificationsManager from "../molecules/notifications_manager";
 interface GuardrailItem {
   guardrail_id?: string;
   guardrail_name: string | null;
-  litellm_params: {
+  Zentris_params: {
     guardrail: string;
     mode: string;
     default_on: boolean;
@@ -187,13 +187,13 @@ const GuardrailTestPlayground: React.FC<GuardrailTestPlaygroundProps> = ({
                             <div>
                               <span className="font-medium">Type: </span>
                               <span className="text-gray-600">
-                                {guardrail.litellm_params.guardrail}
+                                {guardrail.Zentris_params.guardrail}
                               </span>
                             </div>
                             <div>
                               <span className="font-medium">Mode: </span>
                               <span className="text-gray-600">
-                                {guardrail.litellm_params.mode}
+                                {guardrail.Zentris_params.mode}
                               </span>
                             </div>
                           </div>
@@ -251,4 +251,6 @@ const GuardrailTestPlayground: React.FC<GuardrailTestPlaygroundProps> = ({
 };
 
 export default GuardrailTestPlayground;
+
+
 

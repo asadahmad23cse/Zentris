@@ -280,7 +280,7 @@ const menuGroups: MenuGroup[] = [
         page: "learning-resources",
         label: "Learning Resources",
         icon: <BookOutlined />,
-        external_url: "https://models.litellm.ai/cookbook",
+        external_url: "https://models.Zentris.ai/cookbook",
       },
       {
         key: "experimental",
@@ -665,3 +665,5 @@ export default Sidebar;
 
 // Also export menuGroups for advanced use cases
 export { menuGroups };
+
+

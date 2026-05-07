@@ -34,7 +34,7 @@ describe("AdvancedSettings", () => {
     });
   });
 
-  it("should render the litellm params", async () => {
+  it("should render the Zentris params", async () => {
     const { getByText } = render(
       <AdvancedSettings
         showAdvancedSettings={true}
@@ -48,7 +48,9 @@ describe("AdvancedSettings", () => {
       fireEvent.click(getByText("Advanced Settings"));
     });
     await waitFor(() => {
-      expect(getByText("LiteLLM Params")).toBeInTheDocument();
+      expect(getByText("Zentris Params")).toBeInTheDocument();
     });
   });
 });
+
+

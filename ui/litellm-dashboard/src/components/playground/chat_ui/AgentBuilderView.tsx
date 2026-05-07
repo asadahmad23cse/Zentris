@@ -23,7 +23,7 @@ export interface AgentBuilderViewProps {
   disabledPersonalKeyCreation?: boolean;
   proxySettings?: {
     PROXY_BASE_URL?: string;
-    LITELLM_UI_API_DOC_BASE_URL?: string | null;
+    Zentris_UI_API_DOC_BASE_URL?: string | null;
   };
   apiKey?: string;
   customProxyBaseUrl?: string;
@@ -35,7 +35,7 @@ function getConnectTabBaseUrl(
   proxySettings: AgentBuilderViewProps["proxySettings"],
   customProxyBaseUrl?: string,
 ): string {
-  const customDocBaseUrl = proxySettings?.LITELLM_UI_API_DOC_BASE_URL;
+  const customDocBaseUrl = proxySettings?.Zentris_UI_API_DOC_BASE_URL;
   if (customDocBaseUrl && customDocBaseUrl.trim()) return customDocBaseUrl;
   if (proxySettings?.PROXY_BASE_URL) return proxySettings.PROXY_BASE_URL;
   if (customProxyBaseUrl?.trim()) return customProxyBaseUrl;
@@ -69,7 +69,7 @@ function ConnectTabContent({
       createdKeyValue.startsWith("Bearer ") ? createdKeyValue : `Bearer ${createdKeyValue}`
     : "Bearer sk-1234";
   const curlExample = `curl -L -X POST '${baseUrl}/v1/chat/completions' \\
--H 'x-litellm-api-key: ${apiKeyForCurl}' \\
+-H 'x-Zentris-api-key: ${apiKeyForCurl}' \\
 -d '{
   "model": "${agentName}",
   "stream": true,
@@ -127,12 +127,12 @@ function getAgentModelId(agent: AgentModel): string | null {
   return info?.id ?? null;
 }
 
-function parseUnderlyingModel(litellmModel: string | undefined): string | undefined {
-  if (!litellmModel || !litellmModel.startsWith("litellm_agent/")) return undefined;
-  return litellmModel.slice("litellm_agent/".length) || undefined;
+function parseUnderlyingModel(ZentrisModel: string | undefined): string | undefined {
+  if (!ZentrisModel || !ZentrisModel.startsWith("Zentris_agent/")) return undefined;
+  return ZentrisModel.slice("Zentris_agent/".length) || undefined;
 }
 
-const MCP_TOOLS_PREFIX = "litellm_proxy/mcp/";
+const MCP_TOOLS_PREFIX = "Zentris_proxy/mcp/";
 
 function buildToolsFromServerIds(serverIds: string[], servers: MCPServer[]): MCPToolEntry[] {
   return serverIds.map((serverId) => {
@@ -140,7 +140,7 @@ function buildToolsFromServerIds(serverIds: string[], servers: MCPServer[]): MCP
     const serverName = server?.alias || server?.server_name || serverId;
     return {
       type: "mcp",
-      server_label: "litellm",
+      server_label: "Zentris",
       server_url: `${MCP_TOOLS_PREFIX}${serverName}`,
       require_approval: "never",
     };
@@ -259,19 +259,19 @@ export default function AgentBuilderView({
   useEffect(() => {
     if (selectedAgent && !isNewAgent) {
       setDraftName(selectedAgent.model_name);
-      setDraftSystemPrompt(selectedAgent.litellm_params?.litellm_system_prompt ?? "");
-      const underlying = parseUnderlyingModel(selectedAgent.litellm_params?.model);
+      setDraftSystemPrompt(selectedAgent.Zentris_params?.Zentris_system_prompt ?? "");
+      const underlying = parseUnderlyingModel(selectedAgent.Zentris_params?.model);
       setDraftUnderlyingModel(underlying ?? modelGroups[0]?.model_group);
-      const p = selectedAgent.litellm_params as { temperature?: number; max_tokens?: number } | undefined;
+      const p = selectedAgent.Zentris_params as { temperature?: number; max_tokens?: number } | undefined;
       setDraftTemperature(typeof p?.temperature === "number" ? p.temperature : 0.7);
       setDraftMaxTokens(typeof p?.max_tokens === "number" ? p.max_tokens : 4096);
-      const rawTools = selectedAgent.litellm_params?.tools;
+      const rawTools = selectedAgent.Zentris_params?.tools;
       const tools: MCPToolEntry[] = Array.isArray(rawTools)
         ? rawTools.filter((t): t is MCPToolEntry => t && typeof t === "object" && (t as MCPToolEntry).type === "mcp" && typeof (t as MCPToolEntry).server_url === "string")
         : [];
       setDraftTools(tools);
     }
-  }, [selectedId, isNewAgent, selectedAgent?.model_name, selectedAgent?.litellm_params?.tools]);
+  }, [selectedId, isNewAgent, selectedAgent?.model_name, selectedAgent?.Zentris_params?.tools]);
 
   const selectedMCPServerIds = getServerIdsFromTools(draftTools, mcpServers);
 
@@ -299,9 +299,9 @@ export default function AgentBuilderView({
     try {
       await modelCreateCall(accessToken, {
         model_name: draftName.trim(),
-        litellm_params: {
-          model: `litellm_agent/${draftUnderlyingModel}`,
-          litellm_system_prompt: draftSystemPrompt.trim() || undefined,
+        Zentris_params: {
+          model: `Zentris_agent/${draftUnderlyingModel}`,
+          Zentris_system_prompt: draftSystemPrompt.trim() || undefined,
           temperature: draftTemperature,
           max_tokens: draftMaxTokens,
           tools: draftTools,
@@ -330,9 +330,9 @@ export default function AgentBuilderView({
         accessToken,
         {
           model_name: draftName.trim(),
-          litellm_params: {
-            model: `litellm_agent/${draftUnderlyingModel}`,
-            litellm_system_prompt: draftSystemPrompt.trim() || undefined,
+          Zentris_params: {
+            model: `Zentris_agent/${draftUnderlyingModel}`,
+            Zentris_system_prompt: draftSystemPrompt.trim() || undefined,
             temperature: draftTemperature,
             max_tokens: draftMaxTokens,
             tools: draftTools,
@@ -464,7 +464,7 @@ export default function AgentBuilderView({
                     }`}
                   >
                     <div className="font-medium truncate">{agent.model_name}</div>
-                    <div className="text-[10px] text-gray-500 truncate">litellm_agent</div>
+                    <div className="text-[10px] text-gray-500 truncate">Zentris_agent</div>
                   </button>
                 ))}
                 <button
@@ -710,3 +710,5 @@ export default function AgentBuilderView({
     </div>
   );
 }
+
+

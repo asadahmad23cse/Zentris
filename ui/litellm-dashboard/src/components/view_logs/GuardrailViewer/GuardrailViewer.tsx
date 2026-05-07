@@ -74,7 +74,7 @@ interface GuardrailViewerProps {
 const PROVIDERS_WITH_CUSTOM_RENDERERS = new Set([
   "presidio",
   "bedrock",
-  "litellm_content_filter",
+  "Zentris_content_filter",
 ]);
 
 /**
@@ -624,7 +624,7 @@ const EvaluationCard = ({ entry }: { entry: GuardrailInformation }) => {
               <BedrockGuardrailDetails response={bedrockResponse} />
             </div>
           )}
-          {guardrailProvider === "litellm_content_filter" && guardrailResponse && (
+          {guardrailProvider === "Zentris_content_filter" && guardrailResponse && (
             <div className="mt-3">
               <ContentFilterDetails response={guardrailResponse} />
             </div>
@@ -760,3 +760,5 @@ const GuardrailViewer = ({ data, accessToken, logEntry }: GuardrailViewerProps) 
 };
 
 export default GuardrailViewer;
+
+

@@ -22,3 +22,5 @@ export default function NewBadge({
     <Badge color="blue" count={dot ? undefined : "New"} dot={dot} />
   );
 }
+
+

@@ -12,3 +12,5 @@ describe("SSOSettingsEmptyPlaceholder", () => {
     expect(screen.getByText("Configure SSO")).toBeInTheDocument();
   });
 });
+
+

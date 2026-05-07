@@ -68,7 +68,7 @@ const mockOrg = {
   created_by: "admin@example.com",
   spend: 0,
   models: ["gpt-4o-mini"],
-  litellm_budget_table: {
+  Zentris_budget_table: {
     tpm_limit: null,
     rpm_limit: null,
     max_budget: 1000,
@@ -189,3 +189,5 @@ test("should display team ID as fallback when alias is not found", async () => {
     expect(screen.getByText("team_999")).toBeInTheDocument();
   });
 });
+
+

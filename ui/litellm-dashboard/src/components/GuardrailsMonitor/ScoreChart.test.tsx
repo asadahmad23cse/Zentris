@@ -52,3 +52,5 @@ describe("ScoreChart", () => {
     expect(screen.getByText(/2026-03-02/)).toBeInTheDocument();
   });
 });
+
+

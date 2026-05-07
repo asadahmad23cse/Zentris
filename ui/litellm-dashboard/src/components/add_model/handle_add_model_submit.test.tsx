@@ -13,7 +13,7 @@ describe("prepareModelAddRequest", () => {
       model_mappings: [
         {
           public_name: "Public Model",
-          litellm_model: "litellm/public",
+          Zentris_model: "Zentris/public",
         },
       ],
       model_name: "custom-model-name",
@@ -29,9 +29,9 @@ describe("prepareModelAddRequest", () => {
     expect(deployments).toHaveLength(1);
     const [deployment] = deployments!;
     expect(deployment.modelName).toBe("Public Model");
-    expect(deployment.litellmParamsObj.model).toBe("custom-model-name");
-    expect(deployment.litellmParamsObj.input_cost_per_token).toBe(2);
-    expect(deployment.litellmParamsObj.output_cost_per_token).toBe(1);
+    expect(deployment.ZentrisParamsObj.model).toBe("custom-model-name");
+    expect(deployment.ZentrisParamsObj.input_cost_per_token).toBe(2);
+    expect(deployment.ZentrisParamsObj.output_cost_per_token).toBe(1);
     expect(deployment.modelInfoObj.base_model).toBe("gpt-4");
     expect(deployment.modelInfoObj.access_groups).toEqual(["group-1"]);
     expect(deployment.modelInfoObj.team_id).toBe("team-123");
@@ -42,7 +42,7 @@ describe("prepareModelAddRequest", () => {
       model_mappings: [
         {
           public_name: "Petals Model",
-          litellm_model: "petals/model",
+          Zentris_model: "petals/model",
         },
       ],
       model_name: "petals/model",
@@ -53,21 +53,21 @@ describe("prepareModelAddRequest", () => {
 
     expect(deployments).toHaveLength(1);
     const [deployment] = deployments!;
-    expect(deployment.litellmParamsObj.custom_llm_provider).toBe("petals");
+    expect(deployment.ZentrisParamsObj.custom_llm_provider).toBe("petals");
   });
 
-  it("ignores litellm_credential_name inside LiteLLM Params JSON", async () => {
+  it("ignores Zentris_credential_name inside Zentris Params JSON", async () => {
     const formValues = {
       model_mappings: [
         {
           public_name: "Public Model",
-          litellm_model: "litellm/public",
+          Zentris_model: "Zentris/public",
         },
       ],
       model_name: "custom-model-name",
-      litellm_credential_name: "selected-credential",
-      litellm_extra_params: JSON.stringify({
-        litellm_credential_name: "from-json",
+      Zentris_credential_name: "selected-credential",
+      Zentris_extra_params: JSON.stringify({
+        Zentris_credential_name: "from-json",
         timeout: 5,
       }),
     };
@@ -76,7 +76,9 @@ describe("prepareModelAddRequest", () => {
 
     expect(deployments).toHaveLength(1);
     const [deployment] = deployments!;
-    expect(deployment.litellmParamsObj.litellm_credential_name).toBe("selected-credential");
-    expect(deployment.litellmParamsObj.timeout).toBe(5);
+    expect(deployment.ZentrisParamsObj.Zentris_credential_name).toBe("selected-credential");
+    expect(deployment.ZentrisParamsObj.timeout).toBe(5);
   });
 });
+
+

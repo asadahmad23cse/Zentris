@@ -144,3 +144,5 @@ describe("AgentHubTableColumns", () => {
     expect(screen.getByText("1 skill")).toBeInTheDocument();
   });
 });
+
+

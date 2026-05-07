@@ -188,7 +188,7 @@ export default function HashicorpVault() {
                     <Text code>vault kv put secret/SECRET_NAME key=secret_value</Text>
                     <br />
                     <Typography.Link
-                      href="https://docs.litellm.ai/docs/secret_managers/hashicorp_vault"
+                      href="https://docs.Zentris.ai/docs/secret_managers/hashicorp_vault"
                       target="_blank"
                     >
                       View documentation
@@ -241,3 +241,5 @@ export default function HashicorpVault() {
     </>
   );
 }
+
+

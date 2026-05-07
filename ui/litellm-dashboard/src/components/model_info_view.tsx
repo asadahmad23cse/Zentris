@@ -88,7 +88,7 @@ export default function ModelInfoView({
   const getProviderFromModel = (model: string) => {
     if (modelCostMapData !== null && modelCostMapData !== undefined) {
       if (typeof modelCostMapData == "object" && model in modelCostMapData) {
-        return modelCostMapData[model]["litellm_provider"];
+        return modelCostMapData[model]["Zentris_provider"];
       }
     }
     return "openai";
@@ -108,22 +108,22 @@ export default function ModelInfoView({
   const canEditModel =
     (userRole === "Admin" || modelData?.model_info?.created_by === userID) && modelData?.model_info?.db_model;
   const isAdmin = userRole === "Admin";
-  const isAutoRouter = modelData?.litellm_params?.auto_router_config != null;
+  const isAutoRouter = modelData?.Zentris_params?.auto_router_config != null;
 
   const usingExistingCredential =
-    modelData?.litellm_params?.litellm_credential_name != null &&
-    modelData?.litellm_params?.litellm_credential_name != undefined;
+    modelData?.Zentris_params?.Zentris_credential_name != null &&
+    modelData?.Zentris_params?.Zentris_credential_name != undefined;
 
   // Initialize localModelData from modelData when available
   useEffect(() => {
     if (modelData && !localModelData) {
       let processedModelData = modelData;
-      if (!processedModelData.litellm_model_name) {
+      if (!processedModelData.Zentris_model_name) {
         processedModelData = {
           ...processedModelData,
-          litellm_model_name:
-            processedModelData?.litellm_params?.litellm_model_name ??
-            processedModelData?.litellm_params?.model ??
+          Zentris_model_name:
+            processedModelData?.Zentris_params?.Zentris_model_name ??
+            processedModelData?.Zentris_params?.model ??
             processedModelData?.model_info?.key ??
             null,
         };
@@ -131,7 +131,7 @@ export default function ModelInfoView({
       setLocalModelData(processedModelData);
 
       // Check if cache control is enabled
-      if (processedModelData?.litellm_params?.cache_control_injection_points) {
+      if (processedModelData?.Zentris_params?.cache_control_injection_points) {
         setShowCacheControl(true);
       }
     }
@@ -155,12 +155,12 @@ export default function ModelInfoView({
       if (modelData) return;
       let modelInfoResponse = await modelInfoV1Call(accessToken, modelId);
       let specificModelData = modelInfoResponse.data[0];
-      if (specificModelData && !specificModelData.litellm_model_name) {
+      if (specificModelData && !specificModelData.Zentris_model_name) {
         specificModelData = {
           ...specificModelData,
-          litellm_model_name:
-            specificModelData?.litellm_params?.litellm_model_name ??
-            specificModelData?.litellm_params?.model ??
+          Zentris_model_name:
+            specificModelData?.Zentris_params?.Zentris_model_name ??
+            specificModelData?.Zentris_params?.model ??
             specificModelData?.model_info?.key ??
             null,
         };
@@ -168,7 +168,7 @@ export default function ModelInfoView({
       setLocalModelData(specificModelData);
 
       // Check if cache control is enabled
-      if (specificModelData?.litellm_params?.cache_control_injection_points) {
+      if (specificModelData?.Zentris_params?.cache_control_injection_points) {
         setShowCacheControl(true);
       }
     };
@@ -217,7 +217,7 @@ export default function ModelInfoView({
       credential_name: values.credential_name,
       model_id: modelId,
       credential_info: {
-        custom_llm_provider: localModelData.litellm_params?.custom_llm_provider,
+        custom_llm_provider: localModelData.Zentris_params?.custom_llm_provider,
       },
     };
     NotificationsManager.info("Storing credential..");
@@ -230,21 +230,21 @@ export default function ModelInfoView({
       if (!accessToken) return;
       setIsSaving(true);
 
-      // Parse LiteLLM extra params from JSON text area
+      // Parse Zentris extra params from JSON text area
       let parsedExtraParams: Record<string, any> = {};
       try {
-        parsedExtraParams = values.litellm_extra_params ? JSON.parse(values.litellm_extra_params) : {};
-        delete parsedExtraParams.litellm_credential_name;
+        parsedExtraParams = values.Zentris_extra_params ? JSON.parse(values.Zentris_extra_params) : {};
+        delete parsedExtraParams.Zentris_credential_name;
       } catch (e) {
-        NotificationsManager.fromBackend("Invalid JSON in LiteLLM Params");
+        NotificationsManager.fromBackend("Invalid JSON in Zentris Params");
         setIsSaving(false);
         return;
       }
 
-      let updatedLitellmParams = {
-        ...values.litellm_params,
+      let updatedZentrisParams = {
+        ...values.Zentris_params,
         ...parsedExtraParams,
-        model: values.litellm_model_name,
+        model: values.Zentris_model_name,
         api_base: values.api_base,
         custom_llm_provider: values.custom_llm_provider,
         organization: values.organization,
@@ -257,25 +257,25 @@ export default function ModelInfoView({
         output_cost_per_token: values.output_cost / 1_000_000,
         tags: values.tags,
       };
-      if (values.litellm_credential_name) {
-        updatedLitellmParams.litellm_credential_name = values.litellm_credential_name;
+      if (values.Zentris_credential_name) {
+        updatedZentrisParams.Zentris_credential_name = values.Zentris_credential_name;
       } else {
-        delete updatedLitellmParams.litellm_credential_name;
+        delete updatedZentrisParams.Zentris_credential_name;
       }
       if (values.guardrails) {
-        updatedLitellmParams.guardrails = values.guardrails;
+        updatedZentrisParams.guardrails = values.guardrails;
       }
       if (values.vector_store_ids !== undefined) {
-        updatedLitellmParams.vector_store_ids = Array.isArray(values.vector_store_ids)
+        updatedZentrisParams.vector_store_ids = Array.isArray(values.vector_store_ids)
           ? values.vector_store_ids
           : [];
       }
 
       // Handle cache control settings
       if (values.cache_control && values.cache_control_injection_points?.length > 0) {
-        updatedLitellmParams.cache_control_injection_points = values.cache_control_injection_points;
+        updatedZentrisParams.cache_control_injection_points = values.cache_control_injection_points;
       } else {
-        delete updatedLitellmParams.cache_control_injection_points;
+        delete updatedZentrisParams.cache_control_injection_points;
       }
 
       // Parse the model_info from the form values
@@ -303,7 +303,7 @@ export default function ModelInfoView({
 
       const updateData = {
         model_name: values.model_name,
-        litellm_params: updatedLitellmParams,
+        Zentris_params: updatedZentrisParams,
         model_info: updatedModelInfo,
       };
 
@@ -312,8 +312,8 @@ export default function ModelInfoView({
       const updatedModelData = {
         ...localModelData,
         model_name: values.model_name,
-        litellm_model_name: values.litellm_model_name,
-        litellm_params: updatedLitellmParams,
+        Zentris_model_name: values.Zentris_model_name,
+        Zentris_params: updatedZentrisParams,
         model_info: updatedModelInfo,
       };
 
@@ -365,9 +365,9 @@ export default function ModelInfoView({
       const response = await testConnectionRequest(
         accessToken,
         {
-          custom_llm_provider: localModelData.litellm_params.custom_llm_provider,
-          litellm_credential_name: localModelData.litellm_params.litellm_credential_name,
-          model: localModelData.litellm_model_name,
+          custom_llm_provider: localModelData.Zentris_params.custom_llm_provider,
+          Zentris_credential_name: localModelData.Zentris_params.Zentris_credential_name,
+          model: localModelData.Zentris_model_name,
         },
         {
           mode: localModelData.model_info?.mode,
@@ -429,7 +429,7 @@ export default function ModelInfoView({
       onModelUpdate(updatedModel);
     }
   };
-  const isWildcardModel = modelData.litellm_model_name.includes("*");
+  const isWildcardModel = modelData.Zentris_model_name.includes("*");
 
   return (
     <div className="p-4">
@@ -528,11 +528,11 @@ export default function ModelInfoView({
                 </div>
               </Card>
               <Card>
-                <Text>LiteLLM Model</Text>
+                <Text>Zentris Model</Text>
                 <div className="mt-2 overflow-hidden">
-                  <Tooltip title={modelData.litellm_model_name || "Not Set"}>
+                  <Tooltip title={modelData.Zentris_model_name || "Not Set"}>
                     <div className="break-all text-sm font-medium leading-relaxed cursor-pointer">
-                      {modelData.litellm_model_name || "Not Set"}
+                      {modelData.Zentris_model_name || "Not Set"}
                     </div>
                   </Tooltip>
                 </div>
@@ -608,39 +608,39 @@ export default function ModelInfoView({
                   onFinish={handleModelUpdate}
                   initialValues={{
                     model_name: localModelData.model_name,
-                    litellm_model_name: localModelData.litellm_model_name,
-                    api_base: localModelData.litellm_params.api_base,
-                    custom_llm_provider: localModelData.litellm_params.custom_llm_provider,
-                    organization: localModelData.litellm_params.organization,
-                    tpm: localModelData.litellm_params.tpm,
-                    rpm: localModelData.litellm_params.rpm,
-                    max_retries: localModelData.litellm_params.max_retries,
-                    timeout: localModelData.litellm_params.timeout,
-                    stream_timeout: localModelData.litellm_params.stream_timeout,
-                    input_cost: localModelData.litellm_params.input_cost_per_token
-                      ? localModelData.litellm_params.input_cost_per_token * 1_000_000
+                    Zentris_model_name: localModelData.Zentris_model_name,
+                    api_base: localModelData.Zentris_params.api_base,
+                    custom_llm_provider: localModelData.Zentris_params.custom_llm_provider,
+                    organization: localModelData.Zentris_params.organization,
+                    tpm: localModelData.Zentris_params.tpm,
+                    rpm: localModelData.Zentris_params.rpm,
+                    max_retries: localModelData.Zentris_params.max_retries,
+                    timeout: localModelData.Zentris_params.timeout,
+                    stream_timeout: localModelData.Zentris_params.stream_timeout,
+                    input_cost: localModelData.Zentris_params.input_cost_per_token
+                      ? localModelData.Zentris_params.input_cost_per_token * 1_000_000
                       : localModelData.model_info?.input_cost_per_token * 1_000_000 || null,
-                    output_cost: localModelData.litellm_params?.output_cost_per_token
-                      ? localModelData.litellm_params.output_cost_per_token * 1_000_000
+                    output_cost: localModelData.Zentris_params?.output_cost_per_token
+                      ? localModelData.Zentris_params.output_cost_per_token * 1_000_000
                       : localModelData.model_info?.output_cost_per_token * 1_000_000 || null,
-                    cache_control: localModelData.litellm_params?.cache_control_injection_points ? true : false,
-                    cache_control_injection_points: localModelData.litellm_params?.cache_control_injection_points || [],
+                    cache_control: localModelData.Zentris_params?.cache_control_injection_points ? true : false,
+                    cache_control_injection_points: localModelData.Zentris_params?.cache_control_injection_points || [],
                     model_access_group: Array.isArray(localModelData.model_info?.access_groups)
                       ? localModelData.model_info.access_groups
                       : [],
-                    guardrails: Array.isArray(localModelData.litellm_params?.guardrails)
-                      ? localModelData.litellm_params.guardrails
+                    guardrails: Array.isArray(localModelData.Zentris_params?.guardrails)
+                      ? localModelData.Zentris_params.guardrails
                       : [],
-                    vector_store_ids: Array.isArray(localModelData.litellm_params?.vector_store_ids)
-                      ? localModelData.litellm_params.vector_store_ids
+                    vector_store_ids: Array.isArray(localModelData.Zentris_params?.vector_store_ids)
+                      ? localModelData.Zentris_params.vector_store_ids
                       : [],
-                    tags: Array.isArray(localModelData.litellm_params?.tags) ? localModelData.litellm_params.tags : [],
+                    tags: Array.isArray(localModelData.Zentris_params?.tags) ? localModelData.Zentris_params.tags : [],
                     health_check_model: isWildcardModel ? localModelData.model_info?.health_check_model : null,
-                    litellm_credential_name: localModelData.litellm_params?.litellm_credential_name || "",
-                    litellm_extra_params: JSON.stringify(
+                    Zentris_credential_name: localModelData.Zentris_params?.Zentris_credential_name || "",
+                    Zentris_extra_params: JSON.stringify(
                       Object.fromEntries(
-                        Object.entries(localModelData.litellm_params || {}).filter(
-                          ([key]) => key !== "litellm_credential_name",
+                        Object.entries(localModelData.Zentris_params || {}).filter(
+                          ([key]) => key !== "Zentris_credential_name",
                         ),
                       ),
                       null,
@@ -664,13 +664,13 @@ export default function ModelInfoView({
                       </div>
 
                       <div>
-                        <Text className="font-medium">LiteLLM Model Name</Text>
+                        <Text className="font-medium">Zentris Model Name</Text>
                         {isEditing ? (
-                          <Form.Item name="litellm_model_name" className="mb-0">
-                            <TextInput placeholder="Enter LiteLLM model name" />
+                          <Form.Item name="Zentris_model_name" className="mb-0">
+                            <TextInput placeholder="Enter Zentris model name" />
                           </Form.Item>
                         ) : (
-                          <div className="mt-1 p-2 bg-gray-50 rounded">{localModelData.litellm_model_name}</div>
+                          <div className="mt-1 p-2 bg-gray-50 rounded">{localModelData.Zentris_model_name}</div>
                         )}
                       </div>
 
@@ -682,8 +682,8 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData?.litellm_params?.input_cost_per_token
-                              ? (localModelData.litellm_params?.input_cost_per_token * 1_000_000).toFixed(4)
+                            {localModelData?.Zentris_params?.input_cost_per_token
+                              ? (localModelData.Zentris_params?.input_cost_per_token * 1_000_000).toFixed(4)
                               : localModelData?.model_info?.input_cost_per_token
                                 ? (localModelData.model_info.input_cost_per_token * 1_000_000).toFixed(4)
                                 : "Not Set"}
@@ -699,8 +699,8 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData?.litellm_params?.output_cost_per_token
-                              ? (localModelData.litellm_params.output_cost_per_token * 1_000_000).toFixed(4)
+                            {localModelData?.Zentris_params?.output_cost_per_token
+                              ? (localModelData.Zentris_params.output_cost_per_token * 1_000_000).toFixed(4)
                               : localModelData?.model_info?.output_cost_per_token
                                 ? (localModelData.model_info.output_cost_per_token * 1_000_000).toFixed(4)
                                 : "Not Set"}
@@ -716,7 +716,7 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.api_base || "Not Set"}
+                            {localModelData.Zentris_params?.api_base || "Not Set"}
                           </div>
                         )}
                       </div>
@@ -729,7 +729,7 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.custom_llm_provider || "Not Set"}
+                            {localModelData.Zentris_params?.custom_llm_provider || "Not Set"}
                           </div>
                         )}
                       </div>
@@ -742,7 +742,7 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.organization || "Not Set"}
+                            {localModelData.Zentris_params?.organization || "Not Set"}
                           </div>
                         )}
                       </div>
@@ -755,7 +755,7 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.tpm || "Not Set"}
+                            {localModelData.Zentris_params?.tpm || "Not Set"}
                           </div>
                         )}
                       </div>
@@ -768,7 +768,7 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.rpm || "Not Set"}
+                            {localModelData.Zentris_params?.rpm || "Not Set"}
                           </div>
                         )}
                       </div>
@@ -781,7 +781,7 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.max_retries || "Not Set"}
+                            {localModelData.Zentris_params?.max_retries || "Not Set"}
                           </div>
                         )}
                       </div>
@@ -794,7 +794,7 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.timeout || "Not Set"}
+                            {localModelData.Zentris_params?.timeout || "Not Set"}
                           </div>
                         )}
                       </div>
@@ -807,7 +807,7 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.stream_timeout || "Not Set"}
+                            {localModelData.Zentris_params?.stream_timeout || "Not Set"}
                           </div>
                         )}
                       </div>
@@ -864,7 +864,7 @@ export default function ModelInfoView({
                           Guardrails
                           <Tooltip title="Apply safety guardrails to this model to filter content or enforce policies">
                             <a
-                              href="https://docs.litellm.ai/docs/proxy/guardrails/quick_start"
+                              href="https://docs.Zentris.ai/docs/proxy/guardrails/quick_start"
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
@@ -892,11 +892,11 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.guardrails ? (
-                              Array.isArray(localModelData.litellm_params.guardrails) ? (
-                                localModelData.litellm_params.guardrails.length > 0 ? (
+                            {localModelData.Zentris_params?.guardrails ? (
+                              Array.isArray(localModelData.Zentris_params.guardrails) ? (
+                                localModelData.Zentris_params.guardrails.length > 0 ? (
                                   <div className="flex flex-wrap gap-1">
-                                    {localModelData.litellm_params.guardrails.map(
+                                    {localModelData.Zentris_params.guardrails.map(
                                       (guardrail: string, index: number) => (
                                         <span
                                           key={index}
@@ -911,7 +911,7 @@ export default function ModelInfoView({
                                   "No guardrails assigned"
                                 )
                               ) : (
-                                localModelData.litellm_params.guardrails
+                                localModelData.Zentris_params.guardrails
                               )
                             ) : (
                               "Not Set"
@@ -925,7 +925,7 @@ export default function ModelInfoView({
                           Attached Knowledge Bases (RAG)
                           <Tooltip title="Vector stores used for RAG. Every request to this model will automatically retrieve context from these knowledge bases.">
                             <a
-                              href="https://docs.litellm.ai/docs/completion/knowledgebase"
+                              href="https://docs.Zentris.ai/docs/completion/knowledgebase"
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
@@ -944,11 +944,11 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.vector_store_ids ? (
-                              Array.isArray(localModelData.litellm_params.vector_store_ids) ? (
-                                localModelData.litellm_params.vector_store_ids.length > 0 ? (
+                            {localModelData.Zentris_params?.vector_store_ids ? (
+                              Array.isArray(localModelData.Zentris_params.vector_store_ids) ? (
+                                localModelData.Zentris_params.vector_store_ids.length > 0 ? (
                                   <div className="flex flex-wrap gap-1">
-                                    {localModelData.litellm_params.vector_store_ids.map(
+                                    {localModelData.Zentris_params.vector_store_ids.map(
                                       (vsId: string, index: number) => (
                                         <span
                                           key={index}
@@ -963,7 +963,7 @@ export default function ModelInfoView({
                                   "No knowledge bases attached"
                                 )
                               ) : (
-                                String(localModelData.litellm_params.vector_store_ids)
+                                String(localModelData.Zentris_params.vector_store_ids)
                               )
                             ) : (
                               "Not Set"
@@ -994,11 +994,11 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.tags ? (
-                              Array.isArray(localModelData.litellm_params.tags) ? (
-                                localModelData.litellm_params.tags.length > 0 ? (
+                            {localModelData.Zentris_params?.tags ? (
+                              Array.isArray(localModelData.Zentris_params.tags) ? (
+                                localModelData.Zentris_params.tags.length > 0 ? (
                                   <div className="flex flex-wrap gap-1">
-                                    {localModelData.litellm_params.tags.map((tag: string, index: number) => (
+                                    {localModelData.Zentris_params.tags.map((tag: string, index: number) => (
                                       <span
                                         key={index}
                                         className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
@@ -1011,7 +1011,7 @@ export default function ModelInfoView({
                                   "No tags assigned"
                                 )
                               ) : (
-                                localModelData.litellm_params.tags
+                                localModelData.Zentris_params.tags
                               )
                             ) : (
                               "Not Set"
@@ -1022,7 +1022,7 @@ export default function ModelInfoView({
                       <div>
                         <Text className="font-medium">Existing Credentials</Text>
                         {isEditing ? (
-                          <Form.Item name="litellm_credential_name" className="mb-0">
+                          <Form.Item name="Zentris_credential_name" className="mb-0">
                             <Select
                               showSearch
                               placeholder="Select or search for existing credentials"
@@ -1042,7 +1042,7 @@ export default function ModelInfoView({
                           </Form.Item>
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.litellm_credential_name || "Manual"}
+                            {localModelData.Zentris_params?.Zentris_credential_name || "Manual"}
                           </div>
                         )}
                       </div>
@@ -1058,13 +1058,13 @@ export default function ModelInfoView({
                                 optionFilterProp="children"
                                 allowClear
                                 options={(() => {
-                                  const wildcardProvider = modelData.litellm_model_name.split("/")[0];
+                                  const wildcardProvider = modelData.Zentris_model_name.split("/")[0];
                                   return modelHubData?.data
                                     ?.filter((model: any) => {
                                       // Filter by provider to match the wildcard provider
                                       return (
                                         model.providers?.includes(wildcardProvider) &&
-                                        model.model_group !== modelData.litellm_model_name
+                                        model.model_group !== modelData.Zentris_model_name
                                       );
                                     })
                                     .map((model: any) => ({
@@ -1093,11 +1093,11 @@ export default function ModelInfoView({
                         <div>
                           <Text className="font-medium">Cache Control</Text>
                           <div className="mt-1 p-2 bg-gray-50 rounded">
-                            {localModelData.litellm_params?.cache_control_injection_points ? (
+                            {localModelData.Zentris_params?.cache_control_injection_points ? (
                               <div>
                                 <p>Enabled</p>
                                 <div className="mt-2">
-                                  {localModelData.litellm_params.cache_control_injection_points.map(
+                                  {localModelData.Zentris_params.cache_control_injection_points.map(
                                     (point: any, i: number) => (
                                       <div key={i} className="text-sm text-gray-600 mb-1">
                                         Location: {point.location},{point.role && <span> Role: {point.role}</span>}
@@ -1134,10 +1134,10 @@ export default function ModelInfoView({
                       </div>
                       <div>
                         <Text className="font-medium">
-                          LiteLLM Params
-                          <Tooltip title="Optional litellm params used for making a litellm.completion() call. Some params are automatically added by LiteLLM.">
+                          Zentris Params
+                          <Tooltip title="Optional Zentris params used for making a Zentris.completion() call. Some params are automatically added by Zentris.">
                             <a
-                              href="https://docs.litellm.ai/docs/completion/input"
+                              href="https://docs.Zentris.ai/docs/completion/input"
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
@@ -1147,7 +1147,7 @@ export default function ModelInfoView({
                           </Tooltip>
                         </Text>
                         {isEditing ? (
-                          <Form.Item name="litellm_extra_params" rules={[{ validator: formItemValidateJSON }]}>
+                          <Form.Item name="Zentris_extra_params" rules={[{ validator: formItemValidateJSON }]}>
                             <Input.TextArea
                               rows={4}
                               placeholder='{
@@ -1160,7 +1160,7 @@ export default function ModelInfoView({
                         ) : (
                           <div className="mt-1 p-2 bg-gray-50 rounded">
                             <pre className="bg-gray-100 p-2 rounded text-xs overflow-auto mt-1">
-                              {JSON.stringify(localModelData.litellm_params, null, 2)}
+                              {JSON.stringify(localModelData.Zentris_params, null, 2)}
                             </pre>
                           </div>
                         )}
@@ -1217,8 +1217,8 @@ export default function ModelInfoView({
             value: modelData?.model_name || "Not Set",
           },
           {
-            label: "LiteLLM Model Name",
-            value: modelData?.litellm_model_name || "Not Set",
+            label: "Zentris Model Name",
+            value: modelData?.Zentris_model_name || "Not Set",
           },
           {
             label: "Provider",
@@ -1248,7 +1248,7 @@ export default function ModelInfoView({
           onCancel={() => setIsCredentialModalOpen(false)}
           title="Using Existing Credential"
         >
-          <Text>{modelData.litellm_params.litellm_credential_name}</Text>
+          <Text>{modelData.Zentris_params.Zentris_credential_name}</Text>
         </Modal>
       )}
 
@@ -1264,3 +1264,5 @@ export default function ModelInfoView({
     </div>
   );
 }
+
+

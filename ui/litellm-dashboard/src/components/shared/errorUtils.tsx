@@ -42,3 +42,5 @@ export const parseErrorMessage = (error: any): string => {
   // Fallback to stringifying the error
   return String(error);
 };
+
+

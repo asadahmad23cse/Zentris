@@ -14,7 +14,7 @@ interface CodeInterpreterToolProps {
   disabled?: boolean;
 }
 
-const GITHUB_FEATURE_REQUEST_URL = "https://github.com/BerriAI/litellm/issues/new?template=feature_request.yml";
+const GITHUB_FEATURE_REQUEST_URL = "https://github.com/BerriAI/Zentris/issues/new?template=feature_request.yml";
 
 const isOpenAIModel = (model: string): boolean => {
   if (!model) return false;
@@ -87,3 +87,5 @@ const CodeInterpreterTool: React.FC<CodeInterpreterToolProps> = ({
 };
 
 export default CodeInterpreterTool;
+
+

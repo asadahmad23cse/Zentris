@@ -152,3 +152,5 @@ describe("MCPServerEdit (stdio)", () => {
     expect(payload.env).toEqual({ CIRCLECI_TOKEN: "new-token", CIRCLECI_BASE_URL: "https://circleci.com" });
   });
 });
+
+

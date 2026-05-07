@@ -245,7 +245,7 @@ const AgentsPanel: React.FC<AgentsPanelProps> = ({ accessToken, userRole, teams 
                       </TableCell>
                       <TableCell>
                         <Badge size="xs" color="blue">
-                          {agent.litellm_params?.model || "N/A"}
+                          {agent.Zentris_params?.model || "N/A"}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -306,3 +306,5 @@ const AgentsPanel: React.FC<AgentsPanelProps> = ({ accessToken, userRole, teams 
 };
 
 export default AgentsPanel;
+
+

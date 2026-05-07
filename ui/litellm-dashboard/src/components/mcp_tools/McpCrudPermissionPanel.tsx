@@ -268,3 +268,5 @@ const McpCrudPermissionPanel: React.FC<McpCrudPermissionPanelProps> = ({
 };
 
 export default McpCrudPermissionPanel;
+
+

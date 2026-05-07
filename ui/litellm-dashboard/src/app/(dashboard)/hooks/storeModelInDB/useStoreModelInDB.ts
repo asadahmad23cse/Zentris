@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import { getProxyBaseUrl, getGlobalLitellmHeaderName } from "@/components/networking";
+import { getProxyBaseUrl, getGlobalZentrisHeaderName } from "@/components/networking";
 import useAuthorized from "../useAuthorized";
 
 export interface StoreModelInDBParams {
@@ -20,7 +20,7 @@ const performStoreModelInDB = async (
   const response = await fetch(url, {
     method: "POST",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -57,3 +57,5 @@ export const useStoreModelInDB = (): UseMutationResult<
     },
   });
 };
+
+

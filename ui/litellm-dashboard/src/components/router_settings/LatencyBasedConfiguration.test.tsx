@@ -52,3 +52,5 @@ describe("LatencyBasedConfiguration", () => {
     expect(input.value).toContain('true');
   });
 });
+
+

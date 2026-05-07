@@ -82,7 +82,7 @@ describe("KeyInfoView", () => {
     model_max_budget: {},
     soft_budget_cooldown: false,
     blocked: false,
-    litellm_budget_table: {},
+    Zentris_budget_table: {},
     organization_id: null,
     created_at: "2025-10-29T01:26:41.613000Z",
     updated_at: "2025-10-29T01:47:33.980000Z",
@@ -681,3 +681,5 @@ describe("KeyInfoView", () => {
     });
   });
 });
+
+

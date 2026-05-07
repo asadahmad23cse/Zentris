@@ -51,7 +51,7 @@ export const groupFieldsByCategory = (fields: any[], redisType: string) => {
 
 export const gatherFormValues = (fields: any[], redisType: string): { [key: string]: any } => {
   const values: { [key: string]: any } = {
-    type: "redis", // Cache class accepts 'type' parameter (LiteLLMCacheType enum)
+    type: "redis", // Cache class accepts 'type' parameter (ZentrisCacheType enum)
   };
 
   // Iterate through all fields from backend
@@ -108,3 +108,5 @@ export const gatherFormValues = (fields: any[], redisType: string): { [key: stri
 
   return values;
 };
+
+

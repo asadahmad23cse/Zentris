@@ -49,3 +49,5 @@ describe("SimpleToolCallBlock", () => {
     expect(screen.queryByText(/:$/)).not.toBeInTheDocument();
   });
 });
+
+

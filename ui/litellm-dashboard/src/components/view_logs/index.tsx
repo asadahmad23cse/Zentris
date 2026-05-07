@@ -937,10 +937,10 @@ export function RequestViewer({ row, onOpenSettings }: { row: Row<LogEntry>; onO
               <span className="font-medium w-1/3">Duration:</span>
               <span>{row.original.request_duration_ms != null ? (row.original.request_duration_ms / 1000).toFixed(3) : "-"} s.</span>
             </div>
-            {row.original.metadata?.litellm_overhead_time_ms !== undefined && (
+            {row.original.metadata?.Zentris_overhead_time_ms !== undefined && (
               <div className="flex">
-                <span className="font-medium w-1/3">LiteLLM Overhead:</span>
-                <span>{row.original.metadata.litellm_overhead_time_ms} ms</span>
+                <span className="font-medium w-1/3">Zentris Overhead:</span>
+                <span>{row.original.metadata.Zentris_overhead_time_ms} ms</span>
               </div>
             )}
             <div className="flex">
@@ -1047,3 +1047,5 @@ export function RequestViewer({ row, onOpenSettings }: { row: Row<LogEntry>; onO
     </div>
   );
 }
+
+

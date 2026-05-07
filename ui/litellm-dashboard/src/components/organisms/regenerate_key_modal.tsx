@@ -174,7 +174,7 @@ export function RegenerateKeyModal({ selectedToken, visible, onClose, onKeyUpdat
           <Col numColSpan={1}>
             <p>
               Please replace your old key with the new key generated. For security reasons,{" "}
-              <b>you will not be able to view it again</b> through your LiteLLM account. If you lose this secret key,
+              <b>you will not be able to view it again</b> through your Zentris account. If you lose this secret key,
               you will need to generate a new one.
             </p>
           </Col>
@@ -246,3 +246,5 @@ export function RegenerateKeyModal({ selectedToken, visible, onClose, onKeyUpdat
     </Modal>
   );
 }
+
+

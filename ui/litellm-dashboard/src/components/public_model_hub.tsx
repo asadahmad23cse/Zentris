@@ -97,7 +97,7 @@ const PublicModelHub: React.FC<PublicModelHubProps> = ({ accessToken, isEmbedded
   const [mcpHubData, setMcpHubData] = useState<MCPServerData[] | null>(null);
   const [pageTitle, setPageTitle] = useState<string>("Zentris Gateway");
   const [customDocsDescription, setCustomDocsDescription] = useState<string | null>(null);
-  const [litellmVersion, setLitellmVersion] = useState<string>("");
+  const [ZentrisVersion, setZentrisVersion] = useState<string>("");
   const [usefulLinks, setUsefulLinks] = useState<Record<string, string | { url: string; index: number }>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [agentLoading, setAgentLoading] = useState<boolean>(true);
@@ -175,7 +175,7 @@ const PublicModelHub: React.FC<PublicModelHubProps> = ({ accessToken, isEmbedded
         console.log("Public Model Hub Info:", publicModelHubInfo);
         setPageTitle(publicModelHubInfo.docs_title);
         setCustomDocsDescription(publicModelHubInfo.custom_docs_description);
-        setLitellmVersion(publicModelHubInfo.litellm_version);
+        setZentrisVersion(publicModelHubInfo.Zentris_version);
         setUsefulLinks(publicModelHubInfo.useful_links || {});
       };
 
@@ -997,7 +997,7 @@ const PublicModelHub: React.FC<PublicModelHubProps> = ({ accessToken, isEmbedded
               <div className="flex items-center space-x-3 text-sm text-gray-600">
                 <span className="flex items-center">
                   <span className="w-4 h-4 mr-2">🔧</span>
-                  Built with litellm: v{litellmVersion}
+                  Built with Zentris: v{ZentrisVersion}
                 </span>
               </div>
             </Card>
@@ -1934,7 +1934,7 @@ config = {
         "${selectedMcpServer.server_name}": {
             "url": "http://localhost:4000/${selectedMcpServer.server_name}/mcp",
             "headers": {
-                "x-litellm-api-key": "Bearer sk-1234"
+                "x-Zentris-api-key": "Bearer sk-1234"
             }
         }
     }
@@ -1974,7 +1974,7 @@ config = {
         "${selectedMcpServer.server_name}": {
             "url": "http://localhost:4000/${selectedMcpServer.server_name}/mcp",
             "headers": {
-                "x-litellm-api-key": "Bearer sk-1234"
+                "x-Zentris-api-key": "Bearer sk-1234"
             }
         }
     }
@@ -2015,3 +2015,5 @@ if __name__ == "__main__":
 };
 
 export default PublicModelHub;
+
+

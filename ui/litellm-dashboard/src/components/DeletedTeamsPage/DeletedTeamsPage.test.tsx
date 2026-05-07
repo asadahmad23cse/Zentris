@@ -54,3 +54,5 @@ it("should handle loading state", () => {
 
   expect(screen.getByText("🚅 Loading teams...")).toBeInTheDocument();
 });
+
+

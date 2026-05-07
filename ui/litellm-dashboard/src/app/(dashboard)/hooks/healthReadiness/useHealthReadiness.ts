@@ -5,7 +5,7 @@ import { createQueryKeys } from "../common/queryKeysFactory";
 const healthReadinessKeys = createQueryKeys("healthReadiness");
 
 interface HealthReadinessResponse {
-  litellm_version?: string;
+  Zentris_version?: string;
   log_level?: string;
   is_detailed_debug?: boolean;
   [key: string]: any;
@@ -27,3 +27,5 @@ export const useHealthReadiness = (): UseQueryResult<HealthReadinessResponse> =>
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
+
+

@@ -169,7 +169,7 @@ const ModelHubTable: React.FC<ModelHubTableProps> = ({ accessToken, publicPage, 
         let agent_card_list = agents.map((agent: any) => ({
           agent_id: agent.agent_id,
           ...agent.agent_card_params,
-          is_public: agent.litellm_params.is_public,
+          is_public: agent.Zentris_params.is_public,
         }));
         setAgentHubData(agent_card_list);
       } catch (error) {
@@ -659,7 +659,7 @@ const ModelHubTable: React.FC<ModelHubTableProps> = ({ accessToken, publicPage, 
 
 client = openai.OpenAI(
     api_key="your_api_key",
-    base_url="${getProxyBaseUrl()}"  # Your LiteLLM Proxy URL
+    base_url="${getProxyBaseUrl()}"  # Your Zentris Proxy URL
 )
 
 response = client.chat.completions.create(
@@ -999,7 +999,7 @@ config = {
         "${selectedMcpServer.server_name}": {
             "url": "${getProxyBaseUrl()}/${selectedMcpServer.server_name}/mcp",
             "headers": {
-                "x-litellm-api-key": "Bearer sk-1234"
+                "x-Zentris-api-key": "Bearer sk-1234"
             }
         }
     }
@@ -1060,3 +1060,5 @@ if __name__ == "__main__":
 };
 
 export default ModelHubTable;
+
+

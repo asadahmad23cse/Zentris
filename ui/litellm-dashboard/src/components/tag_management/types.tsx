@@ -7,7 +7,7 @@ export interface Tag {
   updated_at: string;
   created_by?: string;
   updated_by?: string;
-  litellm_budget_table?: {
+  Zentris_budget_table?: {
     max_budget?: number;
     soft_budget?: number;
     tpm_limit?: number;
@@ -51,3 +51,5 @@ export interface TagDeleteRequest {
 // The API returns a dictionary of tags where the key is the tag name
 export type TagListResponse = Record<string, Tag>;
 export type TagInfoResponse = Record<string, Tag>;
+
+

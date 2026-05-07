@@ -60,3 +60,5 @@ const LatencyBasedConfiguration: React.FC<LatencyBasedConfigurationProps> = ({
 
 export default LatencyBasedConfiguration;
 
+
+

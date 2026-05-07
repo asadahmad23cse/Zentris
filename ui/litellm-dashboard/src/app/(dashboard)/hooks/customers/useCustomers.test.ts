@@ -29,7 +29,7 @@ const mockCustomers: Customer[] = [
     allowed_model_region: "us-east-1",
     default_model: "gpt-3.5-turbo",
     budget_id: "budget-1",
-    litellm_budget_table: {
+    Zentris_budget_table: {
       budget_id: "budget-1",
       max_budget: 1000,
       soft_budget: 800,
@@ -53,7 +53,7 @@ const mockCustomers: Customer[] = [
     allowed_model_region: null,
     default_model: null,
     budget_id: null,
-    litellm_budget_table: null,
+    Zentris_budget_table: null,
   },
 ];
 
@@ -332,3 +332,5 @@ describe("useCustomers", () => {
     expect(result.current.data).toBeUndefined();
   });
 });
+
+

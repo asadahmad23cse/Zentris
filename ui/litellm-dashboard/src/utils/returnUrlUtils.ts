@@ -10,7 +10,7 @@
  * across different ports.
  */
 
-const RETURN_URL_COOKIE_NAME = "litellm_return_url";
+const RETURN_URL_COOKIE_NAME = "Zentris_return_url";
 const RETURN_URL_PARAM = "redirect_to";
 
 /**
@@ -302,3 +302,5 @@ export function consumeReturnUrl(): string | null {
   // No valid URL found - don't clear cookie (nothing to clear or already invalid)
   return null;
 }
+
+

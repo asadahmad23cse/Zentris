@@ -102,3 +102,5 @@ export const CustomLegend = ({ categories, colors }: { categories: string[]; col
     </div>
   );
 };
+
+

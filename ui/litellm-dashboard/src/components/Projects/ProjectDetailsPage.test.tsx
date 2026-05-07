@@ -41,7 +41,7 @@ const mockProject: ProjectResponse = {
   created_by: "user-1",
   updated_at: "2024-02-01T12:00:00Z",
   updated_by: "user-2",
-  litellm_budget_table: null,
+  Zentris_budget_table: null,
 };
 
 describe("ProjectDetail", () => {
@@ -126,7 +126,7 @@ describe("ProjectDetail", () => {
       mockUseProjectDetails.mockReturnValue({
         data: {
           ...mockProject,
-          litellm_budget_table: { max_budget: 100 },
+          Zentris_budget_table: { max_budget: 100 },
         },
         isLoading: false,
       });
@@ -178,3 +178,5 @@ describe("ProjectDetail", () => {
     });
   });
 });
+
+

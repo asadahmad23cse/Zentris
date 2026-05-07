@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getProxyBaseUrl,
-  getGlobalLitellmHeaderName,
+  getGlobalZentrisHeaderName,
   deriveErrorMessage,
   handleError,
 } from "@/components/networking";
@@ -38,7 +38,7 @@ const updateAccessGroup = async (
   const response = await fetch(url, {
     method: "PUT",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(params),
@@ -75,3 +75,5 @@ export const useEditAccessGroup = () => {
     },
   });
 };
+
+

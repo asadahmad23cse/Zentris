@@ -80,3 +80,5 @@ describe("SurveyPrompt", () => {
     expect(screen.queryByText("Quick feedback")).not.toBeInTheDocument();
   });
 });
+
+

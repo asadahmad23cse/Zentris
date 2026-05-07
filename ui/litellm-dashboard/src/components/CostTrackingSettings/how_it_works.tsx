@@ -67,19 +67,19 @@ const HowItWorks: React.FC = () => {
             <div className="space-y-1.5">
               <div className="flex items-start gap-3">
                 <code className="bg-gray-100 px-2 py-1 rounded text-xs font-mono text-gray-800 whitespace-nowrap">
-                  x-litellm-response-cost
+                  x-Zentris-response-cost
                 </code>
                 <Text className="text-xs text-gray-600">Final cost after discount</Text>
               </div>
               <div className="flex items-start gap-3">
                 <code className="bg-gray-100 px-2 py-1 rounded text-xs font-mono text-gray-800 whitespace-nowrap">
-                  x-litellm-response-cost-original
+                  x-Zentris-response-cost-original
                 </code>
                 <Text className="text-xs text-gray-600">Original cost before discount</Text>
               </div>
               <div className="flex items-start gap-3">
                 <code className="bg-gray-100 px-2 py-1 rounded text-xs font-mono text-gray-800 whitespace-nowrap">
-                  x-litellm-response-cost-discount-amount
+                  x-Zentris-response-cost-discount-amount
                 </code>
                 <Text className="text-xs text-gray-600">Amount discounted</Text>
               </div>
@@ -94,7 +94,7 @@ const HowItWorks: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Response Cost (x-litellm-response-cost)
+                  Response Cost (x-Zentris-response-cost)
                 </label>
                 <TextInput
                   placeholder="0.0171938125"
@@ -105,7 +105,7 @@ const HowItWorks: React.FC = () => {
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Discount Amount (x-litellm-response-cost-discount-amount)
+                  Discount Amount (x-Zentris-response-cost-discount-amount)
                 </label>
                 <TextInput
                   placeholder="0.0009049375"
@@ -145,4 +145,6 @@ const HowItWorks: React.FC = () => {
 };
 
 export default HowItWorks;
+
+
 

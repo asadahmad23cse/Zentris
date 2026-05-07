@@ -314,3 +314,5 @@ export const MCPServerView: React.FC<MCPServerViewProps> = ({
     </div>
   );
 };
+
+

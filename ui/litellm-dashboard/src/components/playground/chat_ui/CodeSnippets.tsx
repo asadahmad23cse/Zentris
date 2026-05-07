@@ -28,7 +28,7 @@ interface GenerateCodeParams {
   selectedSdk: "openai" | "azure";
   proxySettings?: {
     PROXY_BASE_URL?: string;
-    LITELLM_UI_API_DOC_BASE_URL?: string | null;
+    Zentris_UI_API_DOC_BASE_URL?: string | null;
   };
 }
 
@@ -54,9 +54,9 @@ export const generateCodeSnippet = (params: GenerateCodeParams): string => {
   } = params;
   const effectiveApiKey = apiKeySource === "session" ? accessToken : apiKey;
 
-  // Determine base URL with priority: LITELLM_UI_API_DOC_BASE_URL > PROXY_BASE_URL > window.location.origin
+  // Determine base URL with priority: Zentris_UI_API_DOC_BASE_URL > PROXY_BASE_URL > window.location.origin
   let apiBase = window.location.origin;
-  const customDocBaseUrl = proxySettings?.LITELLM_UI_API_DOC_BASE_URL;
+  const customDocBaseUrl = proxySettings?.Zentris_UI_API_DOC_BASE_URL;
   if (customDocBaseUrl && customDocBaseUrl.trim()) {
     apiBase = customDocBaseUrl;
   } else if (proxySettings?.PROXY_BASE_URL) {
@@ -84,14 +84,14 @@ export const generateCodeSnippet = (params: GenerateCodeParams): string => {
       ? `import openai
 
 client = openai.AzureOpenAI(
-	api_key="${effectiveApiKey || "YOUR_LITELLM_API_KEY"}",
+	api_key="${effectiveApiKey || "YOUR_Zentris_API_KEY"}",
 	azure_endpoint="${apiBase}",
 	api_version="2024-02-01"
 )`
       : `import openai
 
 client = openai.OpenAI(
-	api_key="${effectiveApiKey || "YOUR_LITELLM_API_KEY"}",
+	api_key="${effectiveApiKey || "YOUR_Zentris_API_KEY"}",
 	base_url="${apiBase}"
 )`;
 
@@ -575,3 +575,5 @@ print(f"Audio saved to {output_filename}")
 
   return finalCode;
 };
+
+

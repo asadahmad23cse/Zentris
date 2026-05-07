@@ -10,3 +10,5 @@ export interface AlertingVariables {
   LANGFUSE_HOST: string | null;
   OPENMETER_API_KEY: string | null;
 }
+
+

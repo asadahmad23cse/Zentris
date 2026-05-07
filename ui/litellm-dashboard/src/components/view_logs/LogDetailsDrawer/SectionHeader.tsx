@@ -106,3 +106,5 @@ export function SectionHeader({ type, tokens, cost, onCopy, isCollapsed, onToggl
     </div>
   );
 }
+
+

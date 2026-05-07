@@ -137,3 +137,5 @@ describe("UserDashboard beforeunload listener", () => {
     expect(removeCalls).toHaveLength(1);
   });
 });
+
+

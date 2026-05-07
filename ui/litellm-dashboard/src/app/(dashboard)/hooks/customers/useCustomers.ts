@@ -13,7 +13,7 @@ export interface Customer {
   allowed_model_region?: string | null;
   default_model?: string | null;
   budget_id?: string | null;
-  litellm_budget_table?: {
+  Zentris_budget_table?: {
     budget_id: string;
     max_budget?: number | null;
     soft_budget?: number | null;
@@ -40,3 +40,5 @@ export const useCustomers = () => {
     enabled: Boolean(accessToken) && all_admin_roles.includes(userRole!),
   });
 };
+
+

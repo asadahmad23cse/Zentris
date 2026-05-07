@@ -1,6 +1,6 @@
 /**
  * TypeScript types for Claude Code Marketplace
- * Matches backend API types from /litellm/types/proxy/claude_code_endpoints.py
+ * Matches backend API types from /Zentris/types/proxy/claude_code_endpoints.py
  */
 
 export interface PluginSource {
@@ -86,7 +86,7 @@ export interface MarketplaceOwner {
 }
 
 export interface MarketplaceResponse {
-  name: string;  // Marketplace name (e.g., "litellm")
+  name: string;  // Marketplace name (e.g., "Zentris")
   owner: MarketplaceOwner;
   plugins: MarketplacePluginEntry[];
 }
@@ -111,3 +111,5 @@ export interface PluginFormData {
   category: string;
   keywords: string;  // Comma-separated string, will be split into array
 }
+
+

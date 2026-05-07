@@ -312,9 +312,9 @@ function MetricsSection({ logEntry, metadata }: { logEntry: LogEntry; metadata: 
             </>
           )}
 
-          {metadata?.litellm_overhead_time_ms !== undefined && metadata.litellm_overhead_time_ms !== null && (
-            <Descriptions.Item label="LiteLLM Overhead">
-              {metadata.litellm_overhead_time_ms.toFixed(2)} ms
+          {metadata?.Zentris_overhead_time_ms !== undefined && metadata.Zentris_overhead_time_ms !== null && (
+            <Descriptions.Item label="Zentris Overhead">
+              {metadata.Zentris_overhead_time_ms.toFixed(2)} ms
             </Descriptions.Item>
           )}
 
@@ -549,3 +549,5 @@ function MetadataSection({ metadata }: { metadata: Record<string, any> }) {
     </div>
   );
 }
+
+

@@ -12,7 +12,7 @@ describe("ConditionalPublicModelName", () => {
           model_mappings: [
             {
               public_name: "gpt-4",
-              litellm_model: "gpt-4",
+              Zentris_model: "gpt-4",
             },
           ],
         }}
@@ -23,6 +23,8 @@ describe("ConditionalPublicModelName", () => {
 
     expect(screen.getByText("Model Mappings")).toBeInTheDocument();
     expect(screen.getByText("Public Model Name")).toBeInTheDocument();
-    expect(screen.getByText("LiteLLM Model Name")).toBeInTheDocument();
+    expect(screen.getByText("Zentris Model Name")).toBeInTheDocument();
   });
 });
+
+

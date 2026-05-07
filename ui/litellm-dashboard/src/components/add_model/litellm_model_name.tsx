@@ -4,13 +4,13 @@ import { TextInput, Text } from "@tremor/react";
 import { Row, Col } from "antd";
 import { Providers } from "../provider_info_helpers";
 
-interface LiteLLMModelNameFieldProps {
+interface ZentrisModelNameFieldProps {
   selectedProvider: Providers;
   providerModels: string[];
   getPlaceholder: (provider: Providers) => string;
 }
 
-const LiteLLMModelNameField: React.FC<LiteLLMModelNameFieldProps> = ({
+const ZentrisModelNameField: React.FC<ZentrisModelNameFieldProps> = ({
   selectedProvider,
   providerModels,
   getPlaceholder,
@@ -35,12 +35,12 @@ const LiteLLMModelNameField: React.FC<LiteLLMModelNameFieldProps> = ({
           if (selectedProvider === Providers.Azure) {
             return {
               public_name: model,
-              litellm_model: `azure/${model}`,
+              Zentris_model: `azure/${model}`,
             };
           }
           return {
             public_name: model,
-            litellm_model: model,
+            Zentris_model: model,
           };
         });
 
@@ -61,7 +61,7 @@ const LiteLLMModelNameField: React.FC<LiteLLMModelNameFieldProps> = ({
       ? [
           {
             public_name: deploymentName,
-            litellm_model: `azure/${deploymentName}`,
+            Zentris_model: `azure/${deploymentName}`,
           },
         ]
       : [];
@@ -80,16 +80,16 @@ const LiteLLMModelNameField: React.FC<LiteLLMModelNameFieldProps> = ({
     // Immediately update the model mappings
     const currentMappings = form.getFieldValue("model_mappings") || [];
     const updatedMappings = currentMappings.map((mapping: any) => {
-      if (mapping.public_name === "custom" || mapping.litellm_model === "custom") {
+      if (mapping.public_name === "custom" || mapping.Zentris_model === "custom") {
         if (selectedProvider === Providers.Azure) {
           return {
             public_name: customName,
-            litellm_model: `azure/${customName}`,
+            Zentris_model: `azure/${customName}`,
           };
         }
         return {
           public_name: customName,
-          litellm_model: customName,
+          Zentris_model: customName,
         };
       }
       return mapping;
@@ -101,8 +101,8 @@ const LiteLLMModelNameField: React.FC<LiteLLMModelNameFieldProps> = ({
   return (
     <>
       <Form.Item
-        label="LiteLLM Model Name(s)"
-        tooltip="The model name LiteLLM will send to the LLM API"
+        label="Zentris Model Name(s)"
+        tooltip="The model name Zentris will send to the LLM API"
         className="mb-0"
       >
         <Form.Item
@@ -183,8 +183,8 @@ const LiteLLMModelNameField: React.FC<LiteLLMModelNameFieldProps> = ({
         <Col span={14}>
           <Text className="mb-3 mt-1">
             {selectedProvider === Providers.Azure
-              ? "Your deployment name will be saved as the public model name, and LiteLLM will use 'azure/deployment-name' internally"
-              : "The model name LiteLLM will send to the LLM API"}
+              ? "Your deployment name will be saved as the public model name, and Zentris will use 'azure/deployment-name' internally"
+              : "The model name Zentris will send to the LLM API"}
           </Text>
         </Col>
       </Row>
@@ -192,4 +192,6 @@ const LiteLLMModelNameField: React.FC<LiteLLMModelNameFieldProps> = ({
   );
 };
 
-export default LiteLLMModelNameField;
+export default ZentrisModelNameField;
+
+

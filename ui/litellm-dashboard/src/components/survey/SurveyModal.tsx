@@ -17,17 +17,17 @@ const REASONS_OPTIONS = [
   {
     id: "ai_integration",
     label: "AI Integration",
-    description: "LiteLLM had the logging/guardrail integration we needed - Langfuse, OTEL, S3 logging, Azure Content Safety guardrails",
+    description: "Zentris had the logging/guardrail integration we needed - Langfuse, OTEL, S3 logging, Azure Content Safety guardrails",
   },
   {
     id: "unified_api",
     label: "Unified API",
-    description: "LiteLLM had the best OpenAI-compatible API across providers - OpenAI, Anthropic, Gemini, etc.",
+    description: "Zentris had the best OpenAI-compatible API across providers - OpenAI, Anthropic, Gemini, etc.",
   },
   {
     id: "breadth_of_models",
     label: "Breadth of Models/Providers",
-    description: "LiteLLM had the provider + endpoint combinations we needed - /ocr endpoint with Mistral OCR, /batches endppint with Bedrock API, etc.",
+    description: "Zentris had the provider + endpoint combinations we needed - /ocr endpoint with Mistral OCR, /batches endppint with Bedrock API, etc.",
   },
   {
     id: "other",
@@ -102,7 +102,7 @@ export function SurveyModal({ isOpen, onClose, onComplete }: SurveyModalProps) {
       });
 
       // Submit to feedback endpoint (redirects to Google Form)
-      const feedbackUrl = "https://feedback.litellm.ai/survey";
+      const feedbackUrl = "https://feedback.Zentris.ai/survey";
       
       const formData = new URLSearchParams({
         "entry.2015264290": data.usingAtCompany ? "Yes" : "No",
@@ -172,7 +172,7 @@ export function SurveyModal({ isOpen, onClose, onComplete }: SurveyModalProps) {
     if (step === 1) {
       return (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900">Are you using LiteLLM at your company?</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Are you using Zentris at your company?</h2>
           <p className="text-gray-500">Help us understand how our product is being used in professional environments.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
             <button
@@ -206,7 +206,7 @@ export function SurveyModal({ isOpen, onClose, onComplete }: SurveyModalProps) {
     if (step === 2 && data.usingAtCompany === true) {
       return (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900">What company are you using LiteLLM at?</h2>
+          <h2 className="text-2xl font-bold text-gray-900">What company are you using Zentris at?</h2>
           <p className="text-gray-500">This helps us understand our user base better.</p>
           <Input
             size="large"
@@ -223,7 +223,7 @@ export function SurveyModal({ isOpen, onClose, onComplete }: SurveyModalProps) {
     if (step === 3) {
       return (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900">When did you start using LiteLLM?</h2>
+          <h2 className="text-2xl font-bold text-gray-900">When did you start using Zentris?</h2>
           <Radio.Group
             value={data.startDate}
             onChange={(e) => updateData("startDate", e.target.value)}
@@ -248,11 +248,11 @@ export function SurveyModal({ isOpen, onClose, onComplete }: SurveyModalProps) {
       );
     }
 
-    // Step 4: Why did you pick LiteLLM?
+    // Step 4: Why did you pick Zentris?
     if (step === 4) {
       return (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900">Why did you pick LiteLLM over other AI Gateways?</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Why did you pick Zentris over other AI Gateways?</h2>
           <p className="text-gray-500">Select all that apply.</p>
           <div className="space-y-3">
             {REASONS_OPTIONS.map((option) => {
@@ -382,4 +382,6 @@ export function SurveyModal({ isOpen, onClose, onComplete }: SurveyModalProps) {
     </div>
   );
 }
+
+
 

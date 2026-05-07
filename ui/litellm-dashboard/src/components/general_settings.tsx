@@ -203,3 +203,5 @@ const GeneralSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, user
 };
 
 export default GeneralSettings;
+
+

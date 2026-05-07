@@ -24,19 +24,19 @@ interface DocsMenuProps {
  * 
  * @example
  * // Inline "Learn more" style
- * <HelpLink href="https://docs.litellm.ai/docs/proxy/custom_pricing">
+ * <HelpLink href="https://docs.Zentris.ai/docs/proxy/custom_pricing">
  *   Learn more about custom pricing
  * </HelpLink>
  * 
  * @example
  * // Subtle link (just icon + text, minimal styling)
- * <HelpLink href="https://docs.litellm.ai/docs/proxy/cost_tracking" variant="subtle">
+ * <HelpLink href="https://docs.Zentris.ai/docs/proxy/cost_tracking" variant="subtle">
  *   View docs
  * </HelpLink>
  * 
  * @example
  * // Button style (more prominent)
- * <HelpLink href="https://docs.litellm.ai/docs/proxy/custom_pricing" variant="button">
+ * <HelpLink href="https://docs.Zentris.ai/docs/proxy/custom_pricing" variant="button">
  *   Custom Pricing Documentation
  * </HelpLink>
  */
@@ -146,8 +146,8 @@ export const HelpIcon: React.FC<HelpIconProps> = ({
  * 
  * @example
  * <DocsMenu items={[
- *   { label: "Custom pricing for models", href: "https://docs.litellm.ai/docs/proxy/custom_pricing" },
- *   { label: "Spend tracking", href: "https://docs.litellm.ai/docs/proxy/cost_tracking" }
+ *   { label: "Custom pricing for models", href: "https://docs.Zentris.ai/docs/proxy/custom_pricing" },
+ *   { label: "Spend tracking", href: "https://docs.Zentris.ai/docs/proxy/cost_tracking" }
  * ]}>
  *   Docs
  * </DocsMenu>
@@ -209,4 +209,6 @@ export const DocsMenu: React.FC<DocsMenuProps> = ({
     </div>
   );
 };
+
+
 

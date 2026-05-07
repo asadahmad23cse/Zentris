@@ -10,3 +10,5 @@ export function AntDLoadingSpinner({ size, fontSize }: AntDLoadingSpinnerProps) 
   const indicator = <LoadingOutlined style={fontSize ? { fontSize } : undefined} spin />;
   return <Spin indicator={indicator} size={size} />;
 }
+
+

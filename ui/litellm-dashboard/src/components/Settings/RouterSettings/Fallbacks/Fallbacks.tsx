@@ -108,7 +108,7 @@ async function testFallbackModelResponse(selectedModel: string, accessToken: str
         <strong>{response.model}</strong>. See{" "}
         <a
           href="#"
-          onClick={() => window.open("https://docs.litellm.ai/docs/proxy/reliability", "_blank")}
+          onClick={() => window.open("https://docs.Zentris.ai/docs/proxy/reliability", "_blank")}
           style={{ textDecoration: "underline", color: "blue" }}
         >
           curl
@@ -131,7 +131,7 @@ const Fallbacks: React.FC<FallbacksProps> = ({ accessToken, userRole, userID, mo
   const { data: modelCostMapData } = useModelCostMap();
   const getProviderFromModel = (model: string): string => {
     if (modelCostMapData != null && typeof modelCostMapData === "object" && model in modelCostMapData) {
-      return modelCostMapData[model]["litellm_provider"] ?? "";
+      return modelCostMapData[model]["Zentris_provider"] ?? "";
     }
     return "";
   };
@@ -332,3 +332,5 @@ const Fallbacks: React.FC<FallbacksProps> = ({ accessToken, userRole, userID, mo
 };
 
 export default Fallbacks;
+
+

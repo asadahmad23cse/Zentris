@@ -3,7 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { ReactNode } from "react";
 import { useUIConfig } from "./useUIConfig";
-import { getUiConfig, LiteLLMWellKnownUiConfig } from "@/components/networking";
+import { getUiConfig, ZentrisWellKnownUiConfig } from "@/components/networking";
 
 // Mock the networking function
 vi.mock("@/components/networking", () => ({
@@ -22,7 +22,7 @@ vi.mock("../common/queryKeysFactory", () => ({
 }));
 
 // Mock data
-const mockUIConfig: LiteLLMWellKnownUiConfig = {
+const mockUIConfig: ZentrisWellKnownUiConfig = {
   sso_configured: true,
   server_root_path: "/api",
   proxy_base_url: "https://proxy.example.com",
@@ -98,7 +98,7 @@ describe("useUIConfig", () => {
   });
 
   it("should return different UI config data correctly", async () => {
-    const alternativeUIConfig: LiteLLMWellKnownUiConfig = {
+    const alternativeUIConfig: ZentrisWellKnownUiConfig = {
       server_root_path: "/v1",
       proxy_base_url: null,
       auto_redirect_to_sso: false,
@@ -173,3 +173,5 @@ describe("useUIConfig", () => {
     expect(getUiConfig).toHaveBeenCalledTimes(1);
   });
 });
+
+

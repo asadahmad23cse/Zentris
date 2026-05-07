@@ -64,7 +64,7 @@ const AddPromptForm: React.FC<AddPromptFormProps> = ({ visible, onClose, accessT
           // Prepare prompt data for creation
           promptData = {
             prompt_id: values.prompt_id,
-            litellm_params: {
+            Zentris_params: {
               prompt_integration: "dotprompt",
               prompt_id: conversionResult.prompt_id,
               prompt_data: conversionResult.json_data,
@@ -168,3 +168,5 @@ const AddPromptForm: React.FC<AddPromptFormProps> = ({ visible, onClose, accessT
 };
 
 export default AddPromptForm;
+
+

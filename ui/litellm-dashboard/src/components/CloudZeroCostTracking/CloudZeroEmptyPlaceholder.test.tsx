@@ -12,3 +12,5 @@ describe("CloudZeroEmptyPlaceholder", () => {
     expect(screen.getByRole("button", { name: "Add CloudZero Integration" })).toBeInTheDocument();
   });
 });
+
+

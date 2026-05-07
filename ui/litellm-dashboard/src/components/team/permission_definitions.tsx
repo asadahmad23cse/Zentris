@@ -66,3 +66,5 @@ export const getPermissionInfo = (permission: string): PermissionInfo => {
     route: permission,
   };
 };
+
+

@@ -600,3 +600,5 @@ export function getFrameworks(): ComplianceFramework[] {
     categories: Array.from(data.categories.values()),
   }));
 }
+
+

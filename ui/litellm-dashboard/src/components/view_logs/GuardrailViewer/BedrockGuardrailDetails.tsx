@@ -503,3 +503,5 @@ export const BedrockGuardrailDetails: React.FC<{ response: BedrockGuardrailRespo
 };
 
 export default BedrockGuardrailDetails;
+
+

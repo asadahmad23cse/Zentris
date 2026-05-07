@@ -54,3 +54,5 @@ export const simplifyKeyGenerateError = (error: any): string => {
   // If it's not a permission error, return the original error message
   return `Error creating the key: ${error}`;
 };
+
+

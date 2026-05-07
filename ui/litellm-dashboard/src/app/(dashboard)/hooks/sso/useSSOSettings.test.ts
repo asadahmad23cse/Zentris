@@ -308,3 +308,5 @@ describe("useSSOSettings", () => {
     expect(ssoQuery?.queryKey).toEqual(["sso", "detail", "settings"]);
   });
 });
+
+

@@ -74,7 +74,7 @@ interface CacheHealthResponse {
   cache_type?: string;
   ping_response?: boolean;
   set_cache_response?: string;
-  litellm_cache_params?: string;
+  Zentris_cache_params?: string;
   error?: {
     message: string;
     type: string;
@@ -398,3 +398,5 @@ const CacheDashboard: React.FC<CachePageProps> = ({ accessToken, token, userRole
 };
 
 export default CacheDashboard;
+
+

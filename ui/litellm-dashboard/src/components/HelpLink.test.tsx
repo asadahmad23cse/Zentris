@@ -153,3 +153,5 @@ describe("DocsMenu", () => {
     expect(screen.queryByText("Custom pricing")).not.toBeInTheDocument();
   });
 });
+
+

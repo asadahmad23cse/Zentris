@@ -39,3 +39,5 @@ describe("EndpointUsageBarChart", () => {
     expect(screen.getByTestId("tremor-bar-chart")).toBeInTheDocument();
   });
 });
+
+

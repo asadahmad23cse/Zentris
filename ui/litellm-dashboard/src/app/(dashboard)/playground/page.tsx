@@ -11,7 +11,7 @@ import { fetchProxySettings } from "@/utils/proxyUtils";
 
 interface ProxySettings {
   PROXY_BASE_URL?: string;
-  LITELLM_UI_API_DOC_BASE_URL?: string | null;
+  Zentris_UI_API_DOC_BASE_URL?: string | null;
 }
 
 export default function PlaygroundPage() {
@@ -25,7 +25,7 @@ export default function PlaygroundPage() {
         if (settings) {
           setProxySettings({
             PROXY_BASE_URL: settings.PROXY_BASE_URL,
-            LITELLM_UI_API_DOC_BASE_URL: settings.LITELLM_UI_API_DOC_BASE_URL,
+            Zentris_UI_API_DOC_BASE_URL: settings.Zentris_UI_API_DOC_BASE_URL,
           });
         }
       }
@@ -68,7 +68,7 @@ export default function PlaygroundPage() {
             userRole={userRole}
             disabledPersonalKeyCreation={disabledPersonalKeyCreation}
             proxySettings={proxySettings}
-            customProxyBaseUrl={proxySettings?.LITELLM_UI_API_DOC_BASE_URL ?? proxySettings?.PROXY_BASE_URL}
+            customProxyBaseUrl={proxySettings?.Zentris_UI_API_DOC_BASE_URL ?? proxySettings?.PROXY_BASE_URL}
           />
         </TabPanel>
       </TabPanels>
@@ -76,3 +76,5 @@ export default function PlaygroundPage() {
     </div>
   );
 }
+
+

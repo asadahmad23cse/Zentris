@@ -182,7 +182,7 @@ export const CreateUserButton: React.FC<CreateuserProps> = ({
             <>
               New users receive an email invite only when an email integration (SMTP, Resend, or SendGrid) is
               configured.{" "}
-              <Link href="https://docs.litellm.ai/docs/proxy/email" target="_blank">
+              <Link href="https://docs.Zentris.ai/docs/proxy/email" target="_blank">
                 Learn how to set up email notifications
               </Link>
             </>
@@ -247,7 +247,7 @@ export const CreateUserButton: React.FC<CreateuserProps> = ({
               <>
                 New users receive an email invite only when an email integration (SMTP, Resend, or SendGrid) is
                 configured.{" "}
-                <Link href="https://docs.litellm.ai/docs/proxy/email" target="_blank">
+                <Link href="https://docs.Zentris.ai/docs/proxy/email" target="_blank">
                   Learn how to set up email notifications
                 </Link>
               </>
@@ -364,3 +364,5 @@ export const CreateUserButton: React.FC<CreateuserProps> = ({
     </div>
   );
 };
+
+

@@ -11,15 +11,15 @@ describe("APIReferenceView", () => {
   const codeBlockTestId = "api-reference-code-block";
 
   it("uses the API doc base url when provided", () => {
-    const apiDocUrl = "https://docs.litellm.test";
-    const { getAllByTestId } = render(<APIReferenceView proxySettings={{ LITELLM_UI_API_DOC_BASE_URL: apiDocUrl }} />);
+    const apiDocUrl = "https://docs.Zentris.test";
+    const { getAllByTestId } = render(<APIReferenceView proxySettings={{ Zentris_UI_API_DOC_BASE_URL: apiDocUrl }} />);
 
     const codeBlocks = getAllByTestId(codeBlockTestId);
     expect(codeBlocks[0].textContent).toContain(apiDocUrl);
   });
 
   it("falls back to the proxy base url when the docs url is missing", () => {
-    const proxyUrl = "https://proxy.litellm.test";
+    const proxyUrl = "https://proxy.Zentris.test";
     const { getAllByTestId } = render(<APIReferenceView proxySettings={{ PROXY_BASE_URL: proxyUrl }} />);
 
     const codeBlocks = getAllByTestId(codeBlockTestId);
@@ -27,13 +27,13 @@ describe("APIReferenceView", () => {
   });
 
   it("prefers the docs url when both urls are provided", () => {
-    const apiDocUrl = "https://docs-preferred.litellm.test";
-    const proxyUrl = "https://proxy-backup.litellm.test";
+    const apiDocUrl = "https://docs-preferred.Zentris.test";
+    const proxyUrl = "https://proxy-backup.Zentris.test";
 
     const { getAllByTestId } = render(
       <APIReferenceView
         proxySettings={{
-          LITELLM_UI_API_DOC_BASE_URL: apiDocUrl,
+          Zentris_UI_API_DOC_BASE_URL: apiDocUrl,
           PROXY_BASE_URL: proxyUrl,
         }}
       />,
@@ -45,3 +45,5 @@ describe("APIReferenceView", () => {
     expect(renderedCode).not.toContain(proxyUrl);
   });
 });
+
+

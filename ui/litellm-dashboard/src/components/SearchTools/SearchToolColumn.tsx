@@ -40,7 +40,7 @@ export const searchToolColumns = (
       title: "Provider",
       key: "provider",
       render: (_, tool) => {
-        const provider = tool.litellm_params.search_provider;
+        const provider = tool.Zentris_params.search_provider;
         const providerInfo = availableProviders.find((p) => p.provider_name === provider);
         const displayName = providerInfo?.ui_friendly_name || provider;
 
@@ -112,3 +112,5 @@ export const searchToolColumns = (
       },
     },
   ];
+
+

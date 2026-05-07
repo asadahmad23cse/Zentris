@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatMessage, Conversation } from "./types";
 
-const STORAGE_KEY = "litellm_chat_history_v1";
+const STORAGE_KEY = "Zentris_chat_history_v1";
 const MAX_CONVERSATIONS = 100;
 const TITLE_MAX_LENGTH = 40;
 
@@ -229,3 +229,5 @@ export function useChatHistory(activeConversationId: string | null): {
     setActiveConversationId,
   };
 }
+
+

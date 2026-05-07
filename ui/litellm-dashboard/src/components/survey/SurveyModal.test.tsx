@@ -18,7 +18,7 @@ describe("SurveyModal", () => {
       <SurveyModal isOpen={false} onClose={vi.fn()} onComplete={vi.fn()} />
     );
     expect(
-      screen.queryByText(/Are you using LiteLLM at your company\?/i)
+      screen.queryByText(/Are you using Zentris at your company\?/i)
     ).not.toBeInTheDocument();
   });
 
@@ -27,7 +27,7 @@ describe("SurveyModal", () => {
       <SurveyModal isOpen={true} onClose={vi.fn()} onComplete={vi.fn()} />
     );
     expect(
-      screen.getByText(/Are you using LiteLLM at your company\?/i)
+      screen.getByText(/Are you using Zentris at your company\?/i)
     ).toBeInTheDocument();
   });
 
@@ -59,7 +59,7 @@ describe("SurveyModal", () => {
     await user.click(screen.getByRole("button", { name: /Next/i }));
 
     expect(
-      screen.getByText(/What company are you using LiteLLM at\?/i)
+      screen.getByText(/What company are you using Zentris at\?/i)
     ).toBeInTheDocument();
   });
 
@@ -72,7 +72,7 @@ describe("SurveyModal", () => {
     await user.click(screen.getByRole("button", { name: /Personal project/i }));
     await user.click(screen.getByRole("button", { name: /Next/i }));
 
-    expect(screen.getByText(/When did you start using LiteLLM\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/When did you start using Zentris\?/i)).toBeInTheDocument();
   });
 
   it("should show 5 total steps when using at a company", async () => {
@@ -108,7 +108,7 @@ describe("SurveyModal", () => {
     await user.click(screen.getByRole("button", { name: /Back/i }));
 
     expect(
-      screen.getByText(/Are you using LiteLLM at your company\?/i)
+      screen.getByText(/Are you using Zentris at your company\?/i)
     ).toBeInTheDocument();
   });
 
@@ -198,3 +198,5 @@ describe("SurveyModal", () => {
     expect(onClose).toHaveBeenCalled();
   });
 });
+
+

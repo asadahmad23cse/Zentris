@@ -72,7 +72,7 @@ export const createCredentialFromModel = (provider: string, modelData: any): Cre
 
   // Go through each field defined for this provider
   providerFields.forEach((field) => {
-    const value = modelData.litellm_params[field.key];
+    const value = modelData.Zentris_params[field.key];
     console.log("field", field);
     console.log("value", value);
     if (value !== undefined) {
@@ -117,8 +117,8 @@ const ProviderSpecificFields: React.FC<ProviderSpecificFieldsProps> = ({ selecte
       if (providerInfo.provider) {
         entries[providerInfo.provider] = mappedFields;
       }
-      if (providerInfo.litellm_provider) {
-        entries[providerInfo.litellm_provider] = mappedFields;
+      if (providerInfo.Zentris_provider) {
+        entries[providerInfo.Zentris_provider] = mappedFields;
       }
     });
     return entries;
@@ -150,7 +150,7 @@ const ProviderSpecificFields: React.FC<ProviderSpecificFieldsProps> = ({ selecte
       (p) =>
         p.provider_display_name === selectedProviderEnum ||
         p.provider === selectedProvider ||
-        p.litellm_provider === selectedProvider,
+        p.Zentris_provider === selectedProvider,
     );
     if (!providerInfo) {
       return [];
@@ -161,8 +161,8 @@ const ProviderSpecificFields: React.FC<ProviderSpecificFieldsProps> = ({ selecte
     if (providerInfo.provider) {
       providerFieldsByDisplayName[providerInfo.provider] = mapped;
     }
-    if (providerInfo.litellm_provider) {
-      providerFieldsByDisplayName[providerInfo.litellm_provider] = mapped;
+    if (providerInfo.Zentris_provider) {
+      providerFieldsByDisplayName[providerInfo.Zentris_provider] = mapped;
     }
     return mapped;
   }, [selectedProviderEnum, selectedProvider, providerMetadata]);
@@ -282,7 +282,7 @@ const ProviderSpecificFields: React.FC<ProviderSpecificFieldsProps> = ({ selecte
                 <Text className="mb-2">
                   The actual model your azure deployment uses. Used for accurate cost tracking. Select name from{" "}
                   <Link
-                    href="https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json"
+                    href="https://github.com/BerriAI/Zentris/blob/main/model_prices_and_context_window.json"
                     target="_blank"
                   >
                     here
@@ -298,3 +298,5 @@ const ProviderSpecificFields: React.FC<ProviderSpecificFieldsProps> = ({ selecte
 };
 
 export default ProviderSpecificFields;
+
+

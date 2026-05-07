@@ -96,13 +96,13 @@ describe("Request Viewer", () => {
     expect(screen.getByText(TRUNCATED_REQUEST_ID)).toBeInTheDocument();
   });
 
-  it("should display LiteLLM Overhead when litellm_overhead_time_ms is present in metadata", () => {
+  it("should display Zentris Overhead when Zentris_overhead_time_ms is present in metadata", () => {
     render(
       <RequestViewer
         row={createRow({
           metadata: {
             status: "success",
-            litellm_overhead_time_ms: 150,
+            Zentris_overhead_time_ms: 150,
             additional_usage_values: {
               cache_read_input_tokens: 0,
               cache_creation_input_tokens: 0,
@@ -112,14 +112,14 @@ describe("Request Viewer", () => {
       />,
     );
 
-    expect(screen.getByText("LiteLLM Overhead:")).toBeInTheDocument();
+    expect(screen.getByText("Zentris Overhead:")).toBeInTheDocument();
     expect(screen.getByText("150 ms")).toBeInTheDocument();
   });
 
-  it("should not display LiteLLM Overhead when litellm_overhead_time_ms is not present in metadata", () => {
+  it("should not display Zentris Overhead when Zentris_overhead_time_ms is not present in metadata", () => {
     render(<RequestViewer row={createRow()} />);
 
-    expect(screen.queryByText("LiteLLM Overhead:")).not.toBeInTheDocument();
+    expect(screen.queryByText("Zentris Overhead:")).not.toBeInTheDocument();
   });
 
   it("should display retry count when attempted_retries > 0 in metadata", () => {
@@ -231,3 +231,5 @@ describe("SpendLogsTable", () => {
     });
   });
 });
+
+

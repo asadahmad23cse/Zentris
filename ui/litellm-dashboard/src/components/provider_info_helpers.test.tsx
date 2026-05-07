@@ -196,18 +196,18 @@ describe("provider_info_helpers", () => {
 
     it("should return models matching the provider from modelMap", () => {
       const modelMap = {
-        "gpt-3.5-turbo": { litellm_provider: "openai" },
-        "gpt-4": { litellm_provider: "openai" },
-        "claude-3-opus": { litellm_provider: "anthropic" },
+        "gpt-3.5-turbo": { Zentris_provider: "openai" },
+        "gpt-4": { Zentris_provider: "openai" },
+        "claude-3-opus": { Zentris_provider: "anthropic" },
       };
       const result = getProviderModels(Providers.OpenAI, modelMap);
       expect(result).toEqual(["gpt-3.5-turbo", "gpt-4"]);
     });
 
-    it("should return models when litellm_provider includes the provider string", () => {
+    it("should return models when Zentris_provider includes the provider string", () => {
       const modelMap = {
-        "custom-openai-model": { litellm_provider: "custom_openai_endpoint" },
-        "another-model": { litellm_provider: "openai" },
+        "custom-openai-model": { Zentris_provider: "custom_openai_endpoint" },
+        "another-model": { Zentris_provider: "openai" },
       };
       const result = getProviderModels(Providers.OpenAI, modelMap);
       expect(result).toContain("custom-openai-model");
@@ -216,17 +216,17 @@ describe("provider_info_helpers", () => {
 
     it("should filter out models with null values", () => {
       const modelMap = {
-        "gpt-3.5-turbo": { litellm_provider: "openai" },
+        "gpt-3.5-turbo": { Zentris_provider: "openai" },
         "null-model": null,
-        "gpt-4": { litellm_provider: "openai" },
+        "gpt-4": { Zentris_provider: "openai" },
       };
       const result = getProviderModels(Providers.OpenAI, modelMap);
       expect(result).toEqual(["gpt-3.5-turbo", "gpt-4"]);
     });
 
-    it("should filter out models without litellm_provider property", () => {
+    it("should filter out models without Zentris_provider property", () => {
       const modelMap = {
-        "gpt-3.5-turbo": { litellm_provider: "openai" },
+        "gpt-3.5-turbo": { Zentris_provider: "openai" },
         "no-provider-model": { someOtherProperty: "value" },
       };
       const result = getProviderModels(Providers.OpenAI, modelMap);
@@ -235,9 +235,9 @@ describe("provider_info_helpers", () => {
 
     it("should include both cohere and cohere_chat models for Cohere provider", () => {
       const modelMap = {
-        "cohere-model-1": { litellm_provider: "cohere" },
-        "cohere-model-2": { litellm_provider: "cohere_chat" },
-        "other-model": { litellm_provider: "openai" },
+        "cohere-model-1": { Zentris_provider: "cohere" },
+        "cohere-model-2": { Zentris_provider: "cohere_chat" },
+        "other-model": { Zentris_provider: "openai" },
       };
       const result = getProviderModels(Providers.Cohere, modelMap);
       expect(result).toContain("cohere-model-1");
@@ -248,9 +248,9 @@ describe("provider_info_helpers", () => {
 
     it("should include sagemaker_chat models for SageMaker provider", () => {
       const modelMap = {
-        "sagemaker-model-1": { litellm_provider: "sagemaker_chat" },
-        "sagemaker-model-2": { litellm_provider: "sagemaker" },
-        "other-model": { litellm_provider: "openai" },
+        "sagemaker-model-1": { Zentris_provider: "sagemaker_chat" },
+        "sagemaker-model-2": { Zentris_provider: "sagemaker" },
+        "other-model": { Zentris_provider: "openai" },
       };
       const result = getProviderModels(Providers.SageMaker, modelMap);
       expect(result).toContain("sagemaker-model-1");
@@ -261,14 +261,14 @@ describe("provider_info_helpers", () => {
       const modelMap = {
         "string-model": "not-an-object",
         "number-model": 123,
-        "valid-model": { litellm_provider: "openai" },
+        "valid-model": { Zentris_provider: "openai" },
       };
       const result = getProviderModels(Providers.OpenAI, modelMap);
       expect(result).toEqual(["valid-model"]);
     });
 
     it("should log provider key and mapped provider when called", () => {
-      const modelMap = { "gpt-3.5-turbo": { litellm_provider: "openai" } };
+      const modelMap = { "gpt-3.5-turbo": { Zentris_provider: "openai" } };
       getProviderModels(Providers.OpenAI, modelMap);
       expect(consoleSpy).toHaveBeenCalledWith(`Provider key: ${Providers.OpenAI}`);
       expect(consoleSpy).toHaveBeenCalledWith(`Provider mapped to: ${provider_map[Providers.OpenAI]}`);
@@ -276,8 +276,8 @@ describe("provider_info_helpers", () => {
 
     it("should return empty array for provider with no matching models", () => {
       const modelMap = {
-        "gpt-3.5-turbo": { litellm_provider: "openai" },
-        "claude-3-opus": { litellm_provider: "anthropic" },
+        "gpt-3.5-turbo": { Zentris_provider: "openai" },
+        "claude-3-opus": { Zentris_provider: "anthropic" },
       };
       const result = getProviderModels(Providers.Bedrock, modelMap);
       expect(result).toEqual([]);
@@ -285,9 +285,9 @@ describe("provider_info_helpers", () => {
 
     it("should handle multiple providers correctly", () => {
       const modelMap = {
-        "gpt-3.5-turbo": { litellm_provider: "openai" },
-        "claude-3-opus": { litellm_provider: "anthropic" },
-        "groq-model": { litellm_provider: "groq" },
+        "gpt-3.5-turbo": { Zentris_provider: "openai" },
+        "claude-3-opus": { Zentris_provider: "anthropic" },
+        "groq-model": { Zentris_provider: "groq" },
       };
       const openaiResult = getProviderModels(Providers.OpenAI, modelMap);
       const anthropicResult = getProviderModels(Providers.Anthropic, modelMap);
@@ -299,3 +299,5 @@ describe("provider_info_helpers", () => {
     });
   });
 });
+
+

@@ -33,7 +33,7 @@ type SortKey =
 const providerColors: Record<string, string> = {
   Bedrock: "bg-orange-100 text-orange-700 border-orange-200",
   "Google Cloud": "bg-sky-100 text-sky-700 border-sky-200",
-  LiteLLM: "bg-indigo-100 text-indigo-700 border-indigo-200",
+  Zentris: "bg-indigo-100 text-indigo-700 border-indigo-200",
   Custom: "bg-gray-100 text-gray-600 border-gray-200",
 };
 
@@ -311,3 +311,5 @@ export function GuardrailsOverview({
     </div>
   );
 }
+
+

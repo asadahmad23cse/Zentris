@@ -182,3 +182,5 @@ describe("ImpactPopover", () => {
     expect(networking.estimateAttachmentImpactCall).toHaveBeenCalledTimes(1);
   });
 });
+
+

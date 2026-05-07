@@ -160,7 +160,7 @@ const createMockTeamData = (overrides = {}) => ({
     max_parallel_requests: null,
     budget_reset_at: null,
     model_id: null,
-    litellm_model_table: null,
+    Zentris_model_table: null,
     created_at: "2024-01-01T00:00:00Z",
     team_member_budget_table: null,
     guardrails: [],
@@ -480,7 +480,7 @@ describe("TeamInfoView", () => {
     await user.click(editButton);
 
     const secretField = await screen.findByPlaceholderText(
-      '{"namespace": "admin", "mount": "secret", "path_prefix": "litellm"}'
+      '{"namespace": "admin", "mount": "secret", "path_prefix": "Zentris"}'
     );
     expect(secretField).toBeDisabled();
   });
@@ -514,7 +514,7 @@ describe("TeamInfoView", () => {
     await user.click(editButton);
 
     const secretField = await screen.findByPlaceholderText(
-      '{"namespace": "admin", "mount": "secret", "path_prefix": "litellm"}'
+      '{"namespace": "admin", "mount": "secret", "path_prefix": "Zentris"}'
     );
     expect(secretField).not.toBeDisabled();
   });
@@ -853,3 +853,5 @@ describe("TeamInfoView", () => {
     });
   });
 });
+
+

@@ -7,7 +7,7 @@ import { projectKeys, ProjectResponse } from "./useProjects";
 
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: vi.fn(() => ""),
-  getGlobalLitellmHeaderName: vi.fn(() => "Authorization"),
+  getGlobalZentrisHeaderName: vi.fn(() => "Authorization"),
   deriveErrorMessage: vi.fn((data: any) => data?.error || "Error"),
   handleError: vi.fn(),
 }));
@@ -35,7 +35,7 @@ const mockProject: ProjectResponse = {
   created_by: "user-1",
   updated_at: "2024-01-02T00:00:00Z",
   updated_by: "user-1",
-  litellm_budget_table: null,
+  Zentris_budget_table: null,
 };
 
 const mockProjects: ProjectResponse[] = [
@@ -142,3 +142,5 @@ describe("useProjectDetails", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
 });
+
+

@@ -94,3 +94,5 @@ const BudgetModal: React.FC<BudgetModalProps> = ({ isModalVisible, setIsModalVis
 };
 
 export default BudgetModal;
+
+

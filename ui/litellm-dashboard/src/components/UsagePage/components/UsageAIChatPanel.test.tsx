@@ -83,3 +83,5 @@ describe("UsageAIChatPanel", () => {
     expect(screen.getByTestId("usage-ai-chat-panel")).toHaveClass("translate-x-0");
   });
 });
+
+

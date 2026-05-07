@@ -718,7 +718,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                       {/* Top Models */}
                       <Col numColSpan={1}>
                         <Card className="h-full">
-                          <Title>{modelViewType === "groups" ? "Top Public Model Names" : "Top Litellm Models"}</Title>
+                          <Title>{modelViewType === "groups" ? "Top Public Model Names" : "Top Zentris Models"}</Title>
                           <div className="flex justify-between items-center mb-4">
                             <Segmented
                               options={[
@@ -749,7 +749,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                                 }`}
                                 onClick={() => setModelViewType("individual")}
                               >
-                                Litellm Model Name
+                                Zentris Model Name
                               </button>
                             </div>
                           </div>
@@ -1013,3 +1013,5 @@ const getModelActivityData = (userSpendData: { results: DailyData[]; metadata: a
 };
 
 export default UsagePage;
+
+

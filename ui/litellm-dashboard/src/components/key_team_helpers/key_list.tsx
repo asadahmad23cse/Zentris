@@ -45,7 +45,7 @@ export interface KeyResponse {
   model_max_budget: Record<string, number>;
   soft_budget_cooldown: boolean;
   blocked: boolean;
-  litellm_budget_table: Record<string, unknown>;
+  Zentris_budget_table: Record<string, unknown>;
   organization_id: string | null;
   org_id?: string | null;
   created_at: string;
@@ -231,3 +231,5 @@ const useKeyList = ({
 };
 
 export default useKeyList;
+
+

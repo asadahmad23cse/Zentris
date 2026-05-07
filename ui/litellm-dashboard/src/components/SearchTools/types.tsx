@@ -1,4 +1,4 @@
-export interface SearchToolLiteLLMParams {
+export interface SearchToolZentrisParams {
   search_provider: string;
   api_key?: string;
   api_base?: string;
@@ -15,7 +15,7 @@ export interface SearchToolInfo {
 export interface SearchTool {
   search_tool_id?: string;
   search_tool_name: string;
-  litellm_params: SearchToolLiteLLMParams;
+  Zentris_params: SearchToolZentrisParams;
   search_tool_info?: SearchToolInfo;
   created_at?: string;
   updated_at?: string;
@@ -34,4 +34,6 @@ export interface AvailableSearchProvider {
 export interface AvailableSearchProvidersResponse {
   providers: AvailableSearchProvider[];
 }
+
+
 

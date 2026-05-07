@@ -23,3 +23,5 @@ describe("OnboardingErrorView", () => {
     expect(link).toHaveAttribute("href", "/ui/login");
   });
 });
+
+

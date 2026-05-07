@@ -196,16 +196,16 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
       return buildAgentDataFromForm(values);
     } else if (selectedAgentTypeInfo?.use_a2a_form_fields) {
       const agentData = buildAgentDataFromForm(values);
-      if (selectedAgentTypeInfo.litellm_params_template) {
-        agentData.litellm_params = {
-          ...agentData.litellm_params,
-          ...selectedAgentTypeInfo.litellm_params_template,
+      if (selectedAgentTypeInfo.Zentris_params_template) {
+        agentData.Zentris_params = {
+          ...agentData.Zentris_params,
+          ...selectedAgentTypeInfo.Zentris_params_template,
         };
       }
       for (const field of selectedAgentTypeInfo.credential_fields) {
         const value = values[field.key];
-        if (value && field.include_in_litellm_params !== false) {
-          agentData.litellm_params[field.key] = value;
+        if (value && field.include_in_Zentris_params !== false) {
+          agentData.Zentris_params[field.key] = value;
         }
       }
       return agentData;
@@ -261,23 +261,23 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
         }
       }
 
-      // Wire trace-id flags and budget controls into agent litellm_params (before create call)
+      // Wire trace-id flags and budget controls into agent Zentris_params (before create call)
       if (requireTraceIdInbound || requireTraceIdOutbound) {
-        if (!agentData.litellm_params) agentData.litellm_params = {};
+        if (!agentData.Zentris_params) agentData.Zentris_params = {};
         if (requireTraceIdInbound) {
-          agentData.litellm_params.require_trace_id_on_calls_to_agent = true;
+          agentData.Zentris_params.require_trace_id_on_calls_to_agent = true;
         }
         if (requireTraceIdOutbound) {
-          agentData.litellm_params.require_trace_id_on_calls_by_agent = true;
-          if (maxIterations) agentData.litellm_params.max_iterations = maxIterations;
-          if (maxBudgetPerSession) agentData.litellm_params.max_budget_per_session = maxBudgetPerSession;
+          agentData.Zentris_params.require_trace_id_on_calls_by_agent = true;
+          if (maxIterations) agentData.Zentris_params.max_iterations = maxIterations;
+          if (maxBudgetPerSession) agentData.Zentris_params.max_budget_per_session = maxBudgetPerSession;
         }
       }
 
       const selectedGuardrails = values.guardrails || [];
       if (selectedGuardrails.length > 0) {
-        if (!agentData.litellm_params) agentData.litellm_params = {};
-        agentData.litellm_params.guardrails = selectedGuardrails;
+        if (!agentData.Zentris_params) agentData.Zentris_params = {};
+        agentData.Zentris_params.guardrails = selectedGuardrails;
       }
 
       const selectedTeamId = values.team_id || null;
@@ -442,7 +442,7 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <span className="text-sm font-medium text-gray-700">
-                Require x-litellm-trace-id on calls TO this agent
+                Require x-Zentris-trace-id on calls TO this agent
               </span>
               <p className="text-xs text-gray-500 mt-1">
                 Only accept this agent being invoked with a trace-id (e.g. when used as a sub-agent).
@@ -457,10 +457,10 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <span className="text-sm font-medium text-gray-700">
-                Require x-litellm-trace-id on calls BY this agent
+                Require x-Zentris-trace-id on calls BY this agent
               </span>
               <p className="text-xs text-gray-500 mt-1">
-                Requires LLM/MCP calls made by this agent to include x-litellm-trace-id for session tracking.
+                Requires LLM/MCP calls made by this agent to include x-Zentris-trace-id for session tracking.
               </p>
             </div>
             <Switch
@@ -484,7 +484,7 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
         <div className="space-y-4">
           {!requireTraceIdOutbound && (
             <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-              Enable &quot;Require x-litellm-trace-id on calls BY this agent&quot; in Tracing to configure budgets and rate limits.
+              Enable &quot;Require x-Zentris-trace-id on calls BY this agent&quot; in Tracing to configure budgets and rate limits.
             </div>
           )}
 
@@ -534,7 +534,7 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
 
           <div className="text-sm font-medium text-gray-700 mt-4">Per-Session Rate Limits</div>
           <p className="text-xs text-gray-500">
-            Rate limits per session (x-litellm-trace-id). Each session gets its own counters.
+            Rate limits per session (x-Zentris-trace-id). Each session gets its own counters.
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Form.Item label="Session TPM Limit" name="session_tpm_limit" className="mb-0">
@@ -957,3 +957,5 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({
 };
 
 export default AddAgentForm;
+
+

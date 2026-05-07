@@ -37,17 +37,19 @@ export const errorPatterns: ErrorPattern[] = [
     pattern: /500.*Internal Server Error/i,
     replacement: "Provider internal server error",
   },
-  // LiteLLM specific wrapped errors
+  // Zentris specific wrapped errors
   {
-    pattern: /litellm\.AuthenticationError/i,
+    pattern: /Zentris\.AuthenticationError/i,
     replacement: "Authentication failed",
   },
   {
-    pattern: /litellm\.RateLimitError/i,
+    pattern: /Zentris\.RateLimitError/i,
     replacement: "Rate limit exceeded",
   },
   {
-    pattern: /litellm\.APIError/i,
+    pattern: /Zentris\.APIError/i,
     replacement: "API error",
   },
 ];
+
+

@@ -8,7 +8,7 @@ import GuardrailSelectionModal from "./guardrail_selection_modal";
 const makeGuardrailDef = (name: string, description = "A guardrail description") => ({
   guardrail_name: name,
   guardrail_info: { description },
-  litellm_params: { guardrail: "presidio", mode: "pre_call" },
+  Zentris_params: { guardrail: "presidio", mode: "pre_call" },
 });
 
 const makeTemplate = (guardrailDefs: any[] = [], overrides: any = {}) => ({
@@ -125,3 +125,5 @@ describe("GuardrailSelectionModal", () => {
     expect(defaultProps.onCancel).toHaveBeenCalled();
   });
 });
+
+

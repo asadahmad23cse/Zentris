@@ -50,7 +50,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
   const spend = project?.spend ?? 0;
-  const maxBudget = project?.litellm_budget_table?.max_budget ?? null;
+  const maxBudget = project?.Zentris_budget_table?.max_budget ?? null;
   const hasLimit = maxBudget != null && maxBudget > 0;
   const spendPercent = hasLimit ? Math.min((spend / maxBudget) * 100, 100) : 0;
   const spendColor = spendPercent >= 90 ? "#f5222d" : spendPercent >= 70 ? "#faad14" : "#52c41a";
@@ -324,3 +324,5 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
     </Content>
   );
 }
+
+

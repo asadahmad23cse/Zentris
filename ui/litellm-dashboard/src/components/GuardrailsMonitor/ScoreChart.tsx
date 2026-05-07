@@ -37,3 +37,5 @@ export function ScoreChart({ data }: ScoreChartProps) {
     </Card>
   );
 }
+
+

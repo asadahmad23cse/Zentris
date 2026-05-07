@@ -33,3 +33,5 @@ const ResponsesImageRenderer: React.FC<ResponsesImageRendererProps> = ({ message
 };
 
 export default ResponsesImageRenderer;
+
+

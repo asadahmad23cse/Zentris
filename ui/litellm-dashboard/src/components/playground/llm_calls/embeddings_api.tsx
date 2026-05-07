@@ -1,5 +1,5 @@
 import NotificationManager from "@/components/molecules/notifications_manager";
-import { getProxyBaseUrl, getGlobalLitellmHeaderName } from "@/components/networking";
+import { getProxyBaseUrl, getGlobalZentrisHeaderName } from "@/components/networking";
 
 export async function makeOpenAIEmbeddingsRequest(
   input: string,
@@ -23,7 +23,7 @@ export async function makeOpenAIEmbeddingsRequest(
   // Prepare headers with tags and trace ID
   const headers: Record<string, string> = {};
   if (tags && tags.length > 0) {
-    headers["x-litellm-tags"] = tags.join(",");
+    headers["x-Zentris-tags"] = tags.join(",");
   }
 
   try {
@@ -34,7 +34,7 @@ export async function makeOpenAIEmbeddingsRequest(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+        [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
         ...headers,
       },
       body: JSON.stringify({
@@ -64,3 +64,5 @@ export async function makeOpenAIEmbeddingsRequest(
     throw error; // Re-throw to allow the caller to handle the error
   }
 }
+
+

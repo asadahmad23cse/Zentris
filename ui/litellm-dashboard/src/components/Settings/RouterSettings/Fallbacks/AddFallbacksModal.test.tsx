@@ -54,3 +54,5 @@ describe("AddFallbacksModal", () => {
     expect(screen.getByText(/Manage multiple fallback chains/i)).toBeInTheDocument();
   });
 });
+
+

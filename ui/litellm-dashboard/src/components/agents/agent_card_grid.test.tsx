@@ -15,13 +15,13 @@ const mockAgents: Agent[] = [
   {
     agent_id: "agent-1",
     agent_name: "Test Agent 1",
-    litellm_params: { model: "gpt-4" },
+    Zentris_params: { model: "gpt-4" },
     agent_card_params: { description: "First agent" },
   },
   {
     agent_id: "agent-2",
     agent_name: "Test Agent 2",
-    litellm_params: { model: "claude-3" },
+    Zentris_params: { model: "claude-3" },
     agent_card_params: { description: "Second agent" },
   },
 ];
@@ -88,3 +88,5 @@ describe("AgentCardGrid", () => {
     expect(onAgentClick).toHaveBeenCalledWith("agent-1");
   });
 });
+
+

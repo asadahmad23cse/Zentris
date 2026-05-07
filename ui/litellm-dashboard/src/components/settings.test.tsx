@@ -150,8 +150,8 @@ describe("Settings", () => {
       callbacks: [mockCallback],
       available_callbacks: {
         langfuse: {
-          litellm_callback_name: "langfuse",
-          litellm_callback_params: ["LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY", "LANGFUSE_HOST"],
+          Zentris_callback_name: "langfuse",
+          Zentris_callback_params: ["LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY", "LANGFUSE_HOST"],
           ui_callback_name: "Langfuse",
         },
       },
@@ -204,3 +204,5 @@ describe("Settings", () => {
     expect(getByText("CloudZero Cost Tracking")).toBeInTheDocument();
   });
 });
+
+

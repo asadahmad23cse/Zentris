@@ -9,26 +9,26 @@ const {
   mockAccessToken,
   mockHeaderName,
   mockGetProxyBaseUrl,
-  mockGetGlobalLitellmHeaderName,
+  mockGetGlobalZentrisHeaderName,
 } = vi.hoisted(() => {
   const mockProxyBaseUrl = "https://proxy.example.com";
   const mockAccessToken = "test-access-token";
-  const mockHeaderName = "X-LiteLLM-API-Key";
+  const mockHeaderName = "X-Zentris-API-Key";
   const mockGetProxyBaseUrl = vi.fn(() => mockProxyBaseUrl);
-  const mockGetGlobalLitellmHeaderName = vi.fn(() => mockHeaderName);
+  const mockGetGlobalZentrisHeaderName = vi.fn(() => mockHeaderName);
 
   return {
     mockProxyBaseUrl,
     mockAccessToken,
     mockHeaderName,
     mockGetProxyBaseUrl,
-    mockGetGlobalLitellmHeaderName,
+    mockGetGlobalZentrisHeaderName,
   };
 });
 
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: mockGetProxyBaseUrl,
-  getGlobalLitellmHeaderName: mockGetGlobalLitellmHeaderName,
+  getGlobalZentrisHeaderName: mockGetGlobalZentrisHeaderName,
 }));
 
 describe("useCloudZeroCreate", () => {
@@ -323,3 +323,5 @@ describe("useCloudZeroCreate", () => {
     expect(fetchSpy).toHaveBeenCalledWith("/cloudzero/init", expect.any(Object));
   });
 });
+
+

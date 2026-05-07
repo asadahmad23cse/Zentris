@@ -112,3 +112,5 @@ describe("audio_transcription", () => {
     expect(mockUpdateUI).not.toHaveBeenCalled();
   });
 });
+
+

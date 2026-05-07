@@ -44,16 +44,16 @@ vi.mock("../../hooks/models/useModels", () => ({
 // Mock the useModelCostMap hook
 const mockUseModelCostMap = vi.fn(() => ({
   data: {
-    "gpt-4": { litellm_provider: "openai" },
-    "gpt-3.5-turbo": { litellm_provider: "openai" },
-    "gpt-4-accessible": { litellm_provider: "openai" },
-    "gpt-3.5-turbo-blocked": { litellm_provider: "openai" },
-    "gpt-4-sales": { litellm_provider: "openai" },
-    "gpt-4-engineering": { litellm_provider: "openai" },
-    "gpt-4-personal": { litellm_provider: "openai" },
-    "gpt-4-team-only": { litellm_provider: "openai" },
-    "gpt-4-config": { litellm_provider: "openai" },
-    "gpt-4-db": { litellm_provider: "openai" },
+    "gpt-4": { Zentris_provider: "openai" },
+    "gpt-3.5-turbo": { Zentris_provider: "openai" },
+    "gpt-4-accessible": { Zentris_provider: "openai" },
+    "gpt-3.5-turbo-blocked": { Zentris_provider: "openai" },
+    "gpt-4-sales": { Zentris_provider: "openai" },
+    "gpt-4-engineering": { Zentris_provider: "openai" },
+    "gpt-4-personal": { Zentris_provider: "openai" },
+    "gpt-4-team-only": { Zentris_provider: "openai" },
+    "gpt-4-config": { Zentris_provider: "openai" },
+    "gpt-4-db": { Zentris_provider: "openai" },
   },
   isLoading: false,
   error: null,
@@ -173,8 +173,8 @@ describe("AllModelsTab", () => {
 
     mockUseModelCostMap.mockReturnValueOnce(
       createModelCostMapMock({
-        "gpt-4-accessible": { litellm_provider: "openai" },
-        "gpt-3.5-turbo-blocked": { litellm_provider: "openai" },
+        "gpt-4-accessible": { Zentris_provider: "openai" },
+        "gpt-3.5-turbo-blocked": { Zentris_provider: "openai" },
       }),
     );
 
@@ -234,8 +234,8 @@ describe("AllModelsTab", () => {
 
     mockUseModelCostMap.mockReturnValueOnce(
       createModelCostMapMock({
-        "gpt-4-sales": { litellm_provider: "openai" },
-        "gpt-4-engineering": { litellm_provider: "openai" },
+        "gpt-4-sales": { Zentris_provider: "openai" },
+        "gpt-4-engineering": { Zentris_provider: "openai" },
       }),
     );
 
@@ -279,8 +279,8 @@ describe("AllModelsTab", () => {
 
     mockUseModelCostMap.mockReturnValueOnce(
       createModelCostMapMock({
-        "gpt-4-personal": { litellm_provider: "openai" },
-        "gpt-4-team-only": { litellm_provider: "openai" },
+        "gpt-4-personal": { Zentris_provider: "openai" },
+        "gpt-4-team-only": { Zentris_provider: "openai" },
       }),
     );
 
@@ -325,15 +325,15 @@ describe("AllModelsTab", () => {
 
     mockUseModelCostMap.mockReturnValueOnce(
       createModelCostMapMock({
-        "gpt-4-config": { litellm_provider: "openai" },
-        "gpt-4-db": { litellm_provider: "openai" },
+        "gpt-4-config": { Zentris_provider: "openai" },
+        "gpt-4-db": { Zentris_provider: "openai" },
       }),
     );
 
     const modelData = createPaginatedModelData([
       {
         model_name: "gpt-4-config",
-        litellm_model_name: "gpt-4-config",
+        Zentris_model_name: "gpt-4-config",
         provider: "openai",
         model_info: {
           id: "model-config-1",
@@ -348,7 +348,7 @@ describe("AllModelsTab", () => {
       },
       {
         model_name: "gpt-4-db",
-        litellm_model_name: "gpt-4-db",
+        Zentris_model_name: "gpt-4-db",
         provider: "openai",
         model_info: {
           id: "model-db-1",
@@ -383,14 +383,14 @@ describe("AllModelsTab", () => {
 
     mockUseModelCostMap.mockReturnValueOnce(
       createModelCostMapMock({
-        "gpt-4-config": { litellm_provider: "openai" },
+        "gpt-4-config": { Zentris_provider: "openai" },
       }),
     );
 
     const modelData = createPaginatedModelData([
       {
         model_name: "gpt-4-config",
-        litellm_model_name: "gpt-4-config",
+        Zentris_model_name: "gpt-4-config",
         provider: "openai",
         model_info: {
           id: "model-config-1",
@@ -424,8 +424,8 @@ describe("AllModelsTab", () => {
 
     mockUseModelCostMap.mockReturnValue(
       createModelCostMapMock({
-        "gpt-4-page1": { litellm_provider: "openai" },
-        "gpt-4-page2": { litellm_provider: "openai" },
+        "gpt-4-page1": { Zentris_provider: "openai" },
+        "gpt-4-page2": { Zentris_provider: "openai" },
       }),
     );
 
@@ -479,7 +479,7 @@ describe("AllModelsTab", () => {
 
     mockUseModelCostMap.mockReturnValue(
       createModelCostMapMock({
-        "gpt-4-page2": { litellm_provider: "openai" },
+        "gpt-4-page2": { Zentris_provider: "openai" },
       }),
     );
 
@@ -533,14 +533,14 @@ describe("AllModelsTab", () => {
 
     mockUseModelCostMap.mockReturnValue(
       createModelCostMapMock({
-        "gpt-4-delete-test": { litellm_provider: "openai" },
+        "gpt-4-delete-test": { Zentris_provider: "openai" },
       }),
     );
 
     const modelData = createPaginatedModelData([
       {
         model_name: "gpt-4-delete-test",
-        litellm_model_name: "gpt-4-delete-test",
+        Zentris_model_name: "gpt-4-delete-test",
         provider: "openai",
         model_info: {
           id: "model-to-delete",
@@ -577,14 +577,14 @@ describe("AllModelsTab", () => {
 
     mockUseModelCostMap.mockReturnValue(
       createModelCostMapMock({
-        "gpt-4-clickable": { litellm_provider: "openai" },
+        "gpt-4-clickable": { Zentris_provider: "openai" },
       }),
     );
 
     const modelData = createPaginatedModelData([
       {
         model_name: "gpt-4-clickable",
-        litellm_model_name: "gpt-4-clickable",
+        Zentris_model_name: "gpt-4-clickable",
         provider: "openai",
         model_info: {
           id: "clickable-model-id",
@@ -618,3 +618,5 @@ describe("AllModelsTab", () => {
     });
   });
 });
+
+

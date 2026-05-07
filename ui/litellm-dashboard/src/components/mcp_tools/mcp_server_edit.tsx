@@ -23,7 +23,7 @@ interface MCPServerEditProps {
 
 const AUTH_TYPES_REQUIRING_AUTH_VALUE = [AUTH_TYPE.API_KEY, AUTH_TYPE.BEARER_TOKEN, AUTH_TYPE.TOKEN, AUTH_TYPE.BASIC];
 const AUTH_TYPES_REQUIRING_CREDENTIALS = [...AUTH_TYPES_REQUIRING_AUTH_VALUE, AUTH_TYPE.OAUTH2, AUTH_TYPE.AWS_SIGV4];
-const EDIT_OAUTH_UI_STATE_KEY = "litellm-mcp-oauth-edit-state";
+const EDIT_OAUTH_UI_STATE_KEY = "Zentris-mcp-oauth-edit-state";
 
 const MCPServerEdit: React.FC<MCPServerEditProps> = ({
   mcpServer,
@@ -890,7 +890,7 @@ const MCPServerEdit: React.FC<MCPServerEditProps> = ({
               <>
                 <p className="text-sm text-gray-500 mb-2">
                   For MCP servers hosted on AWS Bedrock AgentCore.{" "}
-                  <a href="https://docs.litellm.ai/docs/mcp_aws_sigv4" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
+                  <a href="https://docs.Zentris.ai/docs/mcp_aws_sigv4" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
                     View docs &rarr;
                   </a>
                 </p>
@@ -1044,3 +1044,5 @@ const MCPServerEdit: React.FC<MCPServerEditProps> = ({
 };
 
 export default MCPServerEdit;
+
+

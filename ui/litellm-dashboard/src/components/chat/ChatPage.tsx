@@ -44,7 +44,7 @@ interface ChatPageProps {
 
 const SUGGESTIONS = ["Write", "Learn", "Code", "Brainstorm"];
 const MAX_COMPARISON_MODELS = 3;
-const LOCALSTORAGE_MODEL_KEY = "litellm_chat_selected_models";
+const LOCALSTORAGE_MODEL_KEY = "Zentris_chat_selected_models";
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -1247,3 +1247,5 @@ const ChatPage: React.FC<ChatPageProps> = ({ accessToken, userRole, userId, user
 };
 
 export default ChatPage;
+
+

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createQueryKeys } from "../common/queryKeysFactory";
 import {
   getProxyBaseUrl,
-  getGlobalLitellmHeaderName,
+  getGlobalZentrisHeaderName,
   deriveErrorMessage,
   handleError,
 } from "@/components/networking";
@@ -40,7 +40,7 @@ export interface ProjectResponse {
   created_by: string;
   updated_at: string;
   updated_by: string;
-  litellm_budget_table: ProjectBudget | null;
+  Zentris_budget_table: ProjectBudget | null;
 }
 
 // ── Query keys (shared across project hooks) ─────────────────────────────────
@@ -58,7 +58,7 @@ const fetchProjects = async (
   const response = await fetch(url, {
     method: "GET",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
   });
@@ -85,3 +85,5 @@ export const useProjects = () => {
       Boolean(accessToken) && all_admin_roles.includes(userRole || ""),
   });
 };
+
+

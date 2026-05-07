@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getProxyBaseUrl,
-  getGlobalLitellmHeaderName,
+  getGlobalZentrisHeaderName,
   deriveErrorMessage,
   handleError,
 } from "@/components/networking";
@@ -32,7 +32,7 @@ const createAccessGroup = async (
   const response = await fetch(url, {
     method: "POST",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(params),
@@ -66,3 +66,5 @@ export const useCreateAccessGroup = () => {
     },
   });
 };
+
+

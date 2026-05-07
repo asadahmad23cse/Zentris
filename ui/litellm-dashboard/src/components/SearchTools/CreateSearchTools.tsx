@@ -88,7 +88,7 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
       // Prepare the payload
       const payload = {
         search_tool_name: formValues.search_tool_name,
-        litellm_params: {
+        Zentris_params: {
           search_provider: formValues.search_provider,
           api_key: formValues.api_key,
           api_base: formValues.api_base,
@@ -277,7 +277,7 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
 
           <div className="flex justify-between items-center pt-6 border-t border-gray-100">
             <Tooltip title="Get help on our github">
-              <Typography.Link href="https://github.com/BerriAI/litellm/issues" target="_blank">
+              <Typography.Link href="https://github.com/BerriAI/Zentris/issues" target="_blank">
                 Need Help?
               </Typography.Link>
             </Tooltip>
@@ -318,7 +318,7 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
         {isTestModalVisible && accessToken && (
           <SearchConnectionTest
             key={connectionTestId}
-            litellmParams={{
+            ZentrisParams={{
               search_provider: formValues.search_provider,
               api_key: formValues.api_key,
               api_base: formValues.api_base,
@@ -333,4 +333,6 @@ const CreateSearchTool: React.FC<CreateSearchToolProps> = ({
 };
 
 export default CreateSearchTool;
+
+
 

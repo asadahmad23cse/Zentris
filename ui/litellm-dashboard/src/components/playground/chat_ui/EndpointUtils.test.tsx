@@ -217,3 +217,5 @@ describe("determineEndpointType", () => {
     expect(result).toBe(EndpointType.CHAT);
   });
 });
+
+

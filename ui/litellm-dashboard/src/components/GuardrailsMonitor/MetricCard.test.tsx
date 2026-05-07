@@ -47,3 +47,5 @@ describe("MetricCard", () => {
     expect(screen.queryByText("Last 24 hours")).not.toBeInTheDocument();
   });
 });
+
+

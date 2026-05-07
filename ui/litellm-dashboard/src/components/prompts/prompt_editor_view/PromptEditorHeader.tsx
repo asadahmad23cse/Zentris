@@ -18,7 +18,7 @@ interface PromptEditorHeaderProps {
   accessToken: string | null;
   proxySettings?: {
     PROXY_BASE_URL?: string;
-    LITELLM_UI_API_DOC_BASE_URL?: string | null;
+    Zentris_UI_API_DOC_BASE_URL?: string | null;
   };
   environment: string;
   onEnvironmentChange: (env: string) => void;
@@ -103,4 +103,6 @@ const PromptEditorHeader: React.FC<PromptEditorHeaderProps> = ({
 };
 
 export default PromptEditorHeader;
+
+
 

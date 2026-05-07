@@ -69,16 +69,16 @@ const VectorStoreForm: React.FC<VectorStoreFormProps> = ({
         vector_store_name: formValues.vector_store_name,
         vector_store_description: formValues.vector_store_description,
         vector_store_metadata: metadata,
-        litellm_credential_name: formValues.litellm_credential_name,
+        Zentris_credential_name: formValues.Zentris_credential_name,
       };
 
-      // pass all provider fields as litellm params dict
+      // pass all provider fields as Zentris params dict
       const providerFields = getProviderSpecificFields(formValues.custom_llm_provider);
-      const litellmParams = providerFields.reduce(
+      const ZentrisParams = providerFields.reduce(
         (acc, field) => {
-          // Special handling for Milvus: rename embedding_model to litellm_embedding_model
+          // Special handling for Milvus: rename embedding_model to Zentris_embedding_model
           if (formValues.custom_llm_provider === "milvus" && field.name === "embedding_model") {
-            acc["litellm_embedding_model"] = formValues[field.name];
+            acc["Zentris_embedding_model"] = formValues[field.name];
           } else {
             acc[field.name] = formValues[field.name];
           }
@@ -87,7 +87,7 @@ const VectorStoreForm: React.FC<VectorStoreFormProps> = ({
         {} as Record<string, any>,
       );
 
-      payload["litellm_params"] = litellmParams;
+      payload["Zentris_params"] = ZentrisParams;
 
       await vectorStoreCreateCall(accessToken, payload);
       NotificationsManager.success("Vector store created successfully");
@@ -159,12 +159,12 @@ const VectorStoreForm: React.FC<VectorStoreFormProps> = ({
             message="PG Vector Setup Required"
             description={
               <div>
-                <p>LiteLLM provides a server to connect to PG Vector. To use this provider:</p>
+                <p>Zentris provides a server to connect to PG Vector. To use this provider:</p>
                 <ol style={{ marginLeft: "16px", marginTop: "8px" }}>
                   <li>
-                    Deploy the litellm-pgvector server from:{" "}
-                    <a href="https://github.com/BerriAI/litellm-pgvector" target="_blank" rel="noopener noreferrer">
-                      https://github.com/BerriAI/litellm-pgvector
+                    Deploy the Zentris-pgvector server from:{" "}
+                    <a href="https://github.com/BerriAI/Zentris-pgvector" target="_blank" rel="noopener noreferrer">
+                      https://github.com/BerriAI/Zentris-pgvector
                     </a>
                   </li>
                   <li>Configure your PostgreSQL database with pgvector extension</li>
@@ -292,7 +292,7 @@ const VectorStoreForm: React.FC<VectorStoreFormProps> = ({
           label={
             <span>
               Vector Store Name{" "}
-              <Tooltip title="Custom name you want to give to the vector store, this name will be rendered on the LiteLLM UI">
+              <Tooltip title="Custom name you want to give to the vector store, this name will be rendered on the Zentris UI">
                 <InfoCircleOutlined style={{ marginLeft: "4px" }} />
               </Tooltip>
             </span>
@@ -315,7 +315,7 @@ const VectorStoreForm: React.FC<VectorStoreFormProps> = ({
               </Tooltip>
             </span>
           }
-          name="litellm_credential_name"
+          name="Zentris_credential_name"
         >
           <Select
             showSearch
@@ -365,3 +365,5 @@ const VectorStoreForm: React.FC<VectorStoreFormProps> = ({
 };
 
 export default VectorStoreForm;
+
+

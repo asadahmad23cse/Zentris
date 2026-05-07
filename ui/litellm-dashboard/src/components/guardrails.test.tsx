@@ -82,7 +82,7 @@ describe("GuardrailsPanel", () => {
         {
           guardrail_id: "test-guardrail-1",
           guardrail_name: "Test Guardrail",
-          litellm_params: {
+          Zentris_params: {
             guardrail: "test-provider",
             mode: "async",
             default_on: true,
@@ -102,3 +102,5 @@ describe("GuardrailsPanel", () => {
     expect(screen.getByText("+ Add New Guardrail")).toBeInTheDocument();
   });
 });
+
+

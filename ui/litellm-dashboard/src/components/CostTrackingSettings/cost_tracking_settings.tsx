@@ -15,8 +15,8 @@ import { useMarginConfig } from "./use_margin_config";
 import { fetchAvailableModels, ModelGroup } from "../playground/llm_calls/fetch_models";
 
 const DOCS_LINKS = [
-  { label: "Custom pricing for models", href: "https://docs.litellm.ai/docs/proxy/custom_pricing" },
-  { label: "Spend tracking", href: "https://docs.litellm.ai/docs/proxy/cost_tracking" },
+  { label: "Custom pricing for models", href: "https://docs.Zentris.ai/docs/proxy/custom_pricing" },
+  { label: "Spend tracking", href: "https://docs.Zentris.ai/docs/proxy/cost_tracking" },
 ];
 
 const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({ 
@@ -403,3 +403,5 @@ const CostTrackingSettings: React.FC<CostTrackingSettingsProps> = ({
 };
 
 export default CostTrackingSettings;
+
+

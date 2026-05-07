@@ -22,3 +22,5 @@ export function SurveyPrompt({ onOpen, onDismiss, isVisible }: SurveyPromptProps
     />
   );
 }
+
+

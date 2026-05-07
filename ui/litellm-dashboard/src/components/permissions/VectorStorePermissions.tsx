@@ -80,3 +80,5 @@ export function VectorStorePermissions({ vectorStores, accessToken }: VectorStor
 }
 
 export default VectorStorePermissions;
+
+

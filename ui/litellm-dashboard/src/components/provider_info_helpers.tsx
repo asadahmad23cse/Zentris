@@ -381,11 +381,11 @@ export const getProviderModels = (provider: Providers, modelMap: any): Array<str
 
   if (providerKey && typeof modelMap === "object") {
     Object.entries(modelMap).forEach(([key, value]) => {
-      if (value !== null && typeof value === "object" && "litellm_provider" in (value as object)) {
-        const litellmProvider = (value as any)["litellm_provider"];
+      if (value !== null && typeof value === "object" && "Zentris_provider" in (value as object)) {
+        const ZentrisProvider = (value as any)["Zentris_provider"];
         if (
-          litellmProvider === custom_llm_provider ||
-          (typeof litellmProvider === "string" && litellmProvider.includes(custom_llm_provider))
+          ZentrisProvider === custom_llm_provider ||
+          (typeof ZentrisProvider === "string" && ZentrisProvider.includes(custom_llm_provider))
         ) {
           providerModels.push(key);
         }
@@ -399,8 +399,8 @@ export const getProviderModels = (provider: Providers, modelMap: any): Array<str
         if (
           value !== null &&
           typeof value === "object" &&
-          "litellm_provider" in (value as object) &&
-          (value as any)["litellm_provider"] === "cohere_chat"
+          "Zentris_provider" in (value as object) &&
+          (value as any)["Zentris_provider"] === "cohere_chat"
         ) {
           providerModels.push(key);
         }
@@ -415,8 +415,8 @@ export const getProviderModels = (provider: Providers, modelMap: any): Array<str
         if (
           value !== null &&
           typeof value === "object" &&
-          "litellm_provider" in (value as object) &&
-          (value as any)["litellm_provider"] === "sagemaker_chat"
+          "Zentris_provider" in (value as object) &&
+          (value as any)["Zentris_provider"] === "sagemaker_chat"
         ) {
           providerModels.push(key);
         }
@@ -426,3 +426,5 @@ export const getProviderModels = (provider: Providers, modelMap: any): Array<str
 
   return providerModels;
 };
+
+

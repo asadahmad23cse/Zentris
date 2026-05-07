@@ -93,3 +93,5 @@ describe("ComparisonPanel", () => {
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
 });
+
+

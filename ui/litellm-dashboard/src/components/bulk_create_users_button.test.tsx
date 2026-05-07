@@ -26,3 +26,5 @@ describe("BulkCreateUsersButton", () => {
     expect(getByText("+ Bulk Invite Users")).toBeInTheDocument();
   });
 });
+
+

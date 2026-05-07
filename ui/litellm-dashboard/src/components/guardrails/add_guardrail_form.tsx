@@ -72,7 +72,7 @@ interface GuardrailSettings {
   };
 }
 
-interface LiteLLMParams {
+interface ZentrisParams {
   guardrail: string;
   mode: string;
   default_on: boolean;
@@ -397,7 +397,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
       // Prepare the guardrail data with proper typings
       const guardrailData: {
         guardrail_name: string;
-        litellm_params: {
+        Zentris_params: {
           guardrail: string;
           mode: string;
           default_on: boolean;
@@ -406,7 +406,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
         guardrail_info: any;
       } = {
         guardrail_name: values.guardrail_name,
-        litellm_params: {
+        Zentris_params: {
           guardrail: guardrailProvider,
           mode: values.mode,
           default_on: values.default_on,
@@ -421,14 +421,14 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
           piiEntitiesConfig[entity] = selectedActions[entity] || "MASK"; // Default to MASK if no action selected
         });
 
-        guardrailData.litellm_params.pii_entities_config = piiEntitiesConfig;
+        guardrailData.Zentris_params.pii_entities_config = piiEntitiesConfig;
 
         // Add Presidio API bases if provided
         if (values.presidio_analyzer_api_base) {
-          guardrailData.litellm_params.presidio_analyzer_api_base = values.presidio_analyzer_api_base;
+          guardrailData.Zentris_params.presidio_analyzer_api_base = values.presidio_analyzer_api_base;
         }
         if (values.presidio_anonymizer_api_base) {
-          guardrailData.litellm_params.presidio_anonymizer_api_base = values.presidio_anonymizer_api_base;
+          guardrailData.Zentris_params.presidio_anonymizer_api_base = values.presidio_anonymizer_api_base;
         }
       }
 
@@ -450,7 +450,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
         }
 
         if (selectedPatterns.length > 0) {
-          guardrailData.litellm_params.patterns = selectedPatterns.map((p) => ({
+          guardrailData.Zentris_params.patterns = selectedPatterns.map((p) => ({
             pattern_type: p.type === "prebuilt" ? "prebuilt" : "regex",
             pattern_name: p.type === "prebuilt" ? p.name : undefined,
             pattern: p.type === "custom" ? p.pattern : undefined,
@@ -459,14 +459,14 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
           }));
         }
         if (blockedWords.length > 0) {
-          guardrailData.litellm_params.blocked_words = blockedWords.map((w) => ({
+          guardrailData.Zentris_params.blocked_words = blockedWords.map((w) => ({
             keyword: w.keyword,
             action: w.action,
             description: w.description,
           }));
         }
         if (selectedContentCategories.length > 0) {
-          guardrailData.litellm_params.categories = selectedContentCategories.map((c) => ({
+          guardrailData.Zentris_params.categories = selectedContentCategories.map((c) => ({
             category: c.category,
             enabled: true,
             action: c.action,
@@ -474,7 +474,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
           }));
         }
         if (competitorIntentEnabled && competitorIntentConfig?.brand_self?.length > 0) {
-          guardrailData.litellm_params.competitor_intent_config = {
+          guardrailData.Zentris_params.competitor_intent_config = {
             competitor_intent_type: competitorIntentConfig.competitor_intent_type ?? "airline",
             brand_self: competitorIntentConfig.brand_self,
             locations: competitorIntentConfig.locations?.length > 0 ? competitorIntentConfig.locations : undefined,
@@ -494,7 +494,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
       else if (values.config) {
         try {
           const configObj = JSON.parse(values.config);
-          // For some guardrails, the config values need to be in litellm_params
+          // For some guardrails, the config values need to be in Zentris_params
           guardrailData.guardrail_info = configObj;
         } catch (error) {
           NotificationsManager.fromBackend("Invalid JSON in configuration");
@@ -509,24 +509,24 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
           setLoading(false);
           return;
         }
-        guardrailData.litellm_params.rules = toolPermissionConfig.rules;
-        guardrailData.litellm_params.default_action = toolPermissionConfig.default_action;
-        guardrailData.litellm_params.on_disallowed_action = toolPermissionConfig.on_disallowed_action;
+        guardrailData.Zentris_params.rules = toolPermissionConfig.rules;
+        guardrailData.Zentris_params.default_action = toolPermissionConfig.default_action;
+        guardrailData.Zentris_params.on_disallowed_action = toolPermissionConfig.on_disallowed_action;
         if (toolPermissionConfig.violation_message_template) {
-          guardrailData.litellm_params.violation_message_template = toolPermissionConfig.violation_message_template;
+          guardrailData.Zentris_params.violation_message_template = toolPermissionConfig.violation_message_template;
         }
       }
 
       // Endpoint Settings (realtime) — content filter only
       if (shouldRenderContentFilterConfigSettings(values.provider)) {
         if (endSessionAfterNFails !== undefined && endSessionAfterNFails > 0) {
-          guardrailData.litellm_params.end_session_after_n_fails = endSessionAfterNFails;
+          guardrailData.Zentris_params.end_session_after_n_fails = endSessionAfterNFails;
         }
         if (onViolation && selectedEndpointType === "realtime") {
-          guardrailData.litellm_params.on_violation = onViolation;
+          guardrailData.Zentris_params.on_violation = onViolation;
         }
         if (realtimeViolationMessage.trim()) {
-          guardrailData.litellm_params.realtime_violation_message = realtimeViolationMessage.trim();
+          guardrailData.Zentris_params.realtime_violation_message = realtimeViolationMessage.trim();
         }
       }
 
@@ -574,7 +574,7 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
           }
 
           if (paramValue !== undefined && paramValue !== null && paramValue !== "") {
-            guardrailData.litellm_params[paramName] = paramValue;
+            guardrailData.Zentris_params[paramName] = paramValue;
           }
         });
       }
@@ -1180,3 +1180,5 @@ const AddGuardrailForm: React.FC<AddGuardrailFormProps> = ({ visible, onClose, a
 };
 
 export default AddGuardrailForm;
+
+

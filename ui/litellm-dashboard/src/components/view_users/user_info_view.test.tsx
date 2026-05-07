@@ -42,7 +42,7 @@ vi.mock("../networking", () => {
     teamListCall: (...args: any[]) => mockTeamListCall(...args),
     teamMemberAddCall: (...args: any[]) => mockTeamMemberAddCall(...args),
     teamMemberDeleteCall: (...args: any[]) => mockTeamMemberDeleteCall(...args),
-    getProxyBaseUrl: () => "https://litellm.test",
+    getProxyBaseUrl: () => "https://Zentris.test",
   };
 });
 
@@ -217,3 +217,5 @@ describe("UserInfoView", () => {
     });
   });
 });
+
+

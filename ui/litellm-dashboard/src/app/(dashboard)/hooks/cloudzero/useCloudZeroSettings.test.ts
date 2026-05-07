@@ -10,14 +10,14 @@ const {
   mockAccessToken,
   mockHeaderName,
   mockGetProxyBaseUrl,
-  mockGetGlobalLitellmHeaderName,
+  mockGetGlobalZentrisHeaderName,
   mockCreateQueryKeys,
 } = vi.hoisted(() => {
   const mockProxyBaseUrl = "https://proxy.example.com";
   const mockAccessToken = "test-access-token";
-  const mockHeaderName = "X-LiteLLM-API-Key";
+  const mockHeaderName = "X-Zentris-API-Key";
   const mockGetProxyBaseUrl = vi.fn(() => mockProxyBaseUrl);
-  const mockGetGlobalLitellmHeaderName = vi.fn(() => mockHeaderName);
+  const mockGetGlobalZentrisHeaderName = vi.fn(() => mockHeaderName);
   const mockCreateQueryKeys = vi.fn((resource: string) => ({
     all: [resource],
     lists: () => [resource, "list"],
@@ -31,14 +31,14 @@ const {
     mockAccessToken,
     mockHeaderName,
     mockGetProxyBaseUrl,
-    mockGetGlobalLitellmHeaderName,
+    mockGetGlobalZentrisHeaderName,
     mockCreateQueryKeys,
   };
 });
 
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: mockGetProxyBaseUrl,
-  getGlobalLitellmHeaderName: mockGetGlobalLitellmHeaderName,
+  getGlobalZentrisHeaderName: mockGetGlobalZentrisHeaderName,
 }));
 
 vi.mock("../common/queryKeysFactory", () => ({
@@ -673,3 +673,5 @@ describe("useCloudZeroDeleteSettings", () => {
     expect(fetchSpy).toHaveBeenCalledWith("/cloudzero/delete", expect.any(Object));
   });
 });
+
+

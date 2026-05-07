@@ -1,4 +1,4 @@
-/** A single MCP tool event emitted by the LiteLLM proxy during a Responses API turn. */
+/** A single MCP tool event emitted by the Zentris proxy during a Responses API turn. */
 export interface MCPEvent {
   type: string;
   sequence_number?: number;
@@ -258,3 +258,5 @@ export interface MCPSubmissionsSummary {
   rejected: number;
   items: MCPServer[];
 }
+
+

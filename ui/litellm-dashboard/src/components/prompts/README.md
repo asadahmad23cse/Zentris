@@ -1,6 +1,6 @@
 # Prompts Component
 
-This component provides a view-only interface for viewing prompts in the LiteLLM dashboard, similar to the guardrails component.
+This component provides a view-only interface for viewing prompts in the Zentris dashboard, similar to the guardrails component.
 
 ## Components
 
@@ -75,3 +75,5 @@ The component is fully integrated into the main application:
 - Add bulk operations
 - Add search and filtering capabilities
 - Add export functionality
+
+

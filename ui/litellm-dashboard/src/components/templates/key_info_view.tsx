@@ -212,7 +212,7 @@ export default function KeyInfoView({
             ...(Array.isArray(formValues.logging_settings) && formValues.logging_settings.length > 0 ? { logging: formValues.logging_settings } : {}),
             ...(formValues.disabled_callbacks?.length > 0
               ? {
-                litellm_disabled_callbacks: mapDisplayToInternalNames(formValues.disabled_callbacks),
+                Zentris_disabled_callbacks: mapDisplayToInternalNames(formValues.disabled_callbacks),
               }
               : {}),
           };
@@ -231,7 +231,7 @@ export default function KeyInfoView({
           ...(Array.isArray(formValues.logging_settings) && formValues.logging_settings.length > 0 ? { logging: formValues.logging_settings } : {}),
           ...(formValues.disabled_callbacks?.length > 0
             ? {
-              litellm_disabled_callbacks: mapDisplayToInternalNames(formValues.disabled_callbacks),
+              Zentris_disabled_callbacks: mapDisplayToInternalNames(formValues.disabled_callbacks),
             }
             : {}),
         };
@@ -387,7 +387,7 @@ export default function KeyInfoView({
         regenerateDisabled={!premiumUser}
         regenerateTooltip={
           !premiumUser
-            ? "This is a LiteLLM Enterprise feature, and requires a valid key to use."
+            ? "This is a Zentris Enterprise feature, and requires a valid key to use."
             : undefined
         }
       />
@@ -564,8 +564,8 @@ export default function KeyInfoView({
               <LoggingSettingsView
                 loggingConfigs={extractLoggingSettings(currentKeyData.metadata)}
                 disabledCallbacks={
-                  Array.isArray(currentKeyData.metadata?.litellm_disabled_callbacks)
-                    ? mapInternalToDisplayNames(currentKeyData.metadata.litellm_disabled_callbacks)
+                  Array.isArray(currentKeyData.metadata?.Zentris_disabled_callbacks)
+                    ? mapInternalToDisplayNames(currentKeyData.metadata.Zentris_disabled_callbacks)
                     : []
                 }
                 variant="card"
@@ -814,8 +814,8 @@ export default function KeyInfoView({
                   <LoggingSettingsView
                     loggingConfigs={extractLoggingSettings(currentKeyData.metadata)}
                     disabledCallbacks={
-                      Array.isArray(currentKeyData.metadata?.litellm_disabled_callbacks)
-                        ? mapInternalToDisplayNames(currentKeyData.metadata.litellm_disabled_callbacks)
+                      Array.isArray(currentKeyData.metadata?.Zentris_disabled_callbacks)
+                        ? mapInternalToDisplayNames(currentKeyData.metadata.Zentris_disabled_callbacks)
                         : []
                     }
                     variant="inline"
@@ -830,3 +830,5 @@ export default function KeyInfoView({
     </div>
   );
 }
+
+

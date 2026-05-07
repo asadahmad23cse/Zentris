@@ -416,7 +416,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
         const mappedDisabledCallbacks = mapDisplayToInternalNames(disabledCallbacks);
         metadata = {
           ...metadata,
-          litellm_disabled_callbacks: mappedDisabledCallbacks,
+          Zentris_disabled_callbacks: mappedDisabledCallbacks,
         };
       }
 
@@ -759,7 +759,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                   }))}
                 />
                 <div className="text-xs text-gray-500 mt-2">
-                  This key will be used by the selected agent to make requests to LiteLLM
+                  This key will be used by the selected agent to make requests to Zentris
                 </div>
               </div>
             )}
@@ -1115,7 +1115,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                         Guardrails{" "}
                         <Tooltip title="Apply safety guardrails to this key to filter content or enforce policies">
                           <a
-                            href="https://docs.litellm.ai/docs/proxy/guardrails/quick_start"
+                            href="https://docs.Zentris.ai/docs/proxy/guardrails/quick_start"
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()} // Prevent accordion from collapsing when clicking link
@@ -1151,7 +1151,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                         Disable Global Guardrails{" "}
                         <Tooltip title="When enabled, this key will bypass any guardrails configured to run on every request (global guardrails)">
                           <a
-                            href="https://docs.litellm.ai/docs/proxy/guardrails/quick_start"
+                            href="https://docs.Zentris.ai/docs/proxy/guardrails/quick_start"
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()} // Prevent accordion from collapsing when clicking link
@@ -1178,7 +1178,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                         Policies{" "}
                         <Tooltip title="Apply policies to this key to control guardrails and other settings">
                           <a
-                            href="https://docs.litellm.ai/docs/proxy/guardrails/guardrail_policies"
+                            href="https://docs.Zentris.ai/docs/proxy/guardrails/guardrail_policies"
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()} // Prevent accordion from collapsing when clicking link
@@ -1212,7 +1212,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                         Prompts{" "}
                         <Tooltip title="Allow this key to use specific prompt templates">
                           <a
-                            href="https://docs.litellm.ai/docs/proxy/prompt_management"
+                            href="https://docs.Zentris.ai/docs/proxy/prompt_management"
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()} // Prevent accordion from collapsing when clicking link
@@ -1261,7 +1261,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                         Allowed Pass Through Routes{" "}
                         <Tooltip title="Allow this key to use specific pass through routes">
                           <a
-                            href="https://docs.litellm.ai/docs/proxy/pass_through"
+                            href="https://docs.Zentris.ai/docs/proxy/pass_through"
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()} // Prevent accordion from collapsing when clicking link
@@ -1448,8 +1448,8 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                       title={
                         <span>
                           Key-level logging settings is an enterprise feature, get in touch -
-                          <a href="https://www.litellm.ai/enterprise" target="_blank">
-                            https://www.litellm.ai/enterprise
+                          <a href="https://www.Zentris.ai/enterprise" target="_blank">
+                            https://www.Zentris.ai/enterprise
                           </a>
                         </span>
                       }
@@ -1641,3 +1641,5 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
 };
 
 export default CreateKey;
+
+

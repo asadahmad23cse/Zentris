@@ -52,7 +52,7 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
     if (!initialPromptData?.prompt_spec) return undefined;
     const baseId = initialPromptData.prompt_spec.prompt_id;
     const version = initialPromptData.prompt_spec.version || 
-                   (initialPromptData.prompt_spec.litellm_params as any)?.prompt_id;
+                   (initialPromptData.prompt_spec.Zentris_params as any)?.prompt_id;
     
     // If version is a number, construct versioned ID
     if (typeof version === 'number') {
@@ -202,7 +202,7 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
 
       const promptData = {
         prompt_id: promptId,
-        litellm_params: {
+        Zentris_params: {
           prompt_integration: "dotprompt",
           prompt_id: promptId,
           dotprompt_content: dotpromptContent,
@@ -404,3 +404,5 @@ const PromptEditorView: React.FC<PromptEditorViewProps> = ({ onClose, onSuccess,
 };
 
 export default PromptEditorView;
+
+

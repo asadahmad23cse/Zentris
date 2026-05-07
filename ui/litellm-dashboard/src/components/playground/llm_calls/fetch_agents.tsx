@@ -1,6 +1,6 @@
 // fetch_agents.tsx
 
-import { getProxyBaseUrl, getGlobalLitellmHeaderName, modelInfoCall } from "../../networking";
+import { getProxyBaseUrl, getGlobalZentrisHeaderName, modelInfoCall } from "../../networking";
 
 export interface Agent {
   agent_id: string;
@@ -13,7 +13,7 @@ export interface Agent {
   };
 }
 
-/** MCP tool entry in the same format as chat completions API (litellm_params.tools) */
+/** MCP tool entry in the same format as chat completions API (Zentris_params.tools) */
 export interface MCPToolEntry {
   type: "mcp";
   server_label?: string;
@@ -22,12 +22,12 @@ export interface MCPToolEntry {
   allowed_tools?: string[];
 }
 
-/** Agent model from /model/info where litellm_params.model starts with "litellm_agent/" */
+/** Agent model from /model/info where Zentris_params.model starts with "Zentris_agent/" */
 export interface AgentModel {
   model_name: string;
-  litellm_params: {
+  Zentris_params: {
     model: string;
-    litellm_system_prompt?: string;
+    Zentris_system_prompt?: string;
     /** Saved MCP tools array (same shape as chat completions API tools) */
     tools?: MCPToolEntry[];
     [key: string]: unknown;
@@ -49,7 +49,7 @@ export const fetchAvailableAgents = async (
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+        [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
     });
@@ -77,8 +77,8 @@ export const fetchAvailableAgents = async (
 };
 
 /**
- * Fetches available litellm_agent models from /v2/model/info.
- * Filters for models where litellm_params.model starts with "litellm_agent/".
+ * Fetches available Zentris_agent models from /v2/model/info.
+ * Filters for models where Zentris_params.model starts with "Zentris_agent/".
  */
 export const fetchAvailableAgentModels = async (
   accessToken: string,
@@ -94,17 +94,17 @@ export const fetchAvailableAgentModels = async (
 
     const agentModels: AgentModel[] = list
       .filter(
-        (m: { litellm_params?: { model?: string } }) =>
-          typeof m?.litellm_params?.model === "string" &&
-          m.litellm_params.model.startsWith("litellm_agent/"),
+        (m: { Zentris_params?: { model?: string } }) =>
+          typeof m?.Zentris_params?.model === "string" &&
+          m.Zentris_params.model.startsWith("Zentris_agent/"),
       )
       .map((m: any) => ({
         model_name: m.model_name ?? m.model_group ?? "",
-        litellm_params: {
-          ...m.litellm_params,
-          model: m.litellm_params.model,
-          litellm_system_prompt: m.litellm_params?.litellm_system_prompt,
-          tools: Array.isArray(m.litellm_params?.tools) ? m.litellm_params.tools : undefined,
+        Zentris_params: {
+          ...m.Zentris_params,
+          model: m.Zentris_params.model,
+          Zentris_system_prompt: m.Zentris_params?.Zentris_system_prompt,
+          tools: Array.isArray(m.Zentris_params?.tools) ? m.Zentris_params.tools : undefined,
         },
         model_info: m.model_info ?? null,
       }));
@@ -116,3 +116,5 @@ export const fetchAvailableAgentModels = async (
     throw error;
   }
 };
+
+

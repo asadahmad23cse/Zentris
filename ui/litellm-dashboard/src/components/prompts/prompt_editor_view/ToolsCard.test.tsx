@@ -80,3 +80,5 @@ describe("ToolsCard", () => {
     expect(mockOnRemoveTool).toHaveBeenCalledTimes(1);
   });
 });
+
+

@@ -384,7 +384,7 @@ const PriceDataReload: React.FC<PriceDataReloadProps> = ({
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
                 <InfoCircleOutlined style={{ color: "#fa8c16", fontSize: 12 }} />
                 <Text type="secondary" style={{ fontSize: "11px" }}>
-                  Local mode forced via <code>LITELLM_LOCAL_MODEL_COST_MAP=True</code>
+                  Local mode forced via <code>Zentris_LOCAL_MODEL_COST_MAP=True</code>
                 </Text>
               </div>
             )}
@@ -504,3 +504,5 @@ const PriceDataReload: React.FC<PriceDataReloadProps> = ({
 };
 
 export default PriceDataReload;
+
+

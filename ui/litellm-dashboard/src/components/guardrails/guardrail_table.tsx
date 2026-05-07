@@ -87,10 +87,10 @@ const GuardrailTable: React.FC<GuardrailTableProps> = ({
     },
     {
       header: "Provider",
-      accessorKey: "litellm_params.guardrail",
+      accessorKey: "Zentris_params.guardrail",
       cell: ({ row }) => {
         const guardrail = row.original;
-        const { logo, displayName } = getGuardrailLogoAndName(guardrail.litellm_params.guardrail);
+        const { logo, displayName } = getGuardrailLogoAndName(guardrail.Zentris_params.guardrail);
         return (
           <div className="flex items-center space-x-2">
             {logo && (
@@ -111,24 +111,24 @@ const GuardrailTable: React.FC<GuardrailTableProps> = ({
     },
     {
       header: "Mode",
-      accessorKey: "litellm_params.mode",
+      accessorKey: "Zentris_params.mode",
       cell: ({ row }) => {
         const guardrail = row.original;
-        return <span className="text-xs">{guardrail.litellm_params.mode}</span>;
+        return <span className="text-xs">{guardrail.Zentris_params.mode}</span>;
       },
     },
     {
       header: "Default On",
-      accessorKey: "litellm_params.default_on",
+      accessorKey: "Zentris_params.default_on",
       cell: ({ row }) => {
         const guardrail = row.original;
         return (
           <Badge
-            color={guardrail.litellm_params?.default_on ? "green" : "gray"}
+            color={guardrail.Zentris_params?.default_on ? "green" : "gray"}
             className="text-xs font-normal"
             size="xs"
           >
-            {guardrail.litellm_params?.default_on ? "Default On" : "Default Off"}
+            {guardrail.Zentris_params?.default_on ? "Default On" : "Default Off"}
           </Badge>
         );
       },
@@ -295,11 +295,11 @@ const GuardrailTable: React.FC<GuardrailTableProps> = ({
             guardrail_name: selectedGuardrail.guardrail_name || "",
             provider:
               Object.keys(guardrail_provider_map).find(
-                (key) => guardrail_provider_map[key] === selectedGuardrail?.litellm_params.guardrail,
+                (key) => guardrail_provider_map[key] === selectedGuardrail?.Zentris_params.guardrail,
               ) || "",
-            mode: selectedGuardrail.litellm_params.mode,
-            default_on: selectedGuardrail.litellm_params.default_on,
-            pii_entities_config: selectedGuardrail.litellm_params.pii_entities_config,
+            mode: selectedGuardrail.Zentris_params.mode,
+            default_on: selectedGuardrail.Zentris_params.default_on,
+            pii_entities_config: selectedGuardrail.Zentris_params.pii_entities_config,
             ...selectedGuardrail.guardrail_info,
           }}
         />
@@ -309,3 +309,5 @@ const GuardrailTable: React.FC<GuardrailTableProps> = ({
 };
 
 export default GuardrailTable;
+
+

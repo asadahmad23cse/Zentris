@@ -35,3 +35,5 @@ export const useClaimOnboardingToken = () => {
       await claimOnboardingToken(accessToken, inviteId, userId, password),
   });
 };
+
+

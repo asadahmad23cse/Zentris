@@ -41,7 +41,7 @@ export async function makeOpenAIChatCompletionRequest(
   // Prepare headers with tags and trace ID
   const headers: Record<string, string> = {};
   if (tags && tags.length > 0) {
-    headers["x-litellm-tags"] = tags.join(",");
+    headers["x-Zentris-tags"] = tags.join(",");
   }
 
   const client = new openai.OpenAI({
@@ -77,8 +77,8 @@ export async function makeOpenAIChatCompletionRequest(
         // All MCP Servers selected
         tools.push({
           type: "mcp",
-          server_label: "litellm",
-          server_url: "litellm_proxy/mcp",
+          server_label: "Zentris",
+          server_url: "Zentris_proxy/mcp",
           require_approval: "never",
         });
       } else {
@@ -90,8 +90,8 @@ export async function makeOpenAIChatCompletionRequest(
 
           tools.push({
             type: "mcp",
-            server_label: "litellm",
-            server_url: `litellm_proxy/mcp/${serverName}`,
+            server_label: "Zentris",
+            server_url: `Zentris_proxy/mcp/${serverName}`,
             require_approval: "never",
             ...(allowedTools.length > 0 ? { allowed_tools: allowedTools } : {}),
           });
@@ -107,7 +107,7 @@ export async function makeOpenAIChatCompletionRequest(
         stream_options: {
           include_usage: true,
         },
-        litellm_trace_id: traceId,
+        Zentris_trace_id: traceId,
         messages: chatHistory as ChatCompletionMessageParam[],
         ...(vector_store_ids ? { vector_store_ids } : {}),
         ...(guardrails ? { guardrails } : {}),
@@ -283,3 +283,5 @@ export async function makeOpenAIChatCompletionRequest(
     throw error; // Re-throw to allow the caller to handle the error
   }
 }
+
+

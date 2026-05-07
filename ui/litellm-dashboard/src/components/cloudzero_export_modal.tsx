@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Text, Button, Callout, TextInput } from "@tremor/react";
 import { Modal, Form, Spin, Select } from "antd";
-import { getGlobalLitellmHeaderName } from "@/components/networking";
+import { getGlobalZentrisHeaderName } from "@/components/networking";
 import NotificationsManager from "./molecules/notifications_manager";
 
 interface CloudZeroExportModalProps {
@@ -44,7 +44,7 @@ const CloudZeroExportModal: React.FC<CloudZeroExportModalProps> = ({ isOpen, onC
       const response = await fetch("/cloudzero/settings", {
         method: "GET",
         headers: {
-          [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+          [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       });
@@ -89,7 +89,7 @@ const CloudZeroExportModal: React.FC<CloudZeroExportModalProps> = ({ isOpen, onC
       const response = await fetch(endpoint, {
         method,
         headers: {
-          [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+          [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -129,7 +129,7 @@ const CloudZeroExportModal: React.FC<CloudZeroExportModalProps> = ({ isOpen, onC
       const response = await fetch("/cloudzero/export", {
         method: "POST",
         headers: {
-          [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+          [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -321,3 +321,5 @@ const CloudZeroExportModal: React.FC<CloudZeroExportModalProps> = ({ isOpen, onC
 };
 
 export default CloudZeroExportModal;
+
+

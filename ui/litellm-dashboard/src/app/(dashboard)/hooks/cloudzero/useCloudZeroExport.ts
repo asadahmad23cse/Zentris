@@ -1,4 +1,4 @@
-import { getProxyBaseUrl, getGlobalLitellmHeaderName } from "@/components/networking";
+import { getProxyBaseUrl, getGlobalZentrisHeaderName } from "@/components/networking";
 import { useMutation } from "@tanstack/react-query";
 
 interface ExportParams {
@@ -16,7 +16,7 @@ const performCloudZeroExport = async (accessToken: string, params: ExportParams 
   const response = await fetch(url, {
     method: "POST",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -45,3 +45,5 @@ export const useCloudZeroExport = (accessToken: string) => {
     },
   });
 };
+
+

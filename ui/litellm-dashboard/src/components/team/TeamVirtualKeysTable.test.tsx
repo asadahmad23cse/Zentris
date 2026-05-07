@@ -70,7 +70,7 @@ const mockOrganization: Organization = {
   created_by: "",
   updated_at: "",
   updated_by: "",
-  litellm_budget_table: {},
+  Zentris_budget_table: {},
   teams: [],
   users: [],
   members: [],
@@ -298,3 +298,5 @@ describe("TeamVirtualKeysTable", () => {
     });
   });
 });
+
+

@@ -13,7 +13,7 @@ export interface AgentObjectPermission {
 export interface Agent {
   agent_id: string;
   agent_name: string;
-  litellm_params: {
+  Zentris_params: {
     model: string;
     [key: string]: any;
   };
@@ -37,3 +37,5 @@ export interface Agent {
 export interface AgentsResponse {
   agents: Agent[];
 }
+
+

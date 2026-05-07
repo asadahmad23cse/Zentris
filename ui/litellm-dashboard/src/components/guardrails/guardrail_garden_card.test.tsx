@@ -12,7 +12,7 @@ const baseCard: GuardrailCardInfo = {
   id: "test-guard",
   name: "Test Guardrail",
   description: "A guardrail for testing purposes",
-  category: "litellm",
+  category: "Zentris",
   logo: "/logos/test.svg",
   tags: ["safety"],
 };
@@ -70,3 +70,5 @@ describe("GuardrailCard", () => {
     expect(screen.getByText("T")).toBeInTheDocument();
   });
 });
+
+

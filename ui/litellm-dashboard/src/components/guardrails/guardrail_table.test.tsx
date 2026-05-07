@@ -30,7 +30,7 @@ describe("GuardrailTable", () => {
           {
             guardrail_id: "1",
             guardrail_name: "Guardrail 1",
-            litellm_params: { guardrail: "presidio", mode: "pre_call", default_on: true },
+            Zentris_params: { guardrail: "presidio", mode: "pre_call", default_on: true },
             guardrail_info: null,
             created_at: "2021-01-01",
             updated_at: "2021-01-01",
@@ -54,3 +54,5 @@ describe("GuardrailTable", () => {
     );
   });
 });
+
+

@@ -30,3 +30,5 @@ describe("TruncatedValue", () => {
     expect(el).toHaveStyle({ maxWidth: "300px" });
   });
 });
+
+

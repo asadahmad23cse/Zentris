@@ -14,7 +14,7 @@ vi.mock("@/app/(dashboard)/networking", () => ({
 vi.mock("@/components/networking", () => ({
   teamInfoCall: vi.fn(),
   getProxyBaseUrl: vi.fn(() => ""),
-  getGlobalLitellmHeaderName: vi.fn(() => "Authorization"),
+  getGlobalZentrisHeaderName: vi.fn(() => "Authorization"),
   deriveErrorMessage: vi.fn((data) => data?.error || "Error"),
   handleError: vi.fn(),
 }));
@@ -795,3 +795,5 @@ describe("useDeletedTeams", () => {
     expect(result.current.error).toBeNull();
   });
 });
+
+

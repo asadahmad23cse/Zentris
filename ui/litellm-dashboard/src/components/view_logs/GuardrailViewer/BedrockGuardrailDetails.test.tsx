@@ -116,3 +116,5 @@ describe("BedrockGuardrailDetails", () => {
     expect(screen.getByText("Assessment #1")).toBeInTheDocument();
   });
 });
+
+

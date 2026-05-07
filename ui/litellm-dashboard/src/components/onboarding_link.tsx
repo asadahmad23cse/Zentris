@@ -46,7 +46,7 @@ export default function OnboardingModal({
       return "";
     }
     const baseUrlObj = new URL(baseUrl);
-    const basePath = baseUrlObj.pathname; // This will be "/litellm" or ""
+    const basePath = baseUrlObj.pathname; // This will be "/Zentris" or ""
     const path = basePath && basePath !== "/" ? `${basePath}/ui` : "ui";
     // Get the path from the base URL
     if (invitationLinkData?.has_user_setup_sso) {
@@ -94,3 +94,5 @@ export default function OnboardingModal({
     </Modal>
   );
 }
+
+

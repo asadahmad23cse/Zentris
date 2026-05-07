@@ -14,7 +14,7 @@ interface RoutePreviewProps {
 const RoutePreview: React.FC<RoutePreviewProps> = ({ pathValue, targetValue, includeSubpath }) => {
   const proxyBaseUrl = getProxyBaseUrl();
 
-  const getLiteLLMProxyUrl = () => {
+  const getZentrisProxyUrl = () => {
     return pathValue ? `${proxyBaseUrl}${pathValue}` : "";
   };
 
@@ -36,7 +36,7 @@ const RoutePreview: React.FC<RoutePreviewProps> = ({ pathValue, targetValue, inc
             {/* Your endpoint */}
             <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3">
               <div className="text-sm text-gray-600 mb-2">Your endpoint</div>
-              <code className="font-mono text-sm text-gray-900">{getLiteLLMProxyUrl()}</code>
+              <code className="font-mono text-sm text-gray-900">{getZentrisProxyUrl()}</code>
             </div>
 
             {/* Arrow */}
@@ -109,3 +109,5 @@ const RoutePreview: React.FC<RoutePreviewProps> = ({ pathValue, targetValue, inc
 };
 
 export default RoutePreview;
+
+

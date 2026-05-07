@@ -177,16 +177,16 @@ describe("chat_completion", () => {
     // Check first tool
     const firstTool = callArgs.tools[0];
     expect(firstTool.type).toBe("mcp");
-    expect(firstTool.server_label).toBe("litellm");
-    expect(firstTool.server_url).toBe("litellm_proxy/mcp/alpha");
+    expect(firstTool.server_label).toBe("Zentris");
+    expect(firstTool.server_url).toBe("Zentris_proxy/mcp/alpha");
     expect(firstTool.require_approval).toBe("never");
     expect(firstTool.allowed_tools).toEqual(["toolA", "toolB"]);
 
     // Check second tool
     const secondTool = callArgs.tools[1];
     expect(secondTool.type).toBe("mcp");
-    expect(secondTool.server_label).toBe("litellm");
-    expect(secondTool.server_url).toBe("litellm_proxy/mcp/Beta");
+    expect(secondTool.server_label).toBe("Zentris");
+    expect(secondTool.server_url).toBe("Zentris_proxy/mcp/Beta");
     expect(secondTool.require_approval).toBe("never");
     expect(secondTool.allowed_tools).toEqual(["toolC"]);
   });
@@ -257,3 +257,5 @@ describe("chat_completion", () => {
     expect(callArgs).not.toHaveProperty("mock_testing_fallbacks");
   });
 });
+
+

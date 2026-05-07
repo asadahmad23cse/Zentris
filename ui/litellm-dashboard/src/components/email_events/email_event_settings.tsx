@@ -126,3 +126,5 @@ const EmailEventSettings: React.FC<EmailEventSettingsProps> = ({ accessToken }) 
 };
 
 export default EmailEventSettings;
+
+

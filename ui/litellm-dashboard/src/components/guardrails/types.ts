@@ -21,7 +21,7 @@ export interface PiiConfigurationProps {
 export interface Guardrail {
   guardrail_id: string;
   guardrail_name: string | null;
-  litellm_params: {
+  Zentris_params: {
     guardrail: string;
     mode: string;
     default_on: boolean;
@@ -38,3 +38,5 @@ export enum GuardrailDefinitionLocation {
   DB = "db",
   CONFIG = "config",
 }
+
+

@@ -20,7 +20,7 @@ import { Team } from "@/components/key_team_helpers/key_list";
 import { MCPServers } from "@/components/mcp_tools";
 import ModelHubTable from "@/components/AIHub/ModelHubTable";
 import Navbar from "@/components/navbar";
-import { getUiConfig, Organization, proxyBaseUrl, setGlobalLitellmHeaderName, getInProductNudgesCall } from "@/components/networking";
+import { getUiConfig, Organization, proxyBaseUrl, setGlobalZentrisHeaderName, getInProductNudgesCall } from "@/components/networking";
 import NewUsagePage from "@/components/UsagePage/components/UsagePageView";
 import OldTeams from "@/components/OldTeams";
 import { fetchUserModels, CreateKeyPrefillData } from "@/components/organisms/create_key_button";
@@ -72,7 +72,7 @@ function deleteCookie(name: string, path = "/") {
 interface ProxySettings {
   PROXY_BASE_URL: string;
   PROXY_LOGOUT_URL: string;
-  LITELLM_UI_API_DOC_BASE_URL?: string | null;
+  Zentris_UI_API_DOC_BASE_URL?: string | null;
 }
 
 /**
@@ -345,7 +345,7 @@ function CreateKeyPageContent() {
       }
 
       if (decoded.auth_header_name) {
-        setGlobalLitellmHeaderName(decoded.auth_header_name);
+        setGlobalZentrisHeaderName(decoded.auth_header_name);
       }
 
       if (decoded.user_id) {
@@ -694,3 +694,5 @@ export default function CreateKeyPage() {
     </Suspense>
   );
 }
+
+

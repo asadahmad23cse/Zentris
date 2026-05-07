@@ -76,3 +76,4 @@ describe("fetchProxySettings", () => {
     consoleSpy.mockRestore();
   });
 });
+

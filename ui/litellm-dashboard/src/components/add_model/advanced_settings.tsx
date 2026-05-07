@@ -58,7 +58,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
   };
 
   const handlePassThroughChange = (checked: boolean) => {
-    const currentParams = form.getFieldValue("litellm_extra_params");
+    const currentParams = form.getFieldValue("Zentris_extra_params");
     try {
       let paramsObj = currentParams ? JSON.parse(currentParams) : {};
       if (checked) {
@@ -68,16 +68,16 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
       }
       // Only set the field value if there are remaining parameters
       if (Object.keys(paramsObj).length > 0) {
-        form.setFieldValue("litellm_extra_params", JSON.stringify(paramsObj, null, 2));
+        form.setFieldValue("Zentris_extra_params", JSON.stringify(paramsObj, null, 2));
       } else {
-        form.setFieldValue("litellm_extra_params", "");
+        form.setFieldValue("Zentris_extra_params", "");
       }
     } catch (error) {
       // If JSON parsing fails, only create new object if checked is true
       if (checked) {
-        form.setFieldValue("litellm_extra_params", JSON.stringify({ use_in_pass_through: true }, null, 2));
+        form.setFieldValue("Zentris_extra_params", JSON.stringify({ use_in_pass_through: true }, null, 2));
       } else {
-        form.setFieldValue("litellm_extra_params", "");
+        form.setFieldValue("Zentris_extra_params", "");
       }
     }
   };
@@ -85,17 +85,17 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
   const handleCacheControlChange = (checked: boolean) => {
     setShowCacheControl(checked);
     if (!checked) {
-      const currentParams = form.getFieldValue("litellm_extra_params");
+      const currentParams = form.getFieldValue("Zentris_extra_params");
       try {
         let paramsObj = currentParams ? JSON.parse(currentParams) : {};
         delete paramsObj.cache_control_injection_points;
         if (Object.keys(paramsObj).length > 0) {
-          form.setFieldValue("litellm_extra_params", JSON.stringify(paramsObj, null, 2));
+          form.setFieldValue("Zentris_extra_params", JSON.stringify(paramsObj, null, 2));
         } else {
-          form.setFieldValue("litellm_extra_params", "");
+          form.setFieldValue("Zentris_extra_params", "");
         }
       } catch (error) {
-        form.setFieldValue("litellm_extra_params", "");
+        form.setFieldValue("Zentris_extra_params", "");
       }
     }
   };
@@ -118,7 +118,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                   Attached Knowledge Bases (RAG){" "}
                   <Tooltip title="Vector stores to use for RAG. Every request to this model will automatically retrieve context from these knowledge bases.">
                     <a
-                      href="https://docs.litellm.ai/docs/completion/knowledgebase"
+                      href="https://docs.Zentris.ai/docs/completion/knowledgebase"
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
@@ -145,7 +145,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                   Guardrails{" "}
                   <Tooltip title="Apply safety guardrails to this key to filter content or enforce policies">
                     <a
-                      href="https://docs.litellm.ai/docs/proxy/guardrails/quick_start"
+                      href="https://docs.Zentris.ai/docs/proxy/guardrails/quick_start"
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()} // Prevent accordion from collapsing when clicking link
@@ -233,7 +233,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
               tooltip={
                 <span>
                   Allow using these credentials in pass through routes.{" "}
-                  <Link href="https://docs.litellm.ai/docs/pass_through/vertex_ai" target="_blank">
+                  <Link href="https://docs.Zentris.ai/docs/pass_through/vertex_ai" target="_blank">
                     Learn more
                   </Link>
                 </span>
@@ -248,9 +248,9 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
               onCacheControlChange={handleCacheControlChange}
             />
             <Form.Item
-              label="LiteLLM Params"
-              name="litellm_extra_params"
-              tooltip="Optional litellm params used for making a litellm.completion() call."
+              label="Zentris Params"
+              name="Zentris_extra_params"
+              tooltip="Optional Zentris params used for making a Zentris.completion() call."
               className="mb-4 mt-4"
               rules={[{ validator: formItemValidateJSON }]}
             >
@@ -267,9 +267,9 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
               <Col span={10}></Col>
               <Col span={10}>
                 <Text className="text-gray-600 text-sm">
-                  Pass JSON of litellm supported params{" "}
-                  <Link href="https://docs.litellm.ai/docs/completion/input" target="_blank">
-                    litellm.completion() call
+                  Pass JSON of Zentris supported params{" "}
+                  <Link href="https://docs.Zentris.ai/docs/completion/input" target="_blank">
+                    Zentris.completion() call
                   </Link>
                 </Text>
               </Col>
@@ -296,3 +296,5 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
 };
 
 export default AdvancedSettings;
+
+

@@ -1,6 +1,6 @@
 # Guardrail Configuration Components
 
-This directory contains reusable React components for configuring various guardrail types in the LiteLLM dashboard.
+This directory contains reusable React components for configuring various guardrail types in the Zentris dashboard.
 
 ## Azure Text Moderation Configuration
 
@@ -123,3 +123,5 @@ The existing PII configuration component provides similar functionality for conf
 - `pii_configuration.tsx` - PII configuration component
 - `pii_components.tsx` - PII UI components
 - `types.ts` - PII TypeScript interfaces
+
+

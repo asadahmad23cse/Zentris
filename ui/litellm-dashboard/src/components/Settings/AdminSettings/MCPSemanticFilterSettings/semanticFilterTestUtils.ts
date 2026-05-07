@@ -87,9 +87,11 @@ export const getCurlCommand = (testModel: string, testQuery: string) =>
     "tools": [
         {
             "type": "mcp",
-            "server_url": "litellm_proxy",
+            "server_url": "Zentris_proxy",
             "require_approval": "never"
         }
     ],
     "tool_choice": "required"
 }'`;
+
+

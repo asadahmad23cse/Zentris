@@ -25,3 +25,5 @@ export const QUICK_SELECT_OPTIONS: { label: string; value: number; unit: string 
   { label: "Last 24 Hours", value: 24, unit: "hours" },
   { label: "Last 7 Days", value: 7, unit: "days" },
 ];
+
+

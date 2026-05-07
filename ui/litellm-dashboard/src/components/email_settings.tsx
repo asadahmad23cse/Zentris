@@ -57,9 +57,9 @@ const EmailSettings: React.FC<EmailSettingsProps> = ({ accessToken, premiumUser,
       <Card>
         <Title level={4}>Email Server Settings</Title>
         <Text>
-          <a href="https://docs.litellm.ai/docs/proxy/email" target="_blank" style={{ color: "blue" }}>
+          <a href="https://docs.Zentris.ai/docs/proxy/email" target="_blank" style={{ color: "blue" }}>
             {" "}
-            LiteLLM Docs: email alerts
+            Zentris Docs: email alerts
           </a>{" "}
           <br />
         </Text>
@@ -179,3 +179,5 @@ const EmailSettings: React.FC<EmailSettingsProps> = ({ accessToken, premiumUser,
 };
 
 export default EmailSettings;
+
+

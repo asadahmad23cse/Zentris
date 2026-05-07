@@ -68,3 +68,5 @@ describe("EndpointUsageTable", () => {
     expect(screen.getByTestId("column-spend")).toBeInTheDocument();
   });
 });
+
+

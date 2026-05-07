@@ -32,3 +32,5 @@ describe("EndpointUsageLineChart", () => {
     expect(screen.getByTestId("tremor-line-chart")).toBeInTheDocument();
   });
 });
+
+

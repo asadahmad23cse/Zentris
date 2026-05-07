@@ -70,3 +70,5 @@ export const FIELD_GROUPS: FieldGroup[] = [
 export const MCP_REQUIRED_FIELD_DEFS: RequiredFieldDef[] = FIELD_GROUPS.flatMap((g) => g.fields);
 
 export const SETTINGS_KEY = "mcp_required_fields";
+
+

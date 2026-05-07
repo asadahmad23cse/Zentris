@@ -59,3 +59,5 @@ const ImpactPreviewAlert: React.FC<ImpactPreviewAlertProps> = ({ impactResult })
 };
 
 export default ImpactPreviewAlert;
+
+

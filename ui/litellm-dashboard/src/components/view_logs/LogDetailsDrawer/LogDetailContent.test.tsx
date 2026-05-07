@@ -274,19 +274,19 @@ describe("LogDetailContent", () => {
     expect(screen.getByText("100")).toBeInTheDocument();
   });
 
-  it("should display LiteLLM Overhead when litellm_overhead_time_ms is in metadata", () => {
+  it("should display Zentris Overhead when Zentris_overhead_time_ms is in metadata", () => {
     render(
       <LogDetailContent
         logEntry={createLogEntry({
           metadata: {
             status: "success",
-            litellm_overhead_time_ms: 42.5,
+            Zentris_overhead_time_ms: 42.5,
           },
         })}
       />,
     );
 
-    expect(screen.getByText("LiteLLM Overhead")).toBeInTheDocument();
+    expect(screen.getByText("Zentris Overhead")).toBeInTheDocument();
     expect(screen.getByText("42.50 ms")).toBeInTheDocument();
   });
 
@@ -344,3 +344,5 @@ describe("LogDetailContent", () => {
     expect(within(descriptions as HTMLElement).getByText("-")).toBeInTheDocument();
   });
 });
+
+

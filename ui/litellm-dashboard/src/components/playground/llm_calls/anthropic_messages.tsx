@@ -35,7 +35,7 @@ export async function makeAnthropicMessagesRequest(
   // Prepare headers with tags and trace ID
   const headers: Record<string, string> = {};
   if (tags && tags.length > 0) {
-    headers["x-litellm-tags"] = tags.join(",");
+    headers["x-Zentris-tags"] = tags.join(",");
   }
 
   const client = new Anthropic({
@@ -54,15 +54,15 @@ export async function makeAnthropicMessagesRequest(
       messages: messages.map((m) => ({ role: m.role, content: m.content })),
       stream: true,
       max_tokens: 1024,
-      // @ts-ignore - litellm specific parameter
-      litellm_trace_id: traceId,
+      // @ts-ignore - Zentris specific parameter
+      Zentris_trace_id: traceId,
     };
 
     if (vector_store_ids) requestBody.vector_store_ids = vector_store_ids;
     if (guardrails) requestBody.guardrails = guardrails;
     if (policies) requestBody.policies = policies;
     // Use the streaming helper method for cleaner async iteration
-    // @ts-ignore - The SDK types might not include all litellm-specific parameters
+    // @ts-ignore - The SDK types might not include all Zentris-specific parameters
     const stream = client.messages.stream(requestBody, { signal });
 
     for await (const messageStreamEvent of stream) {
@@ -116,3 +116,5 @@ export async function makeAnthropicMessagesRequest(
     throw error;
   }
 }
+
+

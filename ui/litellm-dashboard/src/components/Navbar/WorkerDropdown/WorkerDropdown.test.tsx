@@ -132,3 +132,5 @@ describe("WorkerDropdown", () => {
     expect(mockOnWorkerSwitch).toHaveBeenCalledWith("w2");
   });
 });
+
+

@@ -204,3 +204,5 @@ const ProviderMarginTable: React.FC<ProviderMarginTableProps> = ({
 
 export default ProviderMarginTable;
 
+
+

@@ -85,3 +85,5 @@ describe("MCPConnectionStatus", () => {
     expect(screen.getByText(/No tools found for this MCP server/i)).toBeInTheDocument();
   });
 });
+
+

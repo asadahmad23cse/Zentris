@@ -63,3 +63,5 @@ export function SimpleToolCallBlock({ tool, compact = false }: SimpleToolCallBlo
     </div>
   );
 }
+
+

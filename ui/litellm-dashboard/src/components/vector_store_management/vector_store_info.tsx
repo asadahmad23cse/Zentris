@@ -210,7 +210,7 @@ const VectorStoreInfoView: React.FC<VectorStoreInfoViewProps> = ({
                       </Text>
                     </div>
 
-                    <Form.Item label="Existing Credentials" name="litellm_credential_name">
+                    <Form.Item label="Existing Credentials" name="Zentris_credential_name">
                       <Select2
                         showSearch
                         placeholder="Select or search for existing credentials"
@@ -365,3 +365,5 @@ const VectorStoreInfoView: React.FC<VectorStoreInfoViewProps> = ({
 };
 
 export default VectorStoreInfoView;
+
+

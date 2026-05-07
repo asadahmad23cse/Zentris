@@ -193,7 +193,7 @@ const ToolPermissionRulesEditor: React.FC<ToolPermissionRulesEditorProps> = ({
     <Card>
       <div className="flex items-center justify-between">
         <div>
-          <Text className="text-lg font-semibold">LiteLLM Tool Permission Guardrail</Text>
+          <Text className="text-lg font-semibold">Zentris Tool Permission Guardrail</Text>
           <Text className="text-sm text-gray-500">
             Provide regex patterns (e.g., ^mcp__github_.*$) for tool names or types and optionally
             constrain payload fields.
@@ -340,3 +340,5 @@ const ToolPermissionRulesEditor: React.FC<ToolPermissionRulesEditorProps> = ({
 };
 
 export default ToolPermissionRulesEditor;
+
+

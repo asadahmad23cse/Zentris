@@ -11,8 +11,8 @@ type LoggingCallbacksProps = {
   availableCallbacks?: Record<
     string,
     {
-      litellm_callback_name: string;
-      litellm_callback_params: string[];
+      Zentris_callback_name: string;
+      Zentris_callback_params: string[];
       ui_callback_name: string;
     }
   >;
@@ -119,3 +119,5 @@ export const LoggingCallbacksTable: React.FC<LoggingCallbacksProps> = ({
     </>
   );
 };
+
+

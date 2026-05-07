@@ -12,7 +12,7 @@ vi.mock("../networking", async () => {
       {
         provider: "OpenAI",
         provider_display_name: Providers.OpenAI,
-        litellm_provider: "openai",
+        Zentris_provider: "openai",
         default_model_placeholder: "gpt-3.5-turbo",
         credential_fields: [
           {
@@ -32,7 +32,7 @@ vi.mock("../networking", async () => {
       {
         provider: "Anthropic",
         provider_display_name: Providers.Anthropic,
-        litellm_provider: "anthropic",
+        Zentris_provider: "anthropic",
         default_model_placeholder: "claude-3-opus-20240229",
         credential_fields: [
           {
@@ -106,3 +106,5 @@ describe("AddCredentialModal", () => {
     });
   });
 });
+
+

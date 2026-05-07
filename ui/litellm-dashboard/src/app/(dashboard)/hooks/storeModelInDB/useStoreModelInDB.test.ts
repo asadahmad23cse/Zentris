@@ -6,7 +6,7 @@ import { useStoreModelInDB } from "./useStoreModelInDB";
 
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: vi.fn(() => ""),
-  getGlobalLitellmHeaderName: vi.fn(() => "Authorization"),
+  getGlobalZentrisHeaderName: vi.fn(() => "Authorization"),
 }));
 
 describe("useStoreModelInDB", () => {
@@ -145,3 +145,5 @@ describe("useStoreModelInDB", () => {
     expect(result.current.error?.message).toBe("Failed to update model storage settings");
   });
 });
+
+

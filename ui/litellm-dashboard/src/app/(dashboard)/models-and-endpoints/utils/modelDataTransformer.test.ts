@@ -12,7 +12,7 @@ describe("transformModelData", () => {
       data: [
         {
           model_name: "gpt-4",
-          litellm_params: {
+          Zentris_params: {
             model: "gpt-4",
             api_base: "https://api.openai.com",
             api_key: "sk-123",
@@ -35,10 +35,10 @@ describe("transformModelData", () => {
     expect(result.data[0]).toHaveProperty("max_tokens", 8192);
     expect(result.data[0]).toHaveProperty("max_input_tokens", 128000);
     expect(result.data[0]).toHaveProperty("api_base", "https://api.openai.com");
-    expect(result.data[0]).toHaveProperty("litellm_model_name", "gpt-4");
-    expect(result.data[0]).toHaveProperty("cleanedLitellmParams");
-    expect(result.data[0].cleanedLitellmParams).not.toHaveProperty("model");
-    expect(result.data[0].cleanedLitellmParams).not.toHaveProperty("api_base");
+    expect(result.data[0]).toHaveProperty("Zentris_model_name", "gpt-4");
+    expect(result.data[0]).toHaveProperty("cleanedZentrisParams");
+    expect(result.data[0].cleanedZentrisParams).not.toHaveProperty("model");
+    expect(result.data[0].cleanedZentrisParams).not.toHaveProperty("api_base");
   });
 
   it("should handle empty data", () => {
@@ -56,7 +56,7 @@ describe("transformModelData", () => {
       data: [
         {
           model_name: "gemini-2.5-flash",
-          litellm_params: {
+          Zentris_params: {
             model: "vertex_ai/gemini-2.5-flash",
           },
           model_info: {
@@ -81,7 +81,7 @@ describe("transformModelData", () => {
       data: [
         {
           model_name: "some-model",
-          litellm_params: {
+          Zentris_params: {
             model: "openai/some-model",
           },
           model_info: {
@@ -106,7 +106,7 @@ describe("transformModelData", () => {
       data: [
         {
           model_name: "some-model",
-          litellm_params: {
+          Zentris_params: {
             model: "openai/some-model",
           },
         },
@@ -120,3 +120,5 @@ describe("transformModelData", () => {
     expect(result.data[0].output_cost).toBeNull();
   });
 });
+
+

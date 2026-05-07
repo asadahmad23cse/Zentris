@@ -22,3 +22,5 @@ export const ProviderLogo: React.FC<ProviderLogoProps> = ({ provider, className 
 
   return <img src={logo} alt={`${provider} logo`} className={className} onError={() => setHasError(true)} />;
 };
+
+

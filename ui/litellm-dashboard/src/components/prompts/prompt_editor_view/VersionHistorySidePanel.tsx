@@ -45,13 +45,13 @@ const VersionHistorySidePanel: React.FC<VersionHistorySidePanelProps> = ({
   };
 
   const getVersionNumber = (prompt: PromptSpec) => {
-    // Use explicit version field if available, otherwise try to extract from litellm_params.prompt_id
+    // Use explicit version field if available, otherwise try to extract from Zentris_params.prompt_id
     if (prompt.version) {
       return `v${prompt.version}`;
     }
     
-    // Fallback: try to extract from litellm_params.prompt_id
-    const versionedId = (prompt.litellm_params as any)?.prompt_id || prompt.prompt_id;
+    // Fallback: try to extract from Zentris_params.prompt_id
+    const versionedId = (prompt.Zentris_params as any)?.prompt_id || prompt.prompt_id;
     if (versionedId.includes(".v")) {
       return `v${versionedId.split(".v")[1]}`;
     }
@@ -138,3 +138,5 @@ const VersionHistorySidePanel: React.FC<VersionHistorySidePanelProps> = ({
 };
 
 export default VersionHistorySidePanel;
+
+

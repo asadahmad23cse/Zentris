@@ -31,3 +31,5 @@ export function removeLocalStorageItem(key: string): void {
     console.warn(`Error removing localStorage key "${key}":`, error);
   }
 }
+
+

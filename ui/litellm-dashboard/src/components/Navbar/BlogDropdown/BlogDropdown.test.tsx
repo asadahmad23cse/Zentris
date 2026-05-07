@@ -205,7 +205,7 @@ describe("BlogDropdown", () => {
 
         await waitFor(() => {
           const viewAllLink = screen.getByRole("link", { name: /view all posts/i });
-          expect(viewAllLink).toHaveAttribute("href", "https://docs.litellm.ai/blog");
+          expect(viewAllLink).toHaveAttribute("href", "https://docs.Zentris.ai/blog");
           expect(viewAllLink).toHaveAttribute("target", "_blank");
           expect(viewAllLink).toHaveAttribute("rel", "noopener noreferrer");
         });
@@ -228,3 +228,5 @@ describe("BlogDropdown", () => {
     });
   });
 });
+
+

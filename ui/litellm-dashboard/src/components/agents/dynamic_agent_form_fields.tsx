@@ -81,28 +81,28 @@ export const buildDynamicAgentData = (
   values: any,
   agentTypeInfo: AgentCreateInfo
 ) => {
-  // Build litellm_params from template
-  const litellmParams: Record<string, any> = {
-    ...(agentTypeInfo.litellm_params_template || {}),
+  // Build Zentris_params from template
+  const ZentrisParams: Record<string, any> = {
+    ...(agentTypeInfo.Zentris_params_template || {}),
   };
 
-  // Add credential fields marked with include_in_litellm_params
+  // Add credential fields marked with include_in_Zentris_params
   for (const field of agentTypeInfo.credential_fields) {
     const value = values[field.key];
-    if (value && field.include_in_litellm_params !== false) {
-      litellmParams[field.key] = value;
+    if (value && field.include_in_Zentris_params !== false) {
+      ZentrisParams[field.key] = value;
     }
   }
 
   // Add cost configuration
   if (values.cost_per_query) {
-    litellmParams.cost_per_query = parseFloat(values.cost_per_query);
+    ZentrisParams.cost_per_query = parseFloat(values.cost_per_query);
   }
   if (values.input_cost_per_token) {
-    litellmParams.input_cost_per_token = parseFloat(values.input_cost_per_token);
+    ZentrisParams.input_cost_per_token = parseFloat(values.input_cost_per_token);
   }
   if (values.output_cost_per_token) {
-    litellmParams.output_cost_per_token = parseFloat(values.output_cost_per_token);
+    ZentrisParams.output_cost_per_token = parseFloat(values.output_cost_per_token);
   }
 
   // Apply model_template if defined (e.g., "bedrock/agentcore/{agent_runtime_arn}")
@@ -115,7 +115,7 @@ export const buildDynamicAgentData = (
         model = model.replace(placeholder, values[field.key]);
       }
     }
-    litellmParams.model = model;
+    ZentrisParams.model = model;
   }
 
   const agentData: Record<string, any> = {
@@ -138,7 +138,7 @@ export const buildDynamicAgentData = (
         tags: ["chat", "conversation"],
       }],
     },
-    litellm_params: litellmParams,
+    Zentris_params: ZentrisParams,
   };
 
   if (values.tpm_limit != null) agentData.tpm_limit = values.tpm_limit;
@@ -150,4 +150,6 @@ export const buildDynamicAgentData = (
 };
 
 export default DynamicAgentFormFields;
+
+
 

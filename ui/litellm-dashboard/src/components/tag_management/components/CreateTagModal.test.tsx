@@ -9,12 +9,12 @@ describe("CreateTagModal", () => {
   const mockAvailableModels = [
     {
       model_name: "GPT-4",
-      litellm_params: { model: "gpt-4" },
+      Zentris_params: { model: "gpt-4" },
       model_info: { id: "model-1" },
     },
     {
       model_name: "Claude-3",
-      litellm_params: { model: "claude-3" },
+      Zentris_params: { model: "claude-3" },
       model_info: { id: "model-2" },
     },
   ];
@@ -62,3 +62,5 @@ describe("CreateTagModal", () => {
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 });
+
+

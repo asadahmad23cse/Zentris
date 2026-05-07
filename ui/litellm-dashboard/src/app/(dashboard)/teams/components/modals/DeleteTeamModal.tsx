@@ -94,3 +94,5 @@ const DeleteTeamModal = ({ teams, teamToDelete, onCancel, onConfirm }: DeleteTea
 };
 
 export default DeleteTeamModal;
+
+

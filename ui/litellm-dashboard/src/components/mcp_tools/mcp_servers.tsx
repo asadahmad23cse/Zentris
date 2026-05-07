@@ -21,7 +21,7 @@ import MCPDiscovery from "./mcp_discovery";
 import { ByokCredentialModal } from "./ByokCredentialModal";
 
 const { Text: AntdText, Title: AntdTitle } = Typography;
-const EDIT_OAUTH_UI_STATE_KEY = "litellm-mcp-oauth-edit-state";
+const EDIT_OAUTH_UI_STATE_KEY = "Zentris-mcp-oauth-edit-state";
 
 const { Option } = Select;
 
@@ -460,3 +460,5 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
 };
 
 export default MCPServers;
+
+

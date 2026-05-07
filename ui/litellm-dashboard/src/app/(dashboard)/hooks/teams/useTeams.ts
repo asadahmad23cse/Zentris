@@ -6,7 +6,7 @@ import { createQueryKeys } from "@/app/(dashboard)/hooks/common/queryKeysFactory
 import { teamInfoCall } from "@/components/networking";
 import {
   getProxyBaseUrl,
-  getGlobalLitellmHeaderName,
+  getGlobalZentrisHeaderName,
   deriveErrorMessage,
   handleError,
 } from "@/components/networking";
@@ -68,7 +68,7 @@ export const teamListCall = async (
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+        [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
     });
@@ -194,7 +194,7 @@ const deletedTeamListCall = async (
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+        [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
     });
@@ -237,3 +237,4 @@ export const useDeletedTeams = (
     placeholderData: keepPreviousData,
   });
 };
+

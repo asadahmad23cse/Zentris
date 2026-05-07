@@ -13,7 +13,7 @@ interface GuardrailGardenProps {
 const GuardrailGarden: React.FC<GuardrailGardenProps> = ({ accessToken, onGuardrailCreated }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCard, setSelectedCard] = useState<GuardrailCardInfo | null>(null);
-  const [showAllLitellm, setShowAllLitellm] = useState(false);
+  const [showAllZentris, setShowAllZentris] = useState(false);
   const CARDS_PER_ROW = 5;
   const VISIBLE_ROWS = 2;
 
@@ -27,7 +27,7 @@ const GuardrailGarden: React.FC<GuardrailGardenProps> = ({ accessToken, onGuardr
     );
   });
 
-  const litellmCards = filteredCards.filter((c) => c.category === "litellm");
+  const ZentrisCards = filteredCards.filter((c) => c.category === "Zentris");
   const partnerCards = filteredCards.filter((c) => c.category === "partner");
 
   if (selectedCard) {
@@ -55,33 +55,33 @@ const GuardrailGarden: React.FC<GuardrailGardenProps> = ({ accessToken, onGuardr
         />
       </div>
 
-      {/* LiteLLM Content Filter Section */}
+      {/* Zentris Content Filter Section */}
       <div style={{ marginBottom: 40 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 600, color: "#111827", margin: 0 }}>LiteLLM Content Filter</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 600, color: "#111827", margin: 0 }}>Zentris Content Filter</h2>
           <span
             style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "#1a73e8", cursor: "pointer" }}
-            onClick={() => setShowAllLitellm(!showAllLitellm)}
+            onClick={() => setShowAllZentris(!showAllZentris)}
           >
-            {showAllLitellm ? (
+            {showAllZentris ? (
               <>Show less</>
             ) : (
               <>
                 <ArrowRightOutlined style={{ fontSize: 12 }} />
-                {`Show all (${litellmCards.length})`}
+                {`Show all (${ZentrisCards.length})`}
               </>
             )}
           </span>
         </div>
         <p style={{ fontSize: 13, color: "#6b7280", margin: "4px 0 20px 0" }}>
-          Built-in guardrails powered by LiteLLM. Zero latency, no external dependencies, no additional cost.
+          Built-in guardrails powered by Zentris. Zero latency, no external dependencies, no additional cost.
         </p>
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
           gap: 16,
         }}>
-          {(showAllLitellm ? litellmCards : litellmCards.slice(0, CARDS_PER_ROW * VISIBLE_ROWS)).map((card) => (
+          {(showAllZentris ? ZentrisCards : ZentrisCards.slice(0, CARDS_PER_ROW * VISIBLE_ROWS)).map((card) => (
             <GuardrailCard key={card.id} card={card} onClick={() => setSelectedCard(card)} />
           ))}
         </div>
@@ -108,3 +108,5 @@ const GuardrailGarden: React.FC<GuardrailGardenProps> = ({ accessToken, onGuardr
 };
 
 export default GuardrailGarden;
+
+

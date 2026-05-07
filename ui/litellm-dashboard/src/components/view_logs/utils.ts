@@ -18,3 +18,5 @@ export function getEventDisplayName(callType: string, model: string): string {
   if (claudeMatch) return claudeMatch[0];
   return noSuffix || "llm_call";
 }
+
+

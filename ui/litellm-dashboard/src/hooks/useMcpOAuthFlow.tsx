@@ -64,9 +64,9 @@ export const useMcpOAuthFlow = ({
   const [tokenResponse, setTokenResponse] = useState<Record<string, any> | null>(null);
   const processingRef = useRef(false);
 
-  const FLOW_STATE_KEY = "litellm-mcp-oauth-flow-state";
-  const RESULT_KEY = "litellm-mcp-oauth-result";
-  const RETURN_URL_KEY = "litellm-mcp-oauth-return-url";
+  const FLOW_STATE_KEY = "Zentris-mcp-oauth-flow-state";
+  const RESULT_KEY = "Zentris-mcp-oauth-result";
+  const RETURN_URL_KEY = "Zentris-mcp-oauth-return-url";
 
   type StoredFlowState = {
     state: string;
@@ -337,3 +337,5 @@ export const useMcpOAuthFlow = ({
     tokenResponse,
   };
 };
+
+

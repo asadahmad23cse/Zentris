@@ -120,7 +120,7 @@ export const ByokCredentialModal: React.FC<ByokCredentialModalProps> = ({
 
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Connect {serverDisplayName}</h2>
             <p className="text-gray-500 mb-6">
-              LiteLLM needs access to {serverDisplayName} to complete your request.
+              Zentris needs access to {serverDisplayName} to complete your request.
             </p>
 
             {/* How it works */}
@@ -135,7 +135,7 @@ export const ByokCredentialModal: React.FC<ByokCredentialModalProps> = ({
                 <div>
                   <p className="font-semibold text-gray-800 mb-1">How it works</p>
                   <p className="text-gray-500 text-sm">
-                    LiteLLM acts as a secure bridge. Your requests are routed through our MCP client directly to{" "}
+                    Zentris acts as a secure bridge. Your requests are routed through our MCP client directly to{" "}
                     {serverDisplayName}&apos;s API.
                   </p>
                 </div>
@@ -253,3 +253,5 @@ export const ByokCredentialModal: React.FC<ByokCredentialModalProps> = ({
 };
 
 export default ByokCredentialModal;
+
+

@@ -49,3 +49,5 @@ describe("splitWildcardModels", () => {
     expect(result.regular).toHaveLength(2);
   });
 });
+
+

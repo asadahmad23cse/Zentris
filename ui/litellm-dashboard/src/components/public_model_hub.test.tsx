@@ -16,9 +16,9 @@ vi.mock("./networking", async (importOriginal) => {
     ...actual,
     modelHubPublicModelsCall: vi.fn().mockResolvedValue([]),
     getPublicModelHubInfo: vi.fn().mockResolvedValue({
-      docs_title: "LiteLLM Gateway",
+      docs_title: "Zentris Gateway",
       custom_docs_description: null,
-      litellm_version: "1.0.0",
+      Zentris_version: "1.0.0",
       useful_links: {},
     }),
     agentHubPublicModelsCall: vi.fn().mockResolvedValue([]),
@@ -186,3 +186,5 @@ describe("PublicModelHub", () => {
     });
   });
 });
+
+

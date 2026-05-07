@@ -89,3 +89,5 @@ describe("handleImageError", () => {
     expect(() => handleImageError(event, "OpenAI")).not.toThrow();
   });
 });
+
+

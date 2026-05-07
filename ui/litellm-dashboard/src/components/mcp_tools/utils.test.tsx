@@ -73,3 +73,5 @@ describe("validateMCPServerName", () => {
     await expect(validateMCPServerName("my server")).rejects.toBeDefined();
   });
 });
+
+

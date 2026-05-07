@@ -46,3 +46,5 @@ export const ENDPOINT_OPTIONS = [
   { value: EndpointType.MCP, label: "/mcp-rest/tools/call" },
   { value: EndpointType.REALTIME, label: "/v1/realtime" },
 ];
+
+

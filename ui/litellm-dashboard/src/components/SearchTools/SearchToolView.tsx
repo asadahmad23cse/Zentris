@@ -79,14 +79,14 @@ export const SearchToolView: React.FC<SearchToolViewProps> = ({
         <Card>
           <Text>Provider</Text>
           <div className="mt-2">
-            <Title>{getProviderDisplayName(searchTool.litellm_params.search_provider)}</Title>
+            <Title>{getProviderDisplayName(searchTool.Zentris_params.search_provider)}</Title>
           </div>
         </Card>
 
         <Card>
           <Text>API Key</Text>
           <div className="mt-2">
-            <Text>{searchTool.litellm_params.api_key ? "****" : "Not set"}</Text>
+            <Text>{searchTool.Zentris_params.api_key ? "****" : "Not set"}</Text>
           </div>
         </Card>
 
@@ -121,5 +121,7 @@ export const SearchToolView: React.FC<SearchToolViewProps> = ({
     </div>
   );
 };
+
+
 
 

@@ -48,9 +48,9 @@ interface SettingsPageProps {
 }
 
 interface genericCallbackParams {
-  litellm_callback_name: string; // what to send in request
+  Zentris_callback_name: string; // what to send in request
   ui_callback_name: string; // what to show on UI
-  litellm_callback_params: string[] | null; // known required params for this callback
+  Zentris_callback_params: string[] | null; // known required params for this callback
 }
 
 const assetsLogoFolder = "../ui/assets/logos/";
@@ -207,7 +207,7 @@ const getDynamicParamsForCallback = (
 const buildCallbackPayload = (formValues: Record<string, any>, callbackName: string) => {
   return {
     environment_variables: formValues,
-    litellm_settings: {
+    Zentris_settings: {
       success_callback: [callbackName],
     },
   };
@@ -230,8 +230,8 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
     Record<
       string,
       {
-        litellm_callback_name: string;
-        litellm_callback_params: string[];
+        Zentris_callback_name: string;
+        Zentris_callback_params: string[];
         ui_callback_name: string;
       }
     >
@@ -428,7 +428,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
 
     const payload = {
       environment_variables: updatedVariables,
-      litellm_settings: {
+      Zentris_settings: {
         success_callback: [callback.name],
       },
     };
@@ -455,7 +455,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
             LANGFUSE_PUBLIC_KEY: values.langfusePublicKey,
             LANGFUSE_SECRET_KEY: values.langfusePrivateKey,
           },
-          litellm_settings: {
+          Zentris_settings: {
             success_callback: [values.callback],
           },
         };
@@ -500,7 +500,7 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
           environment_variables: {
             OPENMETER_API_KEY: values.openMeterApiKey,
           },
-          litellm_settings: {
+          Zentris_settings: {
             success_callback: [values.callback],
           },
         };
@@ -706,13 +706,13 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
         footer={null}
       >
         <a
-          href="https://docs.litellm.ai/docs/proxy/logging"
+          href="https://docs.Zentris.ai/docs/proxy/logging"
           className="mb-8 mt-4"
           target="_blank"
           style={{ color: "blue" }}
         >
           {" "}
-          LiteLLM Docs: Logging
+          Zentris Docs: Logging
         </a>
 
         <Form
@@ -837,3 +837,5 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID, 
 };
 
 export default Settings;
+
+

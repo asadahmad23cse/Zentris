@@ -53,3 +53,5 @@ describe("MCPLogoSelector", () => {
     expect(onChange).toHaveBeenCalledWith(undefined);
   });
 });
+
+

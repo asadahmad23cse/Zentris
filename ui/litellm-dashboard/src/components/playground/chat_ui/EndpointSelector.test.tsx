@@ -28,3 +28,5 @@ describe("EndpointSelector", () => {
     expect(await screen.findByText("/v1/audio/transcriptions")).toBeInTheDocument();
   });
 });
+
+

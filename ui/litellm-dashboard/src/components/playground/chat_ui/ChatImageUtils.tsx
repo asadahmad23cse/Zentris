@@ -73,3 +73,5 @@ export const shouldShowChatAttachedImage = (message: MessageType): boolean => {
     !!message.imagePreviewUrl
   );
 };
+
+

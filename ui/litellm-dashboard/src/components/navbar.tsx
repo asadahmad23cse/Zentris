@@ -9,7 +9,6 @@ import { MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined } from 
 import { Button, Switch, Tag } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { BlogDropdown } from "./Navbar/BlogDropdown/BlogDropdown";
 import { CommunityEngagementButtons } from "./Navbar/CommunityEngagementButtons/CommunityEngagementButtons";
 import UserDropdown from "./Navbar/UserDropdown/UserDropdown";
 import WorkerDropdown from "./Navbar/WorkerDropdown/WorkerDropdown";
@@ -47,7 +46,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const [logoutUrl, setLogoutUrl] = useState("");
   const { logoUrl } = useTheme();
   const { data: healthData } = useHealthReadiness();
-  const version = healthData?.litellm_version;
+  const version = healthData?.Zentris_version;
   const disableBouncingIcon = useDisableBouncingIcon();
 
   // Simple logo URL: use custom logo if available, otherwise default
@@ -73,16 +72,16 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const handleLogout = () => {
     clearTokenCookies();
-    localStorage.removeItem("litellm_selected_worker_id");
-    localStorage.removeItem("litellm_worker_url");
+    localStorage.removeItem("Zentris_selected_worker_id");
+    localStorage.removeItem("Zentris_worker_url");
     window.location.href = logoutUrl;
   };
 
   const handleWorkerSwitch = (workerId: string) => {
     clearTokenCookies();
     clearStoredReturnUrl();
-    localStorage.removeItem("litellm_selected_worker_id");
-    localStorage.removeItem("litellm_worker_url");
+    localStorage.removeItem("Zentris_selected_worker_id");
+    localStorage.removeItem("Zentris_worker_url");
     window.location.href = `/ui/login?worker=${encodeURIComponent(workerId)}`;
   };
 
@@ -126,7 +125,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   )}
                   <Tag className="relative text-xs font-medium cursor-pointer z-10">
                     <a
-                      href="https://docs.litellm.ai/release_notes"
+                      href="https://github.com/asadahmad23cse/Zentris/releases"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-shrink-0"
@@ -153,16 +152,6 @@ const Navbar: React.FC<NavbarProps> = ({
                 unCheckedChildren={<SunOutlined />}
               />
             )}
-            <Button
-              type="text"
-              href="https://github.com/asadahmad23cse/Zentris"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Docs
-            </Button>
-            <BlogDropdown />
-
             {!isPublicPage && <UserDropdown onLogout={handleLogout} />}
           </div>
         </div>
@@ -172,3 +161,5 @@ const Navbar: React.FC<NavbarProps> = ({
 };
 
 export default Navbar;
+
+

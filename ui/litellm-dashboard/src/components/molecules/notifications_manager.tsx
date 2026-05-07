@@ -85,9 +85,9 @@ const RATE_LIMIT_EXTRA = [
 const BUDGET_MATCH = ["budget exceeded", "crossed budget", "provider budget"];
 
 const ENTERPRISE_MATCH = [
-  "must be a litellm enterprise user",
-  "only be available for liteLLM enterprise users",
-  "missing litellm-enterprise package",
+  "must be a Zentris enterprise user",
+  "only be available for Zentris enterprise users",
+  "missing Zentris-enterprise package",
   "only available on the docker image",
   "enterprise feature",
   "premium user",
@@ -206,7 +206,7 @@ const SUCCESS_MATCH = [
 const INFO_MATCH = ["rate limit reached for deployment", "deployment cooldown period active"];
 
 const DEPRECATION_FEATURE_WARN_MATCH = [
-  "this feature is only available for litellm enterprise users",
+  "this feature is only available for Zentris enterprise users",
   "enterprise features are not available",
   "regenerating virtual keys is an enterprise feature",
   "trying to set allowed_routes. this is an enterprise feature",
@@ -369,3 +369,5 @@ const NotificationManager = {
 };
 
 export default NotificationManager;
+
+

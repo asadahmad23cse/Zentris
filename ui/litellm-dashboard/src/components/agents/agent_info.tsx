@@ -190,11 +190,11 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
               <Descriptions.Item label="Skills">
                 {agent.agent_card_params?.skills?.length || 0} configured
               </Descriptions.Item>
-              {agent.litellm_params?.model && (
-                <Descriptions.Item label="Model">{agent.litellm_params.model}</Descriptions.Item>
+              {agent.Zentris_params?.model && (
+                <Descriptions.Item label="Model">{agent.Zentris_params.model}</Descriptions.Item>
               )}
-              {agent.litellm_params?.make_public !== undefined && (
-                <Descriptions.Item label="Make Public">{agent.litellm_params.make_public ? "Yes" : "No"}</Descriptions.Item>
+              {agent.Zentris_params?.make_public !== undefined && (
+                <Descriptions.Item label="Make Public">{agent.Zentris_params.make_public ? "Yes" : "No"}</Descriptions.Item>
               )}
               {agent.agent_card_params?.iconUrl && (
                 <Descriptions.Item label="Icon URL">{agent.agent_card_params.iconUrl}</Descriptions.Item>
@@ -344,4 +344,6 @@ const AgentInfoView: React.FC<AgentInfoViewProps> = ({
 };
 
 export default AgentInfoView;
+
+
 

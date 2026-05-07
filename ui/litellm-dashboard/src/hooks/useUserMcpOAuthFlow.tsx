@@ -43,11 +43,11 @@ interface UseUserMcpOAuthFlowResult {
   error: string | null;
 }
 
-const FLOW_STATE_KEY = "litellm-user-mcp-oauth-flow-state";
+const FLOW_STATE_KEY = "Zentris-user-mcp-oauth-flow-state";
 // Use a user-flow-specific key to avoid collisions with the admin OAuth flow
-// (useMcpOAuthFlow) which uses "litellm-mcp-oauth-result".
-const RESULT_KEY = "litellm-user-mcp-oauth-result";
-const RETURN_URL_KEY = "litellm-mcp-oauth-return-url";
+// (useMcpOAuthFlow) which uses "Zentris-mcp-oauth-result".
+const RESULT_KEY = "Zentris-user-mcp-oauth-result";
+const RETURN_URL_KEY = "Zentris-mcp-oauth-return-url";
 
 type StoredFlowState = {
   state: string;
@@ -81,7 +81,7 @@ const genChallenge = async (verifier: string) => {
 const setStorage = (key: string, value: string) => {
   try {
     // Use sessionStorage only — do not write to localStorage.
-    // The flow state may contain the LiteLLM access token; writing it to
+    // The flow state may contain the Zentris access token; writing it to
     // localStorage would persist it across browser sessions and make it
     // readable by any injected script (XSS).
     // codeql[js/clear-text-storage-of-sensitive-data]
@@ -284,3 +284,5 @@ export const useUserMcpOAuthFlow = ({
 
   return { startOAuthFlow, status, error };
 };
+
+

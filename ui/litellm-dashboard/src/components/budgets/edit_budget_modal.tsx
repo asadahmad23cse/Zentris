@@ -105,3 +105,5 @@ const EditBudgetModal: React.FC<EditBudgetModalProps> = ({
 };
 
 export default EditBudgetModal;
+
+

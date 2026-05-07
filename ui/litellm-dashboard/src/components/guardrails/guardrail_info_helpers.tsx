@@ -45,7 +45,7 @@ export const guardrail_provider_map: Record<string, string> = {
   PresidioPII: "presidio",
   Bedrock: "bedrock",
   Lakera: "lakera_v2",
-  LitellmContentFilter: "litellm_content_filter",
+  ZentrisContentFilter: "Zentris_content_filter",
   ToolPermission: "tool_permission",
   BlockCodeExecution: "block_code_execution",
 };
@@ -99,7 +99,7 @@ export const shouldRenderContentFilterConfigSettings = (provider: string | null)
   // Check both dynamic and legacy providers
   const currentProviders = getGuardrailProviders();
   const providerEnum = currentProviders[provider as keyof typeof currentProviders];
-  return providerEnum === "LiteLLM Content Filter";
+  return providerEnum === "Zentris Content Filter";
 };
 
 const asset_logos_folder = "../ui/assets/logos/";
@@ -124,7 +124,7 @@ export const guardrailLogoMap: Record<string, string> = {
   "OpenAI Moderation": `${asset_logos_folder}openai_small.svg`,
   EnkryptAI: `${asset_logos_folder}enkrypt_ai.avif`,
   "Prompt Security": `${asset_logos_folder}prompt_security.png`,
-  "LiteLLM Content Filter": `${asset_logos_folder}litellm_logo.jpg`,
+  "Zentris Content Filter": `${asset_logos_folder}Zentris_logo.jpg`,
   "Akto": `${asset_logos_folder}akto.svg`,
 };
 
@@ -149,3 +149,5 @@ export const getGuardrailLogoAndName = (guardrailValue: string): { logo: string;
 
   return { logo: logo || "", displayName: displayName || guardrailValue };
 };
+
+

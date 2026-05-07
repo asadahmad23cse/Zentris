@@ -21,13 +21,13 @@ const {
   mockProxyConfigResponse,
   mockDeleteResponse,
   mockUseAuthorized,
-  mockGetGlobalLitellmHeaderName,
+  mockGetGlobalZentrisHeaderName,
   mockDeriveErrorMessage,
   mockHandleError,
 } = vi.hoisted(() => {
   const mockProxyBaseUrl = "https://proxy.example.com";
   const mockAccessToken = "test-access-token";
-  const mockHeaderName = "X-LiteLLM-API-Key";
+  const mockHeaderName = "X-Zentris-API-Key";
 
   const mockProxyConfigResponse: ProxyConfigResponse = [
     {
@@ -65,7 +65,7 @@ const {
   };
 
   const mockUseAuthorized = vi.fn();
-  const mockGetGlobalLitellmHeaderName = vi.fn(() => mockHeaderName);
+  const mockGetGlobalZentrisHeaderName = vi.fn(() => mockHeaderName);
   const mockDeriveErrorMessage = vi.fn((errorData: any) => {
     if (typeof errorData === "string") return errorData;
     return errorData?.message || errorData?.error || "An error occurred";
@@ -79,7 +79,7 @@ const {
     mockProxyConfigResponse,
     mockDeleteResponse,
     mockUseAuthorized,
-    mockGetGlobalLitellmHeaderName,
+    mockGetGlobalZentrisHeaderName,
     mockDeriveErrorMessage,
     mockHandleError,
   };
@@ -91,7 +91,7 @@ vi.mock("../useAuthorized", () => ({
 
 vi.mock("@/components/networking", () => ({
   proxyBaseUrl: mockProxyBaseUrl,
-  getGlobalLitellmHeaderName: mockGetGlobalLitellmHeaderName,
+  getGlobalZentrisHeaderName: mockGetGlobalZentrisHeaderName,
   deriveErrorMessage: mockDeriveErrorMessage,
   handleError: mockHandleError,
 }));
@@ -552,3 +552,5 @@ describe("deleteProxyConfigFieldCall", () => {
     expect(consoleErrorSpy).toHaveBeenCalled();
   });
 });
+
+

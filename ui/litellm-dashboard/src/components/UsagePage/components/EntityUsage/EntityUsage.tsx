@@ -599,7 +599,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({ accessToken, entityType, enti
                       <div className="flex items-center text-sm text-gray-500">
                         <span>Get Started by Tracking cost per {capitalizedEntityLabel} </span>
                         <a
-                          href="https://docs.litellm.ai/docs/proxy/enterprise#spend-tracking"
+                          href="https://docs.Zentris.ai/docs/proxy/enterprise#spend-tracking"
                           className="text-blue-500 hover:text-blue-700 ml-1"
                         >
                           here
@@ -808,3 +808,5 @@ const EntityUsage: React.FC<EntityUsageProps> = ({ accessToken, entityType, enti
 };
 
 export default EntityUsage;
+
+

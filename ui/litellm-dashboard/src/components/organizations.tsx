@@ -205,8 +205,8 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
     return (
       <div>
         <Text>
-          This is a LiteLLM Enterprise feature, and requires a valid key to use. Get a trial key{" "}
-          <a href="https://www.litellm.ai/#pricing" target="_blank" rel="noopener noreferrer">
+          This is a Zentris Enterprise feature, and requires a valid key to use. Get a trial key{" "}
+          <a href="https://www.Zentris.ai/#pricing" target="_blank" rel="noopener noreferrer">
             here
           </a>
           .
@@ -313,9 +313,9 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
                                       </TableCell>
                                       <TableCell>{formatNumberWithCommas(org.spend, 4)}</TableCell>
                                       <TableCell>
-                                        {org.litellm_budget_table?.max_budget !== null &&
-                                        org.litellm_budget_table?.max_budget !== undefined
-                                          ? org.litellm_budget_table?.max_budget
+                                        {org.Zentris_budget_table?.max_budget !== null &&
+                                        org.Zentris_budget_table?.max_budget !== undefined
+                                          ? org.Zentris_budget_table?.max_budget
                                           : "No limit"}
                                       </TableCell>
                                       <TableCell
@@ -413,13 +413,13 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
                                       <TableCell>
                                         <Text>
                                           TPM:{" "}
-                                          {org.litellm_budget_table?.tpm_limit
-                                            ? org.litellm_budget_table?.tpm_limit
+                                          {org.Zentris_budget_table?.tpm_limit
+                                            ? org.Zentris_budget_table?.tpm_limit
                                             : "Unlimited"}
                                           <br />
                                           RPM:{" "}
-                                          {org.litellm_budget_table?.rpm_limit
-                                            ? org.litellm_budget_table?.rpm_limit
+                                          {org.Zentris_budget_table?.rpm_limit
+                                            ? org.Zentris_budget_table?.rpm_limit
                                             : "Unlimited"}
                                         </Text>
                                       </TableCell>
@@ -566,3 +566,5 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
 };
 
 export default OrganizationsTable;
+
+

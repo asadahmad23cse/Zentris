@@ -179,7 +179,7 @@ const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, 
       header: () => (
         <div className="flex items-center gap-1">
           <span>Authentication</span>
-          <Tooltip title="LiteLLM Virtual Key required to call endpoint">
+          <Tooltip title="Zentris Virtual Key required to call endpoint">
             <InformationCircleIcon className="w-4 h-4 text-gray-400 cursor-help" />
           </Tooltip>
         </div>
@@ -305,3 +305,5 @@ const PassThroughSettings: React.FC<GeneralSettingsPageProps> = ({ accessToken, 
 };
 
 export default PassThroughSettings;
+
+

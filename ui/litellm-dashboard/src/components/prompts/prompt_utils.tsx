@@ -33,11 +33,11 @@ export const getBasePromptId = (promptData?: PromptSpec): string => {
 };
 
 /**
- * Get versioned prompt ID from litellm_params (preserves version)
+ * Get versioned prompt ID from Zentris_params (preserves version)
  */
 export const getVersionedPromptId = (promptData?: PromptSpec): string => {
   const baseId = getBasePromptId(promptData);
-  const versionedId = (promptData?.litellm_params as any)?.prompt_id || baseId;
+  const versionedId = (promptData?.Zentris_params as any)?.prompt_id || baseId;
   return versionedId;
 };
 
@@ -50,17 +50,17 @@ export const getCurrentVersion = (promptData?: PromptSpec): string => {
     return String(promptData.version);
   }
   
-  // Fallback: extract from versioned ID in litellm_params
+  // Fallback: extract from versioned ID in Zentris_params
   const versionedId = getVersionedPromptId(promptData);
   return getVersionNumber(versionedId);
 };
 
 /**
- * Extract model from prompt litellm_params
+ * Extract model from prompt Zentris_params
  */
 export const extractModel = (prompt: PromptSpec): string | null => {
   try {
-    const params = prompt.litellm_params as any;
+    const params = prompt.Zentris_params as any;
     
     // Try to extract from dotprompt_content
     if (params?.dotprompt_content) {
@@ -73,7 +73,7 @@ export const extractModel = (prompt: PromptSpec): string | null => {
       return params.prompt_data.model;
     }
     
-    // Try to extract model from litellm_params directly
+    // Try to extract model from Zentris_params directly
     if (params?.model) {
       return params.model;
     }
@@ -102,4 +102,6 @@ export const getProviderFromModelHub = (
   
   return null;
 };
+
+
 

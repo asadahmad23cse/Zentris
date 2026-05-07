@@ -87,8 +87,8 @@ const ContentFilterManager: React.FC<ContentFilterManagerProps> = ({
 
   // Load data from guardrail on mount or when guardrailData changes
   useEffect(() => {
-    if (guardrailData?.litellm_params?.patterns) {
-      const patterns = guardrailData.litellm_params.patterns.map((p: any, index: number) => ({
+    if (guardrailData?.Zentris_params?.patterns) {
+      const patterns = guardrailData.Zentris_params.patterns.map((p: any, index: number) => ({
         id: `pattern-${index}`,
         type: p.pattern_type === "prebuilt" ? "prebuilt" : "custom",
         name: p.pattern_name || p.name,
@@ -103,8 +103,8 @@ const ContentFilterManager: React.FC<ContentFilterManagerProps> = ({
       setOriginalPatterns([]);
     }
 
-    if (guardrailData?.litellm_params?.blocked_words) {
-      const words = guardrailData.litellm_params.blocked_words.map((w: any, index: number) => ({
+    if (guardrailData?.Zentris_params?.blocked_words) {
+      const words = guardrailData.Zentris_params.blocked_words.map((w: any, index: number) => ({
         id: `word-${index}`,
         keyword: w.keyword,
         action: w.action || "BLOCK",
@@ -117,13 +117,13 @@ const ContentFilterManager: React.FC<ContentFilterManagerProps> = ({
       setOriginalBlockedWords([]);
     }
 
-    if (guardrailData?.litellm_params?.categories?.length > 0) {
+    if (guardrailData?.Zentris_params?.categories?.length > 0) {
       const contentCategoriesMap = guardrailSettings?.content_filter_settings?.content_categories
         ? Object.fromEntries(
           guardrailSettings.content_filter_settings.content_categories.map((c) => [c.name, c])
         )
         : {};
-      const categories = guardrailData.litellm_params.categories.map((c: any, index: number) => {
+      const categories = guardrailData.Zentris_params.categories.map((c: any, index: number) => {
         const meta = contentCategoriesMap[c.category];
         return {
           id: `category-${index}`,
@@ -140,7 +140,7 @@ const ContentFilterManager: React.FC<ContentFilterManagerProps> = ({
       setOriginalContentCategories([]);
     }
 
-    const cic = guardrailData?.litellm_params?.competitor_intent_config;
+    const cic = guardrailData?.Zentris_params?.competitor_intent_config;
     if (cic && typeof cic === "object") {
       const enabled = !!(cic.brand_self && Array.isArray(cic.brand_self) && cic.brand_self.length > 0);
       const config: CompetitorIntentConfig = {
@@ -214,7 +214,7 @@ const ContentFilterManager: React.FC<ContentFilterManagerProps> = ({
   }, [hasUnsavedChanges, isEditing, onUnsavedChanges]);
 
   // Check if this is a content filter guardrail
-  if (guardrailData?.litellm_params?.guardrail !== "litellm_content_filter") {
+  if (guardrailData?.Zentris_params?.guardrail !== "Zentris_content_filter") {
     return null;
   }
 
@@ -351,3 +351,5 @@ export const formatContentFilterDataForAPI = (
   }
   return result;
 };
+
+

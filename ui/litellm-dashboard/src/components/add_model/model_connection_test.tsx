@@ -55,9 +55,9 @@ const ModelConnectionTest: React.FC<ModelConnectionTestProps> = ({
 
       console.log("Result from prepareModelAddRequest:", result);
 
-      const { litellmParamsObj, modelInfoObj, modelName: returnedModelName } = result[0];
+      const { ZentrisParamsObj, modelInfoObj, modelName: returnedModelName } = result[0];
 
-      const response = await testConnectionRequest(accessToken, litellmParamsObj, modelInfoObj, modelInfoObj?.mode);
+      const response = await testConnectionRequest(accessToken, ZentrisParamsObj, modelInfoObj, modelInfoObj?.mode);
       if (response.status === "success") {
         NotificationsManager.success("Connection test successful!");
         setError(null);
@@ -65,7 +65,7 @@ const ModelConnectionTest: React.FC<ModelConnectionTestProps> = ({
       } else {
         const errorMessage = response.result?.error || response.message || "Unknown error";
         setError(errorMessage);
-        setRawRequest(litellmParamsObj);
+        setRawRequest(ZentrisParamsObj);
         setRawResponse(response.result?.raw_request_typed_dict);
         setIsSuccess(false);
       }
@@ -94,7 +94,7 @@ const ModelConnectionTest: React.FC<ModelConnectionTestProps> = ({
 
     const mainError = errorMsg.split("stack trace:")[0].trim();
 
-    const cleanedError = mainError.replace(/^litellm\.(.*?)Error: /, "");
+    const cleanedError = mainError.replace(/^Zentris\.(.*?)Error: /, "");
 
     return cleanedError;
   };
@@ -281,7 +281,7 @@ ${formattedBody}
       )}
       <Divider style={{ margin: "24px 0 16px" }} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Button type="link" href="https://docs.litellm.ai/docs/providers" target="_blank" icon={<InfoCircleOutlined />}>
+        <Button type="link" href="https://docs.Zentris.ai/docs/providers" target="_blank" icon={<InfoCircleOutlined />}>
           View Documentation
         </Button>
       </div>
@@ -290,3 +290,5 @@ ${formattedBody}
 };
 
 export default ModelConnectionTest;
+
+

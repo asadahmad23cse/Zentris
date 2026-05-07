@@ -61,11 +61,11 @@ describe("ModelInfoView", () => {
 
   const defaultModelData = {
     model_name: "GPT-4",
-    litellm_params: {
+    Zentris_params: {
       model: "gpt-4",
       api_base: "https://api.openai.com/v1",
       custom_llm_provider: "openai",
-      litellm_credential_name: "selected-credential",
+      Zentris_credential_name: "selected-credential",
     },
     model_info: {
       id: "123",
@@ -350,7 +350,7 @@ describe("ModelInfoView", () => {
     render(<ModelInfoView {...DEFAULT_ADMIN_PROPS} />, { wrapper });
     await waitFor(() => {
       expect(screen.getByText("Provider")).toBeInTheDocument();
-      expect(screen.getByText("LiteLLM Model")).toBeInTheDocument();
+      expect(screen.getByText("Zentris Model")).toBeInTheDocument();
       expect(screen.getByText("Pricing")).toBeInTheDocument();
     });
   });
@@ -415,7 +415,7 @@ describe("ModelInfoView", () => {
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText("Enter model name")).toBeInTheDocument();
-      expect(screen.getByPlaceholderText("Enter LiteLLM model name")).toBeInTheDocument();
+      expect(screen.getByPlaceholderText("Enter Zentris model name")).toBeInTheDocument();
     });
   });
 
@@ -494,10 +494,10 @@ describe("ModelInfoView", () => {
     });
   });
 
-  it("should display LiteLLM Params section", async () => {
+  it("should display Zentris Params section", async () => {
     render(<ModelInfoView {...DEFAULT_ADMIN_PROPS} />, { wrapper });
     await waitFor(() => {
-      expect(screen.getByText("LiteLLM Params")).toBeInTheDocument();
+      expect(screen.getByText("Zentris Params")).toBeInTheDocument();
     });
   });
 
@@ -516,7 +516,7 @@ describe("ModelInfoView", () => {
     });
   });
 
-  it("should keep selector credential and ignore litellm_credential_name from LiteLLM Params json", async () => {
+  it("should keep selector credential and ignore Zentris_credential_name from Zentris Params json", async () => {
     const user = userEvent.setup();
     render(<ModelInfoView {...DEFAULT_ADMIN_PROPS} />, { wrapper });
 
@@ -526,20 +526,20 @@ describe("ModelInfoView", () => {
 
     await user.click(screen.getByRole("button", { name: /edit settings/i }));
 
-    const litellmParamsInput = screen
+    const ZentrisParamsInput = screen
       .getAllByRole("textbox")
       .find(
         (input) =>
           input.tagName === "TEXTAREA" &&
           (input as HTMLTextAreaElement).value.includes('"custom_llm_provider"'),
       );
-    expect(litellmParamsInput).toBeDefined();
-    if (!litellmParamsInput) {
+    expect(ZentrisParamsInput).toBeDefined();
+    if (!ZentrisParamsInput) {
       return;
     }
-    expect((litellmParamsInput as HTMLTextAreaElement).value).not.toContain("litellm_credential_name");
-    await user.clear(litellmParamsInput);
-    await user.paste(`{"litellm_credential_name":"from-json","timeout":42}`);
+    expect((ZentrisParamsInput as HTMLTextAreaElement).value).not.toContain("Zentris_credential_name");
+    await user.clear(ZentrisParamsInput);
+    await user.paste(`{"Zentris_credential_name":"from-json","timeout":42}`);
 
     await user.click(screen.getByRole("button", { name: /save changes/i }));
 
@@ -548,15 +548,15 @@ describe("ModelInfoView", () => {
     });
 
     const updatePayload = mockModelPatchUpdateCall.mock.calls[0][1];
-    expect(updatePayload.litellm_params.litellm_credential_name).toBe("selected-credential");
-    expect(updatePayload.litellm_params.litellm_credential_name).not.toBe("from-json");
+    expect(updatePayload.Zentris_params.Zentris_credential_name).toBe("selected-credential");
+    expect(updatePayload.Zentris_params.Zentris_credential_name).not.toBe("from-json");
   });
 
   it("should display health check model field for wildcard models", async () => {
     const wildcardModelData = {
       ...defaultModelData,
-      litellm_params: {
-        ...defaultModelData.litellm_params,
+      Zentris_params: {
+        ...defaultModelData.Zentris_params,
         model: "openai/gpt-4*",
       },
     };
@@ -586,8 +586,8 @@ describe("ModelInfoView", () => {
   it("should display edit auto router button for auto router models", async () => {
     const autoRouterModelData = {
       ...defaultModelData,
-      litellm_params: {
-        ...defaultModelData.litellm_params,
+      Zentris_params: {
+        ...defaultModelData.Zentris_params,
         auto_router_config: {},
       },
     };
@@ -637,3 +637,5 @@ describe("ModelInfoView", () => {
     });
   });
 });
+
+

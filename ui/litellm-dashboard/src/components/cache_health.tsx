@@ -66,7 +66,7 @@ interface RedisDetails {
 interface ErrorDetails {
   message: string;
   traceback: string;
-  litellm_params?: any;
+  Zentris_params?: any;
   health_check_cache_params?: any;
 }
 
@@ -74,7 +74,7 @@ interface ErrorDetails {
 const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
   // Initialize with safe default values
   let errorDetails: ErrorDetails | null = null;
-  let parsedLitellmParams: any = {};
+  let parsedZentrisParams: any = {};
   let parsedRedisParams: any = {};
 
   try {
@@ -86,29 +86,29 @@ const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
         errorDetails = {
           message: errorMessage?.message || "Unknown error",
           traceback: errorMessage?.traceback || "No traceback available",
-          litellm_params: errorMessage?.litellm_cache_params || {},
+          Zentris_params: errorMessage?.Zentris_cache_params || {},
           health_check_cache_params: errorMessage?.health_check_cache_params || {},
         };
 
-        parsedLitellmParams = deepParse(errorDetails.litellm_params) || {};
+        parsedZentrisParams = deepParse(errorDetails.Zentris_params) || {};
         parsedRedisParams = deepParse(errorDetails.health_check_cache_params) || {};
       } catch (e) {
         console.warn("Error parsing error details:", e);
         errorDetails = {
           message: String(response.error.message || "Unknown error"),
           traceback: "Error parsing details",
-          litellm_params: {},
+          Zentris_params: {},
           health_check_cache_params: {},
         };
       }
     } else {
-      parsedLitellmParams = deepParse(response?.litellm_cache_params) || {};
+      parsedZentrisParams = deepParse(response?.Zentris_cache_params) || {};
       parsedRedisParams = deepParse(response?.health_check_cache_params) || {};
     }
   } catch (e) {
     console.warn("Error in response parsing:", e);
     // Provide safe fallback values
-    parsedLitellmParams = {};
+    parsedZentrisParams = {};
     parsedRedisParams = {};
   }
 
@@ -195,16 +195,16 @@ const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
                       Cache Details
                     </td>
                   </tr>
-                  <TableClickableErrorField label="Cache Configuration" value={String(parsedLitellmParams?.type)} />
+                  <TableClickableErrorField label="Cache Configuration" value={String(parsedZentrisParams?.type)} />
                   <TableClickableErrorField label="Ping Response" value={String(response.ping_response)} />
                   <TableClickableErrorField label="Set Cache Response" value={response.set_cache_response || "N/A"} />
                   <TableClickableErrorField
-                    label="litellm_settings.cache_params"
-                    value={JSON.stringify(parsedLitellmParams, null, 2)}
+                    label="Zentris_settings.cache_params"
+                    value={JSON.stringify(parsedZentrisParams, null, 2)}
                   />
 
                   {/* Redis Details Section */}
-                  {parsedLitellmParams?.type === "redis" && (
+                  {parsedZentrisParams?.type === "redis" && (
                     <>
                       <tr>
                         <td colSpan={2} className="pt-4 pb-2 font-semibold">
@@ -230,7 +230,7 @@ const HealthCheckDetails: React.FC<{ response: any }> = ({ response }) => {
                   try {
                     const data = {
                       ...response,
-                      litellm_cache_params: parsedLitellmParams,
+                      Zentris_cache_params: parsedZentrisParams,
                       health_check_cache_params: parsedRedisParams,
                     };
                     // First parse any string JSON values
@@ -296,3 +296,5 @@ export const CacheHealthTab: React.FC<{
     </div>
   );
 };
+
+

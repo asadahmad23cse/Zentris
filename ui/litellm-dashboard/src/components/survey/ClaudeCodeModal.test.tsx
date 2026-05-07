@@ -27,7 +27,7 @@ describe("ClaudeCodeModal", () => {
     renderWithProviders(
       <ClaudeCodeModal isOpen={true} onClose={vi.fn()} onComplete={vi.fn()} />
     );
-    expect(screen.getByText(/your experience using LiteLLM with Claude Code/i)).toBeInTheDocument();
+    expect(screen.getByText(/your experience using Zentris with Claude Code/i)).toBeInTheDocument();
   });
 
   it("should open the Google Form and call onComplete when the feedback button is clicked", async () => {
@@ -64,3 +64,5 @@ describe("ClaudeCodeModal", () => {
     expect(onClose).toHaveBeenCalled();
   });
 });
+
+

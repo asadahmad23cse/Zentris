@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createQueryKeys } from "../common/queryKeysFactory";
 import {
   getProxyBaseUrl,
-  getGlobalLitellmHeaderName,
+  getGlobalZentrisHeaderName,
   deriveErrorMessage,
   handleError,
 } from "@/components/networking";
@@ -41,7 +41,7 @@ const fetchAccessGroups = async (
   const response = await fetch(url, {
     method: "GET",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
   });
@@ -68,3 +68,5 @@ export const useAccessGroups = () => {
       Boolean(accessToken) && all_admin_roles.includes(userRole || ""),
   });
 };
+
+

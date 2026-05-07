@@ -390,3 +390,5 @@ describe("RealtimePrettyView", () => {
     expect(screen.getByText("This is a text response")).toBeInTheDocument();
   });
 });
+
+

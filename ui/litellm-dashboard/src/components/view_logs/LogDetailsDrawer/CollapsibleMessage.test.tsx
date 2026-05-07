@@ -52,3 +52,5 @@ describe("CollapsibleMessage", () => {
     expect(screen.getByText("Toggle me")).toBeInTheDocument();
   });
 });
+
+

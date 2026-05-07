@@ -82,3 +82,5 @@ describe("Policy option constants", () => {
     expect(OUTPUT_POLICY_OPTIONS.map((o) => o.value)).toEqual(["untrusted", "trusted"]);
   });
 });
+
+

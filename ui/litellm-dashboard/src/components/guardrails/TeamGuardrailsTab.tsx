@@ -65,7 +65,7 @@ function formatSubmissionDate(value: string | null | undefined): string {
 }
 
 function submissionToTeamGuardrail(item: GuardrailSubmissionItem): TeamGuardrail {
-  const params = item.litellm_params ?? {};
+  const params = item.Zentris_params ?? {};
   const info = item.guardrail_info ?? {};
   const headers = params.headers;
   const customHeaders: { key: string; value: string }[] = Array.isArray(headers)
@@ -143,10 +143,10 @@ const TEAM_COLORS: Record<string, string> = {
 
 function buildEquivalentConfigYaml(g: TeamGuardrail): string {
   const lines: string[] = [
-    "litellm_settings:",
+    "Zentris_settings:",
     "  guardrails:",
     `    - guardrail_name: "${g.name.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`,
-    "      litellm_params:",
+    "      Zentris_params:",
     `        guardrail: ${g.guardrailType ?? "generic_guardrail_api"}`,
     `        mode: ${g.mode ?? "pre_call"}  # or post_call, during_call`,
     `        api_base: ${g.endpoint || "https://your-guardrail-api.com"}`,
@@ -472,13 +472,13 @@ function DetailPanel({
               <div className="flex items-center gap-1.5">
                 <KeyIcon className="h-3.5 w-3.5 text-blue-500" />
                 <span className="text-xs font-semibold text-blue-800">
-                  Forward LiteLLM API Key
+                  Forward Zentris API Key
                 </span>
               </div>
               <Toggle enabled={g.forwardKey} onToggle={onToggleForwardKey} />
             </div>
             <p className="text-xs text-blue-700 leading-relaxed">
-              When enabled, the caller&apos;s LiteLLM API key is forwarded as an{" "}
+              When enabled, the caller&apos;s Zentris API key is forwarded as an{" "}
               <code className="font-mono bg-blue-100 px-1 rounded">
                 Authorization
               </code>{" "}
@@ -687,12 +687,12 @@ function DetailPanel({
               This guardrail runs on a separate instance. It receives the user
               request and forwards the result to the next step in the pipeline. See{" "}
               <a
-                href="https://docs.litellm.ai/docs/adding_provider/generic_guardrail_api"
+                href="https://docs.Zentris.ai/docs/adding_provider/generic_guardrail_api"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:underline"
               >
-                LiteLLM Generic Guardrail API docs
+                Zentris Generic Guardrail API docs
               </a>{" "}
               for configuration details.
             </p>
@@ -872,7 +872,7 @@ export function TeamGuardrailsTab({ accessToken }: TeamGuardrailsTabProps) {
     const newValue = !g.forwardKey;
     try {
       await updateGuardrailCall(accessToken, id, {
-        litellm_params: { forward_api_key: newValue },
+        Zentris_params: { forward_api_key: newValue },
       });
       setGuardrails((prev) =>
         prev.map((x) => (x.id === id ? { ...x, forwardKey: newValue } : x))
@@ -896,7 +896,7 @@ export function TeamGuardrailsTab({ accessToken }: TeamGuardrailsTabProps) {
     }
     try {
       await updateGuardrailCall(accessToken, id, {
-        litellm_params: { headers: headersObj },
+        Zentris_params: { headers: headersObj },
       });
       setGuardrails((prev) =>
         prev.map((x) =>
@@ -918,7 +918,7 @@ export function TeamGuardrailsTab({ accessToken }: TeamGuardrailsTabProps) {
     if (!accessToken) return;
     try {
       await updateGuardrailCall(accessToken, id, {
-        litellm_params: { extra_headers: extraHeaders },
+        Zentris_params: { extra_headers: extraHeaders },
       });
       setGuardrails((prev) =>
         prev.map((x) => (x.id === id ? { ...x, extraHeaders } : x))
@@ -1079,3 +1079,5 @@ export function TeamGuardrailsTab({ accessToken }: TeamGuardrailsTabProps) {
     </div>
   );
 }
+
+

@@ -547,7 +547,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
             Please follow our guide to view usage when SpendLogs has more than 1M rows.
           </Text>
           <Button className="mt-4">
-            <a href="https://docs.litellm.ai/docs/proxy/spending_monitoring" target="_blank">
+            <a href="https://docs.Zentris.ai/docs/proxy/spending_monitoring" target="_blank">
               View Usage Guide
             </a>
           </Button>
@@ -778,7 +778,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
           <TabPanel>
             <p className="mb-2 text-gray-500 italic text-[12px]">
               Customers of your LLM API calls. Tracked when a `user` param is passed in your LLM calls{" "}
-              <a className="text-blue-500" href="https://docs.litellm.ai/docs/proxy/users" target="_blank">
+              <a className="text-blue-500" href="https://docs.Zentris.ai/docs/proxy/users" target="_blank">
                 docs here
               </a>
             </p>
@@ -920,7 +920,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
                     Get Started by Tracking cost per tag{" "}
                     <a
                       className="text-blue-500"
-                      href="https://docs.litellm.ai/docs/proxy/cost_tracking"
+                      href="https://docs.Zentris.ai/docs/proxy/cost_tracking"
                       target="_blank"
                     >
                       here
@@ -945,3 +945,5 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
 };
 
 export default UsagePage;
+
+

@@ -66,7 +66,7 @@ export const BlogDropdown: React.FC = () => {
       {
         key: "view-all",
         label: (
-          <a href="https://docs.litellm.ai/blog" target="_blank" rel="noopener noreferrer">
+          <a href="https://docs.Zentris.ai/blog" target="_blank" rel="noopener noreferrer">
             View all posts
           </a>
         ),
@@ -82,3 +82,5 @@ export const BlogDropdown: React.FC = () => {
 };
 
 export default BlogDropdown;
+
+

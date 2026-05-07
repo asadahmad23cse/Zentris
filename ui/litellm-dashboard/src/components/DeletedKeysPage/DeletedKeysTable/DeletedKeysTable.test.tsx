@@ -31,7 +31,7 @@ const mockDeletedKey: DeletedKeyResponse = {
   model_max_budget: {},
   soft_budget_cooldown: false,
   blocked: false,
-  litellm_budget_table: {},
+  Zentris_budget_table: {},
   organization_id: "org-1",
   created_at: "2024-11-01T10:00:00Z",
   updated_at: "2024-11-15T10:00:00Z",
@@ -99,3 +99,5 @@ it("should display key information correctly", () => {
   expect(screen.getByText("sk-1234567890abcdef")).toBeInTheDocument();
   expect(screen.getByText("Showing 1 - 1 of 1 results")).toBeInTheDocument();
 });
+
+

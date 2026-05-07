@@ -7,13 +7,13 @@ import { testSearchToolConnection } from "../networking";
 const { Text } = Typography;
 
 interface SearchConnectionTestProps {
-  litellmParams: Record<string, any>;
+  ZentrisParams: Record<string, any>;
   accessToken: string;
   onTestComplete?: () => void;
 }
 
 const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
-  litellmParams,
+  ZentrisParams,
   accessToken,
   onTestComplete,
 }) => {
@@ -31,7 +31,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
     const runTest = async () => {
       setIsLoading(true);
       try {
-        const result = await testSearchToolConnection(accessToken, litellmParams);
+        const result = await testSearchToolConnection(accessToken, ZentrisParams);
         setTestResult(result);
         if (result.status === "success") {
           NotificationsManager.success("Connection test successful!");
@@ -51,7 +51,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
     };
 
     runTest();
-  }, [accessToken, litellmParams, onTestComplete]);
+  }, [accessToken, ZentrisParams, onTestComplete]);
 
   const getCleanErrorMessage = (errorMsg: string) => {
     if (!errorMsg) return "Unknown error";
@@ -59,8 +59,8 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
     // Remove stack traces
     const mainError = errorMsg.split("stack trace:")[0].trim();
 
-    // Remove litellm error prefixes
-    const cleanedError = mainError.replace(/^litellm\.(.*?)Error:\s*/, "");
+    // Remove Zentris error prefixes
+    const cleanedError = mainError.replace(/^Zentris\.(.*?)Error:\s*/, "");
 
     // Remove AuthenticationError prefix if it exists
     const finalError = cleanedError.replace(/^AuthenticationError:\s*/, "");
@@ -107,7 +107,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
             />
           </div>
           <Text style={{ fontSize: "16px" }}>
-            Testing connection to {litellmParams.search_provider || "search provider"}...
+            Testing connection to {ZentrisParams.search_provider || "search provider"}...
           </Text>
           <style jsx>{`
             @keyframes spin {
@@ -147,7 +147,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
           </div>
           <div style={{ marginLeft: "12px" }}>
             <Text type="success" style={{ fontSize: "18px", fontWeight: 500, display: "block" }}>
-              Connection to {litellmParams.search_provider} successful!
+              Connection to {ZentrisParams.search_provider} successful!
             </Text>
             {testResult.test_query && (
               <Text style={{ fontSize: "14px", color: "#666", marginTop: "8px", display: "block" }}>
@@ -167,7 +167,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
             <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
               <WarningOutlined style={{ color: "#ff4d4f", fontSize: "24px", marginRight: "12px" }} />
               <Text type="danger" style={{ fontSize: "18px", fontWeight: 500 }}>
-                Connection to {litellmParams.search_provider || "search provider"} failed
+                Connection to {ZentrisParams.search_provider || "search provider"} failed
               </Text>
             </div>
 
@@ -260,7 +260,7 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
       )}
       <Divider style={{ margin: "24px 0 16px" }} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Button type="link" href="https://docs.litellm.ai/docs/search" target="_blank" icon={<InfoCircleOutlined />}>
+        <Button type="link" href="https://docs.Zentris.ai/docs/search" target="_blank" icon={<InfoCircleOutlined />}>
           View Search Documentation
         </Button>
       </div>
@@ -269,4 +269,6 @@ const SearchConnectionTest: React.FC<SearchConnectionTestProps> = ({
 };
 
 export default SearchConnectionTest;
+
+
 

@@ -31,3 +31,5 @@ describe("OrganizationsTable", () => {
     expect(getByText("+ Create New Organization")).toBeInTheDocument();
   });
 });
+
+

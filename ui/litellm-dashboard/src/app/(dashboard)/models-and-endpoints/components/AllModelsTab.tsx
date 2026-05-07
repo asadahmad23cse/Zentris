@@ -114,7 +114,7 @@ const AllModelsTab = ({
   const getProviderFromModel = (model: string) => {
     if (modelCostMapData !== null && modelCostMapData !== undefined) {
       if (typeof modelCostMapData == "object" && model in modelCostMapData) {
-        return modelCostMapData[model]["litellm_provider"];
+        return modelCostMapData[model]["Zentris_provider"];
       }
     }
     return "openai";
@@ -561,8 +561,8 @@ const AllModelsTab = ({
             value: modelToDelete.model_name || "Not Set",
           },
           {
-            label: "LiteLLM Model Name",
-            value: modelToDelete.litellm_model_name || "Not Set",
+            label: "Zentris Model Name",
+            value: modelToDelete.Zentris_model_name || "Not Set",
           },
           {
             label: "Provider",
@@ -587,3 +587,5 @@ const AllModelsTab = ({
 };
 
 export default AllModelsTab;
+
+

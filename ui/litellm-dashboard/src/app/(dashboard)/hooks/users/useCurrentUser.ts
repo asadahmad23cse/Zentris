@@ -15,3 +15,5 @@ export const useCurrentUser = (): UseQueryResult<UserInfoV2Response> => {
     enabled: Boolean(accessToken && userId),
   });
 };
+
+

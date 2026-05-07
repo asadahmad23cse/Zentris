@@ -10,8 +10,8 @@ export const transformModelData = (rawModelData: any, getProviderFromModel: (mod
 
   for (let i = 0; i < transformedData.length; i++) {
     let curr_model = transformedData[i];
-    let litellm_model_name = curr_model?.litellm_params?.model;
-    let custom_llm_provider = curr_model?.litellm_params?.custom_llm_provider;
+    let Zentris_model_name = curr_model?.Zentris_params?.model;
+    let custom_llm_provider = curr_model?.Zentris_params?.custom_llm_provider;
     let model_info = curr_model?.model_info;
 
     let provider = "";
@@ -19,12 +19,12 @@ export const transformModelData = (rawModelData: any, getProviderFromModel: (mod
     let output_cost: any = null;
     let max_tokens = "Undefined";
     let max_input_tokens = "Undefined";
-    let cleanedLitellmParams = {};
+    let cleanedZentrisParams = {};
 
-    // Check if litellm_model_name is null or undefined
-    if (litellm_model_name) {
-      // Split litellm_model_name based on "/"
-      let splitModel = litellm_model_name.split("/");
+    // Check if Zentris_model_name is null or undefined
+    if (Zentris_model_name) {
+      // Split Zentris_model_name based on "/"
+      let splitModel = Zentris_model_name.split("/");
 
       // Get the first element in the split
       let firstElement = splitModel[0];
@@ -32,10 +32,10 @@ export const transformModelData = (rawModelData: any, getProviderFromModel: (mod
       // If there is only one element, default provider to openai
       provider = custom_llm_provider;
       if (!provider) {
-        provider = splitModel.length === 1 ? getProviderFromModel(litellm_model_name) : firstElement;
+        provider = splitModel.length === 1 ? getProviderFromModel(Zentris_model_name) : firstElement;
       }
     } else {
-      // litellm_model_name is null or undefined, default provider to openai
+      // Zentris_model_name is null or undefined, default provider to openai
       provider = "-";
     }
 
@@ -46,16 +46,16 @@ export const transformModelData = (rawModelData: any, getProviderFromModel: (mod
       max_input_tokens = model_info?.max_input_tokens;
     }
 
-    if (curr_model?.litellm_params) {
-      cleanedLitellmParams = Object.fromEntries(
-        Object.entries(curr_model?.litellm_params).filter(([key]) => key !== "model" && key !== "api_base"),
+    if (curr_model?.Zentris_params) {
+      cleanedZentrisParams = Object.fromEntries(
+        Object.entries(curr_model?.Zentris_params).filter(([key]) => key !== "model" && key !== "api_base"),
       );
     }
 
     transformedData[i].provider = provider;
     transformedData[i].input_cost = input_cost;
     transformedData[i].output_cost = output_cost;
-    transformedData[i].litellm_model_name = litellm_model_name;
+    transformedData[i].Zentris_model_name = Zentris_model_name;
 
     // Convert Cost in terms of Cost per 1M tokens
     if (transformedData[i].input_cost != null) {
@@ -68,9 +68,11 @@ export const transformModelData = (rawModelData: any, getProviderFromModel: (mod
 
     transformedData[i].max_tokens = max_tokens;
     transformedData[i].max_input_tokens = max_input_tokens;
-    transformedData[i].api_base = curr_model?.litellm_params?.api_base;
-    transformedData[i].cleanedLitellmParams = cleanedLitellmParams;
+    transformedData[i].api_base = curr_model?.Zentris_params?.api_base;
+    transformedData[i].cleanedZentrisParams = cleanedZentrisParams;
   }
 
   return { data: transformedData };
 };
+
+

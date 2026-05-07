@@ -9,3 +9,5 @@ const SecuritySettingsPage = () => {
 };
 
 export default SecuritySettingsPage;
+
+

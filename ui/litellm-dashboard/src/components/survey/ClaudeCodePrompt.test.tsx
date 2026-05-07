@@ -80,3 +80,5 @@ describe("ClaudeCodePrompt", () => {
     expect(screen.queryByText("Claude Code Feedback")).not.toBeInTheDocument();
   });
 });
+
+

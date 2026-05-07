@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Title, Text, TextInput, Button } from "@tremor/react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { getProxyBaseUrl, getGlobalLitellmHeaderName } from "@/components/networking";
+import { getProxyBaseUrl, getGlobalZentrisHeaderName } from "@/components/networking";
 import NotificationsManager from "./molecules/notifications_manager";
 
 interface UIThemeSettingsProps {
@@ -27,7 +27,7 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
       const response = await fetch(url, {
         method: "GET",
         headers: {
-          [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+          [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       });
@@ -51,7 +51,7 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
       const response = await fetch(url, {
         method: "PATCH",
         headers: {
-          [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+          [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -80,7 +80,7 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
       const response = await fetch(url, {
         method: "PATCH",
         headers: {
-          [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+          [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ logo_url: null, favicon_url: null }),
@@ -99,7 +99,7 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
     <div className="w-full mx-auto max-w-4xl px-6 py-8">
       <div className="mb-8">
         <Title className="text-2xl font-bold mb-2">UI Theme Customization</Title>
-        <Text className="text-gray-600">Customize your LiteLLM admin dashboard with a custom logo and favicon.</Text>
+        <Text className="text-gray-600">Customize your Zentris admin dashboard with a custom logo and favicon.</Text>
       </div>
       <Card className="shadow-sm p-6">
         <div className="space-y-6">
@@ -126,3 +126,5 @@ const UIThemeSettings: React.FC<UIThemeSettingsProps> = ({ userID, userRole, acc
 };
 
 export default UIThemeSettings;
+
+

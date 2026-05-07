@@ -5,3 +5,5 @@ export function mapEmptyStringToNull(input: string): string | null {
 
   return input;
 }
+
+

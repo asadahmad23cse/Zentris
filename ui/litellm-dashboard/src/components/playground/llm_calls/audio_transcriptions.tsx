@@ -27,7 +27,7 @@ export async function makeOpenAIAudioTranscriptionRequest(
     apiKey: accessToken,
     baseURL: proxyBaseUrl,
     dangerouslyAllowBrowser: true,
-    defaultHeaders: tags && tags.length > 0 ? { "x-litellm-tags": tags.join(",") } : undefined,
+    defaultHeaders: tags && tags.length > 0 ? { "x-Zentris-tags": tags.join(",") } : undefined,
   });
 
   try {
@@ -73,3 +73,5 @@ export async function makeOpenAIAudioTranscriptionRequest(
     throw error; // Re-throw to allow the caller to handle the error
   }
 }
+
+

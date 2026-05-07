@@ -252,3 +252,5 @@ describe("useAuthorized", () => {
     expect(checkTokenValidityMock).toHaveBeenCalledWith(token);
   });
 });
+
+

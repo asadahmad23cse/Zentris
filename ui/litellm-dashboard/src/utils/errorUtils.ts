@@ -1,7 +1,7 @@
 /**
  * Shared error-message extraction utility.
  *
- * Handles the common shapes returned by LiteLLM / FastAPI:
+ * Handles the common shapes returned by Zentris / FastAPI:
  *   - Error instances (err.message)
  *   - { detail: "string" }
  *   - { detail: [{ msg, loc, type }] }   (FastAPI 422)
@@ -33,3 +33,5 @@ export function extractErrorMessage(err: unknown): string {
   }
   return String(err);
 }
+
+

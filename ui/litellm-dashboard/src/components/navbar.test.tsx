@@ -204,7 +204,7 @@ describe("Navbar", () => {
   });
 
   it("should show version badge when health data contains version", () => {
-    mockUseHealthReadinessImpl = () => ({ data: { litellm_version: "1.0.0" } });
+    mockUseHealthReadinessImpl = () => ({ data: { Zentris_version: "1.0.0" } });
 
     renderWithProviders(<Navbar {...defaultProps} />);
 
@@ -290,3 +290,5 @@ describe("Navbar", () => {
     expect(screen.queryByTestId("dark-mode-toggle")).not.toBeInTheDocument();
   });
 });
+
+

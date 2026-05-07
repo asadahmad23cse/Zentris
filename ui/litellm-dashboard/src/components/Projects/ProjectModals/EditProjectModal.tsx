@@ -64,7 +64,7 @@ export function EditProjectModal({
         team_id: project.team_id ?? "",
         description: project.description ?? "",
         models: project.models ?? [],
-        max_budget: project.litellm_budget_table?.max_budget ?? undefined,
+        max_budget: project.Zentris_budget_table?.max_budget ?? undefined,
         isBlocked: project.blocked,
         guardrails: guardrails.length > 0 ? guardrails : undefined,
         modelLimits: modelLimits.length > 0 ? modelLimits : undefined,
@@ -129,3 +129,5 @@ export function EditProjectModal({
     </Modal>
   );
 }
+
+

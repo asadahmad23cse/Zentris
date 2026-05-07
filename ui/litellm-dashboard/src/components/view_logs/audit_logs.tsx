@@ -24,11 +24,11 @@ const asset_logos_folder = "../ui/assets/";
 export const auditLogsPreviewImg = `${asset_logos_folder}audit-logs-preview.png`;
 
 const TABLE_NAME_DISPLAY: Record<string, string> = {
-  LiteLLM_VerificationToken: "Keys",
-  LiteLLM_TeamTable: "Teams",
-  LiteLLM_UserTable: "Users",
-  LiteLLM_OrganizationTable: "Organizations",
-  LiteLLM_ProxyModelTable: "Models",
+  Zentris_VerificationToken: "Keys",
+  Zentris_TeamTable: "Teams",
+  Zentris_UserTable: "Users",
+  Zentris_OrganizationTable: "Organizations",
+  Zentris_ProxyModelTable: "Models",
 };
 
 const ACTION_COLOR: Record<string, string> = {
@@ -169,7 +169,7 @@ export default function AuditLogs({
       <div style={{ textAlign: "center", marginTop: "20px" }}>
         <h1 style={{ display: "block", marginBottom: "10px" }}>✨ Enterprise Feature.</h1>
         <p style={{ display: "block", marginBottom: "10px" }}>
-          This is a LiteLLM Enterprise feature, and requires a valid key to use.
+          This is a Zentris Enterprise feature, and requires a valid key to use.
         </p>
         <p style={{ display: "block", marginBottom: "20px", fontStyle: "italic" }}>
           Here&apos;s a preview of what Audit Logs offer:
@@ -251,11 +251,11 @@ export default function AuditLogs({
               allowClear
               style={{ width: 150 }}
               options={[
-                { label: "Keys", value: "LiteLLM_VerificationToken" },
-                { label: "Teams", value: "LiteLLM_TeamTable" },
-                { label: "Users", value: "LiteLLM_UserTable" },
-                { label: "Organizations", value: "LiteLLM_OrganizationTable" },
-                { label: "Models", value: "LiteLLM_ProxyModelTable" },
+                { label: "Keys", value: "Zentris_VerificationToken" },
+                { label: "Teams", value: "Zentris_TeamTable" },
+                { label: "Users", value: "Zentris_UserTable" },
+                { label: "Organizations", value: "Zentris_OrganizationTable" },
+                { label: "Models", value: "Zentris_ProxyModelTable" },
               ]}
               onChange={(val) => { setTableName(val); resetPage(); }}
             />
@@ -306,3 +306,5 @@ export default function AuditLogs({
     </>
   );
 }
+
+

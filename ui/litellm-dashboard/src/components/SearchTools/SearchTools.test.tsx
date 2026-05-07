@@ -70,7 +70,7 @@ const mockSearchTools: SearchTool[] = [
   {
     search_tool_id: "tool-1",
     search_tool_name: "Perplexity Search",
-    litellm_params: {
+    Zentris_params: {
       search_provider: "perplexity",
       api_key: "sk-test-key",
     },
@@ -82,7 +82,7 @@ const mockSearchTools: SearchTool[] = [
   {
     search_tool_id: "tool-2",
     search_tool_name: "Tavily Search",
-    litellm_params: {
+    Zentris_params: {
       search_provider: "tavily",
     },
     created_at: "2024-01-16T10:30:00Z",
@@ -240,3 +240,5 @@ describe("SearchTools", () => {
     });
   });
 });
+
+

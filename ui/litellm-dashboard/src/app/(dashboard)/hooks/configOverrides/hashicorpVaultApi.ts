@@ -1,4 +1,4 @@
-import { getProxyBaseUrl, getGlobalLitellmHeaderName, deriveErrorMessage } from "@/components/networking";
+import { getProxyBaseUrl, getGlobalZentrisHeaderName, deriveErrorMessage } from "@/components/networking";
 
 export const getHashicorpVaultConfig = async (accessToken: string) => {
   const proxyBaseUrl = getProxyBaseUrl();
@@ -8,7 +8,7 @@ export const getHashicorpVaultConfig = async (accessToken: string) => {
   const response = await fetch(url, {
     method: "GET",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
     },
   });
   if (!response.ok) {
@@ -31,7 +31,7 @@ export const updateHashicorpVaultConfig = async (
   const response = await fetch(url, {
     method: "POST",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(config),
@@ -53,7 +53,7 @@ export const deleteHashicorpVaultConfig = async (accessToken: string) => {
   const response = await fetch(url, {
     method: "DELETE",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
     },
   });
   if (!response.ok) {
@@ -73,7 +73,7 @@ export const testHashicorpVaultConnection = async (accessToken: string) => {
   const response = await fetch(url, {
     method: "POST",
     headers: {
-      [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+      [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
     },
   });
   if (!response.ok) {
@@ -84,3 +84,5 @@ export const testHashicorpVaultConnection = async (accessToken: string) => {
   const data = await response.json();
   return data;
 };
+
+

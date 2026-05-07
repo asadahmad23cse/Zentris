@@ -392,7 +392,7 @@ export default function WebRTCTester() {
       await pc.setRemoteDescription({ type: 'answer', sdp: ans });
       setSdpAnswer(ans);
       setAnswerActive(true);
-      log('success', 'CONN', '✓ Session established — Browser ↔ LiteLLM ↔ OpenAI');
+      log('success', 'CONN', '✓ Session established — Browser ↔ Zentris ↔ OpenAI');
     } catch (e) {
       log('error', 'ERR', `calls failed: ${e.message}`);
       stopSession();
@@ -441,7 +441,7 @@ export default function WebRTCTester() {
             <div className="wrt-live-dot" />
             <div>
               <div className="wrt-toggle-title">INTERACTIVE TESTER</div>
-              <div className="wrt-toggle-sub">Browser → LiteLLM → OpenAI · WebRTC</div>
+              <div className="wrt-toggle-sub">Browser → Zentris → OpenAI · WebRTC</div>
             </div>
           </div>
           <span className={`wrt-chevron${open ? ' open' : ''}`}>▼</span>
@@ -474,7 +474,7 @@ export default function WebRTCTester() {
                 <div className="wrt-flow">
                   <div className={`wrt-flow-box${f(1) ? ' active' : ''}`}>Browser</div>
                   <div className={`wrt-flow-arrow${f(1) ? ' active' : ''}`}>→</div>
-                  <div className={`wrt-flow-box${f(1) ? ' active' : ''}`}>LiteLLM</div>
+                  <div className={`wrt-flow-box${f(1) ? ' active' : ''}`}>Zentris</div>
                   <div className={`wrt-flow-arrow${f(2) ? ' active' : ''}`}>→</div>
                   <div className={`wrt-flow-box${f(2) ? ' active' : ''}`}>OpenAI</div>
                 </div>
@@ -569,3 +569,4 @@ export default function WebRTCTester() {
     </>
   );
 }
+

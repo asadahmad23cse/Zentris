@@ -19,16 +19,16 @@ const ConditionalPublicModelName: React.FC = () => {
     if (customModelName && selectedModels.includes("custom")) {
       const currentMappings = form.getFieldValue("model_mappings") || [];
       const updatedMappings = currentMappings.map((mapping: any) => {
-        if (mapping.public_name === "custom" || mapping.litellm_model === "custom") {
+        if (mapping.public_name === "custom" || mapping.Zentris_model === "custom") {
           if (selectedProvider === Providers.Azure) {
             return {
               public_name: customModelName,
-              litellm_model: `azure/${customModelName}`,
+              Zentris_model: `azure/${customModelName}`,
             };
           }
           return {
             public_name: customModelName,
-            litellm_model: customModelName,
+            Zentris_model: customModelName,
           };
         }
         return mapping;
@@ -48,14 +48,14 @@ const ConditionalPublicModelName: React.FC = () => {
       const shouldUpdateMappings =
         currentMappings.length !== selectedModels.length ||
         !selectedModels.every((model) =>
-          currentMappings.some((mapping: { public_name: string; litellm_model: string }) => {
+          currentMappings.some((mapping: { public_name: string; Zentris_model: string }) => {
             if (model === "custom") {
-              return mapping.litellm_model === "custom" || mapping.litellm_model === customModelName;
+              return mapping.Zentris_model === "custom" || mapping.Zentris_model === customModelName;
             }
             if (selectedProvider === Providers.Azure) {
-              return mapping.litellm_model === `azure/${model}`;
+              return mapping.Zentris_model === `azure/${model}`;
             }
-            return mapping.litellm_model === model;
+            return mapping.Zentris_model === model;
           }),
         );
 
@@ -65,23 +65,23 @@ const ConditionalPublicModelName: React.FC = () => {
             if (selectedProvider === Providers.Azure) {
               return {
                 public_name: customModelName,
-                litellm_model: `azure/${customModelName}`,
+                Zentris_model: `azure/${customModelName}`,
               };
             }
             return {
               public_name: customModelName,
-              litellm_model: customModelName,
+              Zentris_model: customModelName,
             };
           }
           if (selectedProvider === Providers.Azure) {
             return {
               public_name: model,
-              litellm_model: `azure/${model}`,
+              Zentris_model: `azure/${model}`,
             };
           }
           return {
             public_name: model,
-            litellm_model: model,
+            Zentris_model: model,
           };
         });
 
@@ -95,24 +95,24 @@ const ConditionalPublicModelName: React.FC = () => {
 
   const publicNameTooltipContent = (
     <>
-      <div className="mb-2 font-normal">The name you specify in your API calls to LiteLLM Proxy</div>
+      <div className="mb-2 font-normal">The name you specify in your API calls to Zentris Proxy</div>
       <div className="mb-2 font-normal">
         <strong>Example:</strong> If you name your public model{" "}
         <code className="bg-gray-700 px-1 py-0.5 rounded text-xs">example-name</code>, and choose{" "}
-        <code className="bg-gray-700 px-1 py-0.5 rounded text-xs">openai/qwen-plus-latest</code> as the LiteLLM model
+        <code className="bg-gray-700 px-1 py-0.5 rounded text-xs">openai/qwen-plus-latest</code> as the Zentris model
       </div>
       <div className="mb-2 font-normal">
-        <strong>Usage:</strong> You make an API call to the LiteLLM proxy with{" "}
+        <strong>Usage:</strong> You make an API call to the Zentris proxy with{" "}
         <code className="bg-gray-700 px-1 py-0.5 rounded text-xs">model = &quot;example-name&quot;</code>
       </div>
       <div className="font-normal">
-        <strong>Result:</strong> LiteLLM sends{" "}
+        <strong>Result:</strong> Zentris sends{" "}
         <code className="bg-gray-700 px-1 py-0.5 rounded text-xs">qwen-plus-latest</code> to the provider
       </div>
     </>
   );
 
-  const liteLLMModelTooltipContent = <div>The model name LiteLLM will send to the LLM API</div>;
+  const ZentrisModelTooltipContent = <div>The model name Zentris will send to the LLM API</div>;
 
   const columns = [
     {
@@ -135,19 +135,19 @@ const ConditionalPublicModelName: React.FC = () => {
               // Check conditions for Anthropic -1m suffix handling
               const isAnthropic = selectedProvider === Providers.Anthropic;
               const endsWith1m = newValue.endsWith("-1m");
-              const litellmParams = form.getFieldValue("litellm_extra_params");
-              const isLitellmParamsEmpty = !litellmParams || litellmParams.trim() === "";
+              const ZentrisParams = form.getFieldValue("Zentris_extra_params");
+              const isZentrisParamsEmpty = !ZentrisParams || ZentrisParams.trim() === "";
 
               let finalPublicName = newValue;
 
-              if (isAnthropic && endsWith1m && isLitellmParamsEmpty) {
-                // Set litellm params with extra_headers
-                const litellmParamsValue = JSON.stringify(
+              if (isAnthropic && endsWith1m && isZentrisParamsEmpty) {
+                // Set Zentris params with extra_headers
+                const ZentrisParamsValue = JSON.stringify(
                   { extra_headers: { "anthropic-beta": "context-1m-2025-08-07" } },
                   null,
                   2,
                 );
-                form.setFieldValue("litellm_extra_params", litellmParamsValue);
+                form.setFieldValue("Zentris_extra_params", ZentrisParamsValue);
 
                 // Remove -1m suffix from public_name
                 finalPublicName = newValue.slice(0, -3); // Remove "-1m" (3 characters)
@@ -163,12 +163,12 @@ const ConditionalPublicModelName: React.FC = () => {
     {
       title: (
         <span className="flex items-center">
-          LiteLLM Model Name
-          <Tooltip content={liteLLMModelTooltipContent} width="360px" />
+          Zentris Model Name
+          <Tooltip content={ZentrisModelTooltipContent} width="360px" />
         </span>
       ),
-      dataIndex: "litellm_model",
-      key: "litellm_model",
+      dataIndex: "Zentris_model",
+      key: "Zentris_model",
     },
   ];
 
@@ -177,7 +177,7 @@ const ConditionalPublicModelName: React.FC = () => {
       <Form.Item
         label="Model Mappings"
         name="model_mappings"
-        tooltip="Map public model names to LiteLLM model names for load balancing"
+        tooltip="Map public model names to Zentris model names for load balancing"
         labelCol={{ span: 10 }}
         wrapperCol={{ span: 16 }}
         labelAlign="left"
@@ -212,3 +212,5 @@ const ConditionalPublicModelName: React.FC = () => {
 };
 
 export default ConditionalPublicModelName;
+
+

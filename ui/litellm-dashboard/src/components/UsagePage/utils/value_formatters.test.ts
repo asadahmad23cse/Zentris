@@ -62,3 +62,5 @@ describe("valueFormatterSpend", () => {
     expect(valueFormatterSpend(1_000)).toBe("$1k");
   });
 });
+
+

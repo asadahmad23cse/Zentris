@@ -15,3 +15,5 @@ export const fetchTeams = async (
 
   return givenTeams;
 };
+
+

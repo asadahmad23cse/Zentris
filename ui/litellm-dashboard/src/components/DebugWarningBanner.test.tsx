@@ -21,10 +21,10 @@ describe("DebugWarningBanner", () => {
     expect(screen.getByText(/Performance Warning: Detailed Debug Mode Active/i)).toBeInTheDocument();
   });
 
-  it("should mention LITELLM_LOG=DEBUG in the description", () => {
+  it("should mention Zentris_LOG=DEBUG in the description", () => {
     vi.mocked(useHealthReadiness).mockReturnValue({ data: { is_detailed_debug: true } } as any);
     renderWithProviders(<DebugWarningBanner />);
-    expect(screen.getByText("LITELLM_LOG=DEBUG")).toBeInTheDocument();
+    expect(screen.getByText("Zentris_LOG=DEBUG")).toBeInTheDocument();
   });
 
   it("should render nothing when is_detailed_debug is false", () => {
@@ -39,3 +39,5 @@ describe("DebugWarningBanner", () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
+
+

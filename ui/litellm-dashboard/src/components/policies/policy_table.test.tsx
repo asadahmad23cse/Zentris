@@ -148,3 +148,5 @@ describe("PolicyTable", () => {
     expect(defaultProps.onViewClick).toHaveBeenCalledWith("prod-id");
   });
 });
+
+

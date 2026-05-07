@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Typography, Select, Input, Switch, Modal } from "antd";
 import { Button, TextInput } from "@tremor/react";
 import { guardrail_provider_map, guardrailLogoMap, getGuardrailProviders } from "./guardrail_info_helpers";
-import { getGuardrailUISettings, getGlobalLitellmHeaderName } from "../networking";
+import { getGuardrailUISettings, getGlobalZentrisHeaderName } from "../networking";
 import PiiConfiguration from "./pii_configuration";
 import NotificationsManager from "../molecules/notifications_manager";
 
@@ -113,12 +113,12 @@ const EditGuardrailForm: React.FC<EditGuardrailFormProps> = ({
       // Get the guardrail provider value from the map
       const guardrailProvider = guardrail_provider_map[values.provider];
 
-      // Prepare the guardrail data with proper types for litellm_params
+      // Prepare the guardrail data with proper types for Zentris_params
       const guardrailData: {
         guardrail_id: string;
         guardrail: {
           guardrail_name: string;
-          litellm_params: {
+          Zentris_params: {
             guardrail: string;
             mode: string;
             default_on: boolean;
@@ -130,7 +130,7 @@ const EditGuardrailForm: React.FC<EditGuardrailFormProps> = ({
         guardrail_id: guardrailId,
         guardrail: {
           guardrail_name: values.guardrail_name,
-          litellm_params: {
+          Zentris_params: {
             guardrail: guardrailProvider,
             mode: values.mode,
             default_on: values.default_on,
@@ -146,20 +146,20 @@ const EditGuardrailForm: React.FC<EditGuardrailFormProps> = ({
           piiEntitiesConfig[entity] = selectedActions[entity] || "MASK"; // Default to MASK if no action selected
         });
 
-        guardrailData.guardrail.litellm_params.pii_entities_config = piiEntitiesConfig;
+        guardrailData.guardrail.Zentris_params.pii_entities_config = piiEntitiesConfig;
       }
       // Add config values to the guardrail_info if provided
       else if (values.config) {
         try {
           const configObj = JSON.parse(values.config);
-          // For some guardrails, the config values need to be in litellm_params
+          // For some guardrails, the config values need to be in Zentris_params
           // Especially for providers like Bedrock that need guardrailIdentifier and guardrailVersion
           if (values.provider === "Bedrock" && configObj) {
             if (configObj.guardrail_id) {
-              guardrailData.guardrail.litellm_params.guardrailIdentifier = configObj.guardrail_id;
+              guardrailData.guardrail.Zentris_params.guardrailIdentifier = configObj.guardrail_id;
             }
             if (configObj.guardrail_version) {
-              guardrailData.guardrail.litellm_params.guardrailVersion = configObj.guardrail_version;
+              guardrailData.guardrail.Zentris_params.guardrailVersion = configObj.guardrail_version;
             }
           } else {
             // For other providers, add the config to guardrail_info
@@ -183,7 +183,7 @@ const EditGuardrailForm: React.FC<EditGuardrailFormProps> = ({
       const response = await fetch(url, {
         method: "PUT",
         headers: {
-          [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+          [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(guardrailData),
@@ -419,3 +419,5 @@ const EditGuardrailForm: React.FC<EditGuardrailFormProps> = ({
 };
 
 export default EditGuardrailForm;
+
+

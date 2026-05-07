@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery, UseQueryResult } from "@tanstack/react-quer
 import { createQueryKeys } from "../common/queryKeysFactory";
 import {
   getProxyBaseUrl,
-  getGlobalLitellmHeaderName,
+  getGlobalZentrisHeaderName,
   deriveErrorMessage,
   handleError,
 } from "@/components/networking";
@@ -82,7 +82,7 @@ const keyListCall = async (
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+        [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
     });
@@ -135,3 +135,4 @@ export const useDeletedKeys = (
     placeholderData: keepPreviousData,
   });
 };
+

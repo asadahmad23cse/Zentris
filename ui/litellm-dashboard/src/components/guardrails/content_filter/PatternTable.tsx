@@ -105,3 +105,5 @@ const PatternTable: React.FC<PatternTableProps> = ({
 
 export default PatternTable;
 
+
+

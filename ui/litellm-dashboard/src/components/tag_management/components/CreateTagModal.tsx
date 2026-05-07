@@ -7,7 +7,7 @@ import NumericalInput from "../../shared/numerical_input";
 
 interface ModelInfo {
   model_name: string;
-  litellm_params: {
+  Zentris_params: {
     model: string;
   };
   model_info: {
@@ -107,7 +107,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ visible, onCancel, onSu
               <p className="text-sm text-gray-600">
                 TPM/RPM limits for tags are not currently supported. If you need this feature, please{" "}
                 <a
-                  href="https://github.com/BerriAI/litellm/issues/new"
+                  href="https://github.com/BerriAI/Zentris/issues/new"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:text-blue-800 underline"
@@ -129,3 +129,5 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ visible, onCancel, onSu
 };
 
 export default CreateTagModal;
+
+

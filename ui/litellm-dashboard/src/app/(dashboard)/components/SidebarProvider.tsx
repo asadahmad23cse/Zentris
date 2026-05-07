@@ -83,3 +83,5 @@ const SidebarProvider = ({ setPage, defaultSelectedKey, sidebarCollapsed }: Side
 };
 
 export default SidebarProvider;
+
+

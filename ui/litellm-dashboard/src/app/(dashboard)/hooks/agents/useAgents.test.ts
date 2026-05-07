@@ -24,7 +24,7 @@ const mockAgents: Agent[] = [
   {
     agent_id: "agent-1",
     agent_name: "Test Agent 1",
-    litellm_params: {
+    Zentris_params: {
       model: "gpt-3.5-turbo",
       api_key: "test-key-1",
     },
@@ -39,7 +39,7 @@ const mockAgents: Agent[] = [
   {
     agent_id: "agent-2",
     agent_name: "Test Agent 2",
-    litellm_params: {
+    Zentris_params: {
       model: "claude-3",
       api_key: "test-key-2",
     },
@@ -330,3 +330,5 @@ describe("useAgents", () => {
     expect(result.current.data).toBeUndefined();
   });
 });
+
+

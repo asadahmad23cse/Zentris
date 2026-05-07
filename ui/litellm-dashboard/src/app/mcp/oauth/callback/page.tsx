@@ -6,9 +6,9 @@ import { useSearchParams } from "next/navigation";
 // Written to sessionStorage so both the admin hook (useMcpOAuthFlow) and the
 // user hook (useUserMcpOAuthFlow) can pick up the result.  Each hook reads
 // its own namespace to avoid cross-flow collisions.
-const ADMIN_RESULT_KEY = "litellm-mcp-oauth-result";
-const USER_RESULT_KEY = "litellm-user-mcp-oauth-result";
-const RETURN_URL_STORAGE_KEY = "litellm-mcp-oauth-return-url";
+const ADMIN_RESULT_KEY = "Zentris-mcp-oauth-result";
+const USER_RESULT_KEY = "Zentris-user-mcp-oauth-result";
+const RETURN_URL_STORAGE_KEY = "Zentris-mcp-oauth-return-url";
 
 const resolveDefaultRedirect = () => {
   if (typeof window === "undefined") {
@@ -33,7 +33,7 @@ const McpOAuthCallbackContent = () => {
       return null;
     }
     return {
-      type: "litellm-mcp-oauth",
+      type: "Zentris-mcp-oauth",
       code: searchParams.get("code"),
       state: searchParams.get("state"),
       // Forward OAuth provider error params so the hook can surface the real
@@ -66,9 +66,9 @@ const McpOAuthCallbackContent = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
       <div className="max-w-lg w-full rounded-lg bg-white shadow-md p-8 text-center space-y-4">
-        <h1 className="text-xl font-semibold text-slate-900">LiteLLM MCP OAuth</h1>
+        <h1 className="text-xl font-semibold text-slate-900">Zentris MCP OAuth</h1>
           <p className="text-sm text-slate-700">
-            Authorization complete. You may close this window and return to the LiteLLM dashboard.
+            Authorization complete. You may close this window and return to the Zentris dashboard.
           </p>
           <p className="text-xs text-slate-500">
             If the window does not close automatically, everything is still saved—you can close it manually.
@@ -87,3 +87,5 @@ const McpOAuthCallbackPage = () => {
 };
 
 export default McpOAuthCallbackPage;
+
+

@@ -32,3 +32,5 @@ describe("createQueryKeys", () => {
     expect(keys.detail("123")).toEqual(["books", "detail", "123"]);
   });
 });
+
+

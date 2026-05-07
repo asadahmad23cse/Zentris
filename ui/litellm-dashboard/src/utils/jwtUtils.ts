@@ -27,3 +27,5 @@ export function checkTokenValidity(token: string | null): boolean {
   const decoded = decodeToken(token);
   return decoded !== null && !isJwtExpired(token);
 }
+
+

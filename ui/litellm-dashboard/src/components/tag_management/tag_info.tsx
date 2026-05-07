@@ -60,8 +60,8 @@ const TagInfoView: React.FC<TagInfoViewProps> = ({ tagId, onClose, accessToken, 
             name: tagData.name,
             description: tagData.description,
             models: tagData.models,
-            max_budget: tagData.litellm_budget_table?.max_budget,
-            budget_duration: tagData.litellm_budget_table?.budget_duration,
+            max_budget: tagData.Zentris_budget_table?.max_budget,
+            budget_duration: tagData.Zentris_budget_table?.budget_duration,
           });
         }
       }
@@ -205,7 +205,7 @@ const TagInfoView: React.FC<TagInfoViewProps> = ({ tagId, onClose, accessToken, 
                   <p className="text-sm text-gray-600">
                     TPM/RPM limits for tags are not currently supported. If you need this feature, please{" "}
                     <a
-                      href="https://github.com/BerriAI/litellm/issues/new"
+                      href="https://github.com/BerriAI/Zentris/issues/new"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 underline"
@@ -262,35 +262,35 @@ const TagInfoView: React.FC<TagInfoViewProps> = ({ tagId, onClose, accessToken, 
             </div>
           </Card>
 
-          {tagDetails.litellm_budget_table && (
+          {tagDetails.Zentris_budget_table && (
             <Card>
               <Title>Budget & Rate Limits</Title>
               <div className="space-y-4 mt-4">
-                {tagDetails.litellm_budget_table.max_budget !== undefined &&
-                  tagDetails.litellm_budget_table.max_budget !== null && (
+                {tagDetails.Zentris_budget_table.max_budget !== undefined &&
+                  tagDetails.Zentris_budget_table.max_budget !== null && (
                     <div>
                       <Text className="font-medium">Max Budget</Text>
-                      <Text>${tagDetails.litellm_budget_table.max_budget}</Text>
+                      <Text>${tagDetails.Zentris_budget_table.max_budget}</Text>
                     </div>
                   )}
-                {tagDetails.litellm_budget_table.budget_duration && (
+                {tagDetails.Zentris_budget_table.budget_duration && (
                   <div>
                     <Text className="font-medium">Budget Duration</Text>
-                    <Text>{tagDetails.litellm_budget_table.budget_duration}</Text>
+                    <Text>{tagDetails.Zentris_budget_table.budget_duration}</Text>
                   </div>
                 )}
-                {tagDetails.litellm_budget_table.tpm_limit !== undefined &&
-                  tagDetails.litellm_budget_table.tpm_limit !== null && (
+                {tagDetails.Zentris_budget_table.tpm_limit !== undefined &&
+                  tagDetails.Zentris_budget_table.tpm_limit !== null && (
                     <div>
                       <Text className="font-medium">TPM Limit</Text>
-                      <Text>{tagDetails.litellm_budget_table.tpm_limit.toLocaleString()}</Text>
+                      <Text>{tagDetails.Zentris_budget_table.tpm_limit.toLocaleString()}</Text>
                     </div>
                   )}
-                {tagDetails.litellm_budget_table.rpm_limit !== undefined &&
-                  tagDetails.litellm_budget_table.rpm_limit !== null && (
+                {tagDetails.Zentris_budget_table.rpm_limit !== undefined &&
+                  tagDetails.Zentris_budget_table.rpm_limit !== null && (
                     <div>
                       <Text className="font-medium">RPM Limit</Text>
-                      <Text>{tagDetails.litellm_budget_table.rpm_limit.toLocaleString()}</Text>
+                      <Text>{tagDetails.Zentris_budget_table.rpm_limit.toLocaleString()}</Text>
                     </div>
                   )}
               </div>
@@ -303,3 +303,5 @@ const TagInfoView: React.FC<TagInfoViewProps> = ({ tagId, onClose, accessToken, 
 };
 
 export default TagInfoView;
+
+

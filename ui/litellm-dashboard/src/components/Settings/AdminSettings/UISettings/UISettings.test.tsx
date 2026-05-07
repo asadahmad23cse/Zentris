@@ -163,3 +163,5 @@ describe("UISettings", () => {
     expect(NotificationManager.success).toHaveBeenCalledWith("UI settings updated successfully");
   });
 });
+
+

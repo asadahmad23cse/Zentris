@@ -7,7 +7,7 @@ import { RouterFieldsResponse, useRouterFields } from "./useRouterFields";
 // Mock the networking module
 vi.mock("@/components/networking", () => ({
   proxyBaseUrl: null,
-  getGlobalLitellmHeaderName: vi.fn(() => "Authorization"),
+  getGlobalZentrisHeaderName: vi.fn(() => "Authorization"),
 }));
 
 // Mock useAuthorized hook
@@ -366,7 +366,7 @@ describe("useRouterFields", () => {
           field_default: false,
           options: null,
           ui_field_name: "Enable Tag Filtering",
-          link: "https://docs.litellm.ai/docs/proxy/tag_routing",
+          link: "https://docs.Zentris.ai/docs/proxy/tag_routing",
         },
       ],
       routing_strategy_descriptions: {},
@@ -383,6 +383,8 @@ describe("useRouterFields", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(result.current.data?.fields[0].link).toBe("https://docs.litellm.ai/docs/proxy/tag_routing");
+    expect(result.current.data?.fields[0].link).toBe("https://docs.Zentris.ai/docs/proxy/tag_routing");
   });
 });
+
+

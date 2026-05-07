@@ -25,8 +25,8 @@ describe("LoggingCallbacksTable", () => {
         ]}
         availableCallbacks={{
           otel: {
-            litellm_callback_name: "otel",
-            litellm_callback_params: [],
+            Zentris_callback_name: "otel",
+            Zentris_callback_params: [],
             ui_callback_name: "OpenTelemetry",
           },
         }}
@@ -56,3 +56,5 @@ describe("LoggingCallbacksTable", () => {
     expect(getByText("custom_callback_x")).toBeInTheDocument();
   });
 });
+
+

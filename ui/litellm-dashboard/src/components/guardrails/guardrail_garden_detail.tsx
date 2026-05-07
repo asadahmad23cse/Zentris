@@ -22,11 +22,11 @@ const GuardrailDetailView: React.FC<GuardrailDetailViewProps> = ({
   const [activeTab, setActiveTab] = useState("overview");
 
   const detailRows = [
-    { property: "Provider", value: card.category === "litellm" ? "LiteLLM Content Filter" : "Partner Guardrail" },
+    { property: "Provider", value: card.category === "Zentris" ? "Zentris Content Filter" : "Partner Guardrail" },
     ...(card.subcategory ? [{ property: "Subcategory", value: card.subcategory }] : []),
-    ...(card.category === "litellm" ? [{ property: "Cost", value: "$0 / request" }] : []),
-    ...(card.category === "litellm" ? [{ property: "External Dependencies", value: "None" }] : []),
-    ...(card.category === "litellm" ? [{ property: "Latency", value: card.eval?.latency || "<1ms" }] : []),
+    ...(card.category === "Zentris" ? [{ property: "Cost", value: "$0 / request" }] : []),
+    ...(card.category === "Zentris" ? [{ property: "External Dependencies", value: "None" }] : []),
+    ...(card.category === "Zentris" ? [{ property: "Latency", value: card.eval?.latency || "<1ms" }] : []),
   ];
 
   const evalRows = card.eval
@@ -160,7 +160,7 @@ const GuardrailDetailView: React.FC<GuardrailDetailViewProps> = ({
             <div style={{ marginBottom: 28 }}>
               <div style={{ fontSize: 12, color: "#5f6368", marginBottom: 4 }}>Guardrail ID</div>
               <div style={{ fontSize: 13, color: "#202124", wordBreak: "break-all" }}>
-                litellm/{card.id}
+                Zentris/{card.id}
               </div>
             </div>
 
@@ -168,7 +168,7 @@ const GuardrailDetailView: React.FC<GuardrailDetailViewProps> = ({
             <div style={{ marginBottom: 28 }}>
               <div style={{ fontSize: 12, color: "#5f6368", marginBottom: 4 }}>Type</div>
               <div style={{ fontSize: 13, color: "#202124" }}>
-                {card.category === "litellm" ? "Content Filter" : "Partner"}
+                {card.category === "Zentris" ? "Content Filter" : "Partner"}
               </div>
             </div>
 
@@ -236,3 +236,5 @@ const GuardrailDetailView: React.FC<GuardrailDetailViewProps> = ({
 };
 
 export default GuardrailDetailView;
+
+

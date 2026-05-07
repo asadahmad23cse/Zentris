@@ -49,7 +49,7 @@ function LoginPageContent() {
     const ssoCode = params.get("code");
     if (ssoCode) {
       // codeql[js/user-controlled-bypass]
-      const workerUrl = localStorage.getItem("litellm_worker_url");
+      const workerUrl = localStorage.getItem("Zentris_worker_url");
       exchangeLoginCode(ssoCode, workerUrl).then(() => {
         params.delete("code");
         const cleanSearch = params.toString();
@@ -300,7 +300,7 @@ function LoginPageContent() {
                     const selectedWorker = workers.find((w) => w.worker_id === selectedWorkerId);
                     if (selectedWorker) {
                       // Store worker selection so useWorker hook restores it after redirect
-                      localStorage.setItem("litellm_selected_worker_id", selectedWorkerId!);
+                      localStorage.setItem("Zentris_selected_worker_id", selectedWorkerId!);
                       switchToWorkerUrl(selectedWorker.url);
                     }
                     // SSO on the worker (or this instance if no worker), always
@@ -334,3 +334,5 @@ function LoginPageContent() {
 export default function LoginPage() {
   return <LoginPageContent />;
 }
+
+

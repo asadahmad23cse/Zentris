@@ -11,3 +11,5 @@ describe("getModelDisplayName", () => {
     expect(getModelDisplayName("openai/*")).toBe("All openai models");
   });
 });
+
+

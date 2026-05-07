@@ -610,19 +610,19 @@ export const auditLogColumns: ColumnDef<AuditLogEntry>[] = [
       const tableName = info.getValue();
       let displayValue = tableName;
       switch (tableName) {
-        case "LiteLLM_VerificationToken":
+        case "Zentris_VerificationToken":
           displayValue = "Keys";
           break;
-        case "LiteLLM_TeamTable":
+        case "Zentris_TeamTable":
           displayValue = "Teams";
           break;
-        case "LiteLLM_OrganizationTable":
+        case "Zentris_OrganizationTable":
           displayValue = "Organizations";
           break;
-        case "LiteLLM_UserTable":
+        case "Zentris_UserTable":
           displayValue = "Users";
           break;
-        case "LiteLLM_ProxyModelTable":
+        case "Zentris_ProxyModelTable":
           displayValue = "Models";
           break;
         default:
@@ -690,3 +690,5 @@ export const auditLogColumns: ColumnDef<AuditLogEntry>[] = [
     },
   },
 ];
+
+

@@ -8,7 +8,7 @@ import type { KeyResponse } from "@/components/key_team_helpers/key_list";
 // Mock the networking utilities
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: vi.fn().mockReturnValue(""),
-  getGlobalLitellmHeaderName: vi.fn().mockReturnValue("Authorization"),
+  getGlobalZentrisHeaderName: vi.fn().mockReturnValue("Authorization"),
   deriveErrorMessage: vi.fn((errorData: any) => {
     return (
       (errorData?.error && (errorData.error.message || errorData.error)) ||
@@ -65,7 +65,7 @@ const mockKeys: KeyResponse[] = [
     model_max_budget: { "gpt-3.5-turbo": 100 },
     soft_budget_cooldown: false,
     blocked: false,
-    litellm_budget_table: {},
+    Zentris_budget_table: {},
     organization_id: null,
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
@@ -121,7 +121,7 @@ const mockKeys: KeyResponse[] = [
     model_max_budget: { "claude-3": 200 },
     soft_budget_cooldown: false,
     blocked: false,
-    litellm_budget_table: {},
+    Zentris_budget_table: {},
     organization_id: null,
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
@@ -759,3 +759,5 @@ describe("useDeletedKeys", () => {
     expect(result.current.data).toEqual(mockKeysResponse);
   });
 });
+
+

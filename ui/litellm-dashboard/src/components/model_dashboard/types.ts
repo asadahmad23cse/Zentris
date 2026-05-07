@@ -8,13 +8,13 @@ export interface ModelInfo {
   access_groups: string[] | null;
 }
 
-export interface LiteLLMParams {
+export interface ZentrisParams {
   model: string;
   api_base?: string;
   input_cost_per_token?: number;
   output_cost_per_token?: number;
   custom_llm_provider?: string;
-  litellm_credential_name?: string;
+  Zentris_credential_name?: string;
   [key: string]: any;
 }
 
@@ -22,14 +22,14 @@ export interface ModelData {
   model_info: ModelInfo;
   model_name: string;
   provider: string;
-  litellm_model_name: string;
+  Zentris_model_name: string;
   input_cost: number;
   output_cost: number;
   max_tokens: number;
   max_input_tokens: number;
   api_base?: string;
-  litellm_params: LiteLLMParams;
-  cleanedLitellmParams: Record<string, any>;
+  Zentris_params: ZentrisParams;
+  cleanedZentrisParams: Record<string, any>;
   accessToken?: string;
 }
 
@@ -44,3 +44,5 @@ export interface ModelDashboardProps {
   premiumUser: boolean;
   teams: any[];
 }
+
+

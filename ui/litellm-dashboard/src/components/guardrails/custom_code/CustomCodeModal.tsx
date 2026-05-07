@@ -149,7 +149,7 @@ const MODE_OPTIONS = [
 export interface EditGuardrailData {
   guardrail_id: string;
   guardrail_name: string;
-  litellm_params: {
+  Zentris_params: {
     mode?: string | string[];
     default_on?: boolean;
     custom_code?: string;
@@ -238,7 +238,7 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
       name: "Pre MCP (MCP tool as OpenAI tool)",
       data: {
         texts: [
-          "Tool: read_wiki_structure\nArguments: {\"repoName\": \"BerriAI/litellm\"}"
+          "Tool: read_wiki_structure\nArguments: {\"repoName\": \"BerriAI/Zentris\"}"
         ],
         images: [],
         tools: [
@@ -250,7 +250,7 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
               parameters: {
                 type: "object",
                 properties: {
-                  repoName: { type: "string", description: "Repository name, e.g. BerriAI/litellm" }
+                  repoName: { type: "string", description: "Repository name, e.g. BerriAI/Zentris" }
                 },
                 required: ["repoName"]
               }
@@ -263,12 +263,12 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
             type: "function",
             function: {
               name: "read_wiki_structure",
-              arguments: "{\"repoName\": \"BerriAI/litellm\"}"
+              arguments: "{\"repoName\": \"BerriAI/Zentris\"}"
             }
           }
         ],
         structured_messages: [
-          { role: "user", content: "Tool: read_wiki_structure\nArguments: {\"repoName\": \"BerriAI/litellm\"}" }
+          { role: "user", content: "Tool: read_wiki_structure\nArguments: {\"repoName\": \"BerriAI/Zentris\"}" }
         ],
         model: "mcp-tool-call"
       }
@@ -301,9 +301,9 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
       if (editData) {
         // Edit mode: populate with existing data
         setGuardrailName(editData.guardrail_name || "");
-        setMode(normalizeMode(editData.litellm_params?.mode));
-        setDefaultOn(editData.litellm_params?.default_on || false);
-        setCode(editData.litellm_params?.custom_code || CODE_TEMPLATES.empty.code);
+        setMode(normalizeMode(editData.Zentris_params?.mode));
+        setDefaultOn(editData.Zentris_params?.default_on || false);
+        setCode(editData.Zentris_params?.custom_code || CODE_TEMPLATES.empty.code);
         setSelectedTemplate(""); // No template selected in edit mode
       } else {
         // Create mode: reset to defaults
@@ -364,7 +364,7 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
       if (isEditMode && editData) {
         // Update existing guardrail
         const updateData: any = {
-          litellm_params: {
+          Zentris_params: {
             custom_code: code,
           },
         };
@@ -373,15 +373,15 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
         if (guardrailName !== editData.guardrail_name) {
           updateData.guardrail_name = guardrailName;
         }
-        const existingMode = normalizeMode(editData.litellm_params?.mode);
+        const existingMode = normalizeMode(editData.Zentris_params?.mode);
         const modeChanged =
           mode.length !== existingMode.length ||
           mode.some((m, i) => m !== existingMode[i]);
         if (modeChanged) {
-          updateData.litellm_params.mode = mode;
+          updateData.Zentris_params.mode = mode;
         }
-        if (defaultOn !== editData.litellm_params?.default_on) {
-          updateData.litellm_params.default_on = defaultOn;
+        if (defaultOn !== editData.Zentris_params?.default_on) {
+          updateData.Zentris_params.default_on = defaultOn;
         }
 
         await updateGuardrailCall(accessToken, editData.guardrail_id, updateData);
@@ -390,7 +390,7 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
         // Create new guardrail
         const guardrailData = {
           guardrail_name: guardrailName,
-          litellm_params: {
+          Zentris_params: {
             guardrail: "custom_code",
             mode: mode,
             default_on: defaultOn,
@@ -546,7 +546,7 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
                     }}
                     onClick={(e) => {
                       e.preventDefault();
-                      window.open('https://models.litellm.ai/guardrails', '_blank');
+                      window.open('https://models.Zentris.ai/guardrails', '_blank');
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = '#f0f0f0';
@@ -729,7 +729,7 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
               </div>
               <Button
                 size="xs"
-                onClick={() => window.open('https://github.com/BerriAI/litellm-guardrails', '_blank')}
+                onClick={() => window.open('https://github.com/BerriAI/Zentris-guardrails', '_blank')}
                 icon={ExportOutlined}
                 className="bg-blue-600 hover:bg-blue-700 text-white border-0"
               >
@@ -830,3 +830,5 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
 };
 
 export default CustomCodeModal;
+
+

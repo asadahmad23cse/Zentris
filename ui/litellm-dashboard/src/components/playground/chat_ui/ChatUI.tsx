@@ -86,7 +86,7 @@ interface ChatUIProps {
   disabledPersonalKeyCreation: boolean;
   proxySettings?: {
     PROXY_BASE_URL?: string;
-    LITELLM_UI_API_DOC_BASE_URL?: string | null;
+    Zentris_UI_API_DOC_BASE_URL?: string | null;
   };
   /** When true, hide configuration sidebar and use fixedModel only (e.g. embedded in Agent Builder). */
   simplified?: boolean;
@@ -715,7 +715,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
           const requestProxyBaseUrl =
             simplified && proxySettings
-              ? (proxySettings.LITELLM_UI_API_DOC_BASE_URL ?? proxySettings.PROXY_BASE_URL ?? undefined)
+              ? (proxySettings.Zentris_UI_API_DOC_BASE_URL ?? proxySettings.PROXY_BASE_URL ?? undefined)
               : (customProxyBaseUrl || undefined);
           await makeOpenAIChatCompletionRequest(
             apiChatHistory,
@@ -1033,14 +1033,14 @@ const ChatUI: React.FC<ChatUIProps> = ({
                   <Text className="font-medium block text-gray-700 flex items-center">
                     <SettingOutlined className="mr-2" /> Custom Proxy Base URL
                   </Text>
-                  {proxySettings?.LITELLM_UI_API_DOC_BASE_URL && !customProxyBaseUrl && (
+                  {proxySettings?.Zentris_UI_API_DOC_BASE_URL && !customProxyBaseUrl && (
                     <Button
                       type="link"
                       size="small"
                       icon={<LinkOutlined />}
                       onClick={() => {
-                        setCustomProxyBaseUrl(proxySettings.LITELLM_UI_API_DOC_BASE_URL || "");
-                        sessionStorage.setItem("customProxyBaseUrl", proxySettings.LITELLM_UI_API_DOC_BASE_URL || "");
+                        setCustomProxyBaseUrl(proxySettings.Zentris_UI_API_DOC_BASE_URL || "");
+                        sessionStorage.setItem("customProxyBaseUrl", proxySettings.Zentris_UI_API_DOC_BASE_URL || "");
                       }}
                       className="text-gray-500 hover:text-gray-700"
                     >
@@ -1835,7 +1835,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     <div className="flex flex-wrap gap-2">
                       {[
                         "Generate sample sales data CSV and create a chart",
-                        "Create a PNG bar chart comparing AI gateway providers including LiteLLM",
+                        "Create a PNG bar chart comparing AI gateway providers including Zentris",
                         "Generate a CSV of LLM pricing data and visualize it as a line chart",
                       ].map((prompt, idx) => (
                         <button
@@ -2075,3 +2075,5 @@ const ChatUI: React.FC<ChatUIProps> = ({
 };
 
 export default ChatUI;
+
+

@@ -9,7 +9,7 @@ import type { Agent } from "./types";
 const baseAgent: Agent = {
   agent_id: "agent-123",
   agent_name: "Test Agent",
-  litellm_params: { model: "gpt-4" },
+  Zentris_params: { model: "gpt-4" },
   agent_card_params: {
     description: "A test agent for unit testing",
     url: "https://agent.example.com",
@@ -97,3 +97,5 @@ describe("AgentCard", () => {
     expect(onDeleteClick).toHaveBeenCalledWith("agent-123", "Test Agent");
   });
 });
+
+

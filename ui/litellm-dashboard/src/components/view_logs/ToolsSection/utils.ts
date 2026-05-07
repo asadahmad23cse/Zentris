@@ -177,3 +177,5 @@ export function hasTools(log: LogEntry): boolean {
   const requestTools = extractToolsFromRequest(log);
   return requestTools.length > 0;
 }
+
+

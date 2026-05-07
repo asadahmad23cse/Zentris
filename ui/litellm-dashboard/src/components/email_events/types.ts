@@ -12,3 +12,5 @@ export interface EmailEventSettingsUpdateRequest {
 export interface EmailEventSettingsResponse {
   settings: EmailEventSetting[];
 }
+
+

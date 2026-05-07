@@ -55,7 +55,7 @@ export default function TeamMemberTab({
   const getUserBudget = (userId: string | null): string | null => {
     if (!userId) return null;
     const membership = teamData.team_memberships.find((tm) => tm.user_id === userId);
-    const maxBudget = membership?.litellm_budget_table?.max_budget;
+    const maxBudget = membership?.Zentris_budget_table?.max_budget;
     if (maxBudget === null || maxBudget === undefined) {
       return null;
     }
@@ -66,8 +66,8 @@ export default function TeamMemberTab({
   const getUserRateLimits = (userId: string | null): string => {
     if (!userId) return "No Limits";
     const membership = teamData.team_memberships.find((tm) => tm.user_id === userId);
-    const rpmLimit = membership?.litellm_budget_table?.rpm_limit;
-    const tpmLimit = membership?.litellm_budget_table?.tpm_limit;
+    const rpmLimit = membership?.Zentris_budget_table?.rpm_limit;
+    const tpmLimit = membership?.Zentris_budget_table?.tpm_limit;
 
     const rpmText = rpmLimit ? `${formatNumber(rpmLimit)} RPM` : null;
     const tpmText = tpmLimit ? `${formatNumber(tpmLimit)} TPM` : null;
@@ -135,9 +135,9 @@ export default function TeamMemberTab({
         );
         const enhancedMember = {
           ...record,
-          max_budget_in_team: membership?.litellm_budget_table?.max_budget || null,
-          tpm_limit: membership?.litellm_budget_table?.tpm_limit || null,
-          rpm_limit: membership?.litellm_budget_table?.rpm_limit || null,
+          max_budget_in_team: membership?.Zentris_budget_table?.max_budget || null,
+          tpm_limit: membership?.Zentris_budget_table?.tpm_limit || null,
+          rpm_limit: membership?.Zentris_budget_table?.rpm_limit || null,
         };
         setSelectedEditMember(enhancedMember);
         setIsEditMemberModalVisible(true);
@@ -153,3 +153,5 @@ export default function TeamMemberTab({
     />
   );
 }
+
+

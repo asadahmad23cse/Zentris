@@ -56,7 +56,7 @@ export async function makeOpenAIResponsesRequest(
   // Prepare headers with tags and trace ID
   const headers: Record<string, string> = {};
   if (tags && tags.length > 0) {
-    headers["x-litellm-tags"] = tags.join(",");
+    headers["x-Zentris-tags"] = tags.join(",");
   }
 
   const client = new openai.OpenAI({
@@ -97,7 +97,7 @@ export async function makeOpenAIResponsesRequest(
         // All MCP Servers selected
         tools.push({
           type: "mcp",
-          server_label: "litellm",
+          server_label: "Zentris",
           server_url: `${proxyBaseUrl}/mcp`,
           require_approval: "never",
         });
@@ -136,7 +136,7 @@ export async function makeOpenAIResponsesRequest(
         model: selectedModel,
         input: formattedInput,
         stream: true,
-        litellm_trace_id: traceId,
+        Zentris_trace_id: traceId,
         ...(previousResponseId ? { previous_response_id: previousResponseId } : {}),
         ...(vector_store_ids ? { vector_store_ids } : {}),
         ...(guardrails ? { guardrails } : {}),
@@ -269,3 +269,5 @@ export async function makeOpenAIResponsesRequest(
     throw error; // Re-throw to allow the caller to handle the error
   }
 }
+
+

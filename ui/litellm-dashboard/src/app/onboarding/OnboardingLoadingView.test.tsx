@@ -14,3 +14,5 @@ describe("OnboardingLoadingView", () => {
     expect(container.firstChild).toHaveClass("flex", "justify-center");
   });
 });
+
+

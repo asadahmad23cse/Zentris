@@ -14,11 +14,11 @@ interface AuditLogDrawerProps {
 }
 
 const TABLE_NAME_DISPLAY: Record<string, string> = {
-  LiteLLM_VerificationToken: "Keys",
-  LiteLLM_TeamTable: "Teams",
-  LiteLLM_UserTable: "Users",
-  LiteLLM_OrganizationTable: "Organizations",
-  LiteLLM_ProxyModelTable: "Models",
+  Zentris_VerificationToken: "Keys",
+  Zentris_TeamTable: "Teams",
+  Zentris_UserTable: "Users",
+  Zentris_OrganizationTable: "Organizations",
+  Zentris_ProxyModelTable: "Models",
 };
 
 const ACTION_COLOR: Record<string, string> = {
@@ -84,7 +84,7 @@ function MetadataRow({ label, value }: { label: string; value: React.ReactNode }
 
 function DiffSection({ log }: { log: AuditLogEntry }) {
   const { action, table_name, before_value, updated_values } = log;
-  const isKeyTable = table_name === "LiteLLM_VerificationToken";
+  const isKeyTable = table_name === "Zentris_VerificationToken";
   const isUpdateAction = action === "updated" || action === "rotated";
 
   let displayBefore = before_value;
@@ -258,3 +258,5 @@ export function AuditLogDrawer({ open, onClose, log }: AuditLogDrawerProps) {
     </Drawer>
   );
 }
+
+

@@ -74,11 +74,11 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
           if (tool) {
             form.setFieldsValue({
               search_tool_name: tool.search_tool_name,
-              search_provider: tool.litellm_params.search_provider,
-              api_key: tool.litellm_params.api_key,
-              api_base: tool.litellm_params.api_base,
-              timeout: tool.litellm_params.timeout,
-              max_retries: tool.litellm_params.max_retries,
+              search_provider: tool.Zentris_params.search_provider,
+              api_key: tool.Zentris_params.api_key,
+              api_base: tool.Zentris_params.api_base,
+              timeout: tool.Zentris_params.timeout,
+              max_retries: tool.Zentris_params.max_retries,
               description: tool.search_tool_info?.description,
             });
             setSelectedToolId(toolId);
@@ -122,7 +122,7 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
 
   const toolToDelete = searchTools?.find((t) => t.search_tool_id === toolIdToDelete);
   const providerInfo = toolToDelete
-    ? availableProviders.find((p) => p.provider_name === toolToDelete.litellm_params.search_provider)
+    ? availableProviders.find((p) => p.provider_name === toolToDelete.Zentris_params.search_provider)
     : null;
 
   const handleCreateSuccess = (newSearchTool: SearchTool) => {
@@ -137,7 +137,7 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
       const values = await form.validateFields();
       const searchToolData = {
         search_tool_name: values.search_tool_name,
-        litellm_params: {
+        Zentris_params: {
           search_provider: values.search_provider,
           api_key: values.api_key,
           api_base: values.api_base,
@@ -207,7 +207,7 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
           searchTools?.find((tool: SearchTool) => tool.search_tool_id === selectedToolId) || {
             search_tool_id: "",
             search_tool_name: "",
-            litellm_params: {
+            Zentris_params: {
               search_provider: "",
             },
           }
@@ -254,7 +254,7 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
               { label: "ID", value: toolToDelete.search_tool_id, code: true },
               {
                 label: "Provider",
-                value: providerInfo?.ui_friendly_name || toolToDelete.litellm_params.search_provider,
+                value: providerInfo?.ui_friendly_name || toolToDelete.Zentris_params.search_provider,
               },
               { label: "Description", value: toolToDelete.search_tool_info?.description || "-" },
             ]
@@ -302,3 +302,5 @@ const SearchTools: React.FC<SearchToolsProps> = ({ accessToken, userRole, userID
 };
 
 export default SearchTools;
+
+

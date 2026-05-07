@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { getProxyBaseUrl, getGlobalLitellmHeaderName } from "@/components/networking";
+import { getProxyBaseUrl, getGlobalZentrisHeaderName } from "@/components/networking";
 import { CostEstimateRequest, CostEstimateResponse } from "../types";
 import { ModelEntry, MultiModelResult } from "./types";
 
@@ -59,7 +59,7 @@ export function useMultiCostEstimate(accessToken: string | null) {
         const response = await fetch(url, {
           method: "POST",
           headers: {
-            [getGlobalLitellmHeaderName()]: `Bearer ${accessToken}`,
+            [getGlobalZentrisHeaderName()]: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestBody),
@@ -203,4 +203,6 @@ export function useMultiCostEstimate(accessToken: string | null) {
     getMultiModelResult,
   };
 }
+
+
 

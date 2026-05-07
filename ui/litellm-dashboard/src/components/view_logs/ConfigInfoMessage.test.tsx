@@ -39,3 +39,5 @@ describe("ConfigInfoMessage", () => {
     expect(onOpenSettings).toHaveBeenCalledOnce();
   });
 });
+
+

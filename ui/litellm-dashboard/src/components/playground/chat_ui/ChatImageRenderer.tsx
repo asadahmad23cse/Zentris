@@ -36,3 +36,5 @@ const ChatImageRenderer: React.FC<ChatImageRendererProps> = ({ message }) => {
 };
 
 export default ChatImageRenderer;
+
+

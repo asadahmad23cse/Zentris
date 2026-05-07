@@ -10,3 +10,5 @@ const BudgetsPage = () => {
 };
 
 export default BudgetsPage;
+
+

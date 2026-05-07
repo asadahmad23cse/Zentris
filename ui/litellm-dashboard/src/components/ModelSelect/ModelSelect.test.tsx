@@ -104,7 +104,7 @@ const createMockOrganization = (models: string[]): Organization => ({
   created_by: "user-1",
   updated_at: "2024-01-01",
   updated_by: "user-1",
-  litellm_budget_table: null,
+  Zentris_budget_table: null,
   teams: null,
   users: null,
   members: null,
@@ -568,3 +568,5 @@ describe("ModelSelect", () => {
     });
   });
 });
+
+

@@ -21,3 +21,5 @@ export const useHashicorpVaultConfig = () => {
     gcTime: 60 * 60 * 1000,
   });
 };
+
+

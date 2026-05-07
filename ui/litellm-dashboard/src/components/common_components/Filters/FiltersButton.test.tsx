@@ -35,3 +35,5 @@ describe("FiltersButton", () => {
     expect(screen.getByRole("button", { name: /advanced filters/i })).toBeInTheDocument();
   });
 });
+
+

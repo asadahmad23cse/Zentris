@@ -16,21 +16,21 @@ const mockProviderFields: ProviderCreateInfo[] = [
   {
     provider: "OpenAI",
     provider_display_name: "OpenAI",
-    litellm_provider: "openai",
+    Zentris_provider: "openai",
     default_model_placeholder: "gpt-3.5-turbo",
     credential_fields: [],
   },
   {
     provider: "Anthropic",
     provider_display_name: "Anthropic",
-    litellm_provider: "anthropic",
+    Zentris_provider: "anthropic",
     default_model_placeholder: "claude-3-sonnet-20240229",
     credential_fields: [],
   },
   {
     provider: "Azure",
     provider_display_name: "Azure OpenAI",
-    litellm_provider: "azure",
+    Zentris_provider: "azure",
     default_model_placeholder: "gpt-35-turbo",
     credential_fields: [],
   },
@@ -159,7 +159,7 @@ describe("useProviderFields", () => {
       {
         provider: "TestProvider",
         provider_display_name: "Test Provider",
-        litellm_provider: "test",
+        Zentris_provider: "test",
         default_model_placeholder: "test-model",
         credential_fields: [], // Keeping empty as per existing test patterns
       },
@@ -177,6 +177,8 @@ describe("useProviderFields", () => {
 
     expect(result.current.data).toEqual(mockFieldsWithCredentials);
     expect(result.current.data?.[0].provider).toBe("TestProvider");
-    expect(result.current.data?.[0].litellm_provider).toBe("test");
+    expect(result.current.data?.[0].Zentris_provider).toBe("test");
   });
 });
+
+
