@@ -16,6 +16,7 @@ import GuardrailsMonitorView from "@/components/GuardrailsMonitor/GuardrailsMoni
 import GuardrailsPanel from "@/components/guardrails";
 import PoliciesPanel from "@/components/policies";
 import ZentrisSecurityDashboard from "@/components/ZentrisSecurityDashboard";
+import ZentrisBrandingEnforcer from "@/components/ZentrisBrandingEnforcer";
 import { Team } from "@/components/key_team_helpers/key_list";
 import { MCPServers } from "@/components/mcp_tools";
 import ModelHubTable from "@/components/AIHub/ModelHubTable";
@@ -459,6 +460,7 @@ function CreateKeyPageContent() {
           algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
         }}>
           <ThemeProvider accessToken={accessToken}>
+            <ZentrisBrandingEnforcer />
             {invitation_id ? (
               <UserDashboard
                 userID={userID}
