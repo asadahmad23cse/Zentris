@@ -30,12 +30,24 @@ interface MCPSemanticFilterSettingsProps {
 }
 
 export default function MCPSemanticFilterSettings({ accessToken }: MCPSemanticFilterSettingsProps) {
+  if (!accessToken) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        Please log in to configure semantic filter settings.
+      </div>
+    );
+  }
+
+  return <MCPSemanticFilterSettingsForm accessToken={accessToken} />;
+}
+
+function MCPSemanticFilterSettingsForm({ accessToken }: { accessToken: string }) {
   const { data, isLoading, isError, error } = useMCPSemanticFilterSettings();
   const {
     mutate: updateSettings,
     isPending: isUpdating,
     error: updateError,
-  } = useUpdateMCPSemanticFilterSettings(accessToken || "");
+  } = useUpdateMCPSemanticFilterSettings(accessToken);
   const [form] = Form.useForm();
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -116,25 +128,23 @@ export default function MCPSemanticFilterSettings({ accessToken }: MCPSemanticFi
     });
   };
 
-  if (!accessToken) {
-    return (
-      <div className="p-6 text-center text-gray-500">
-        Please log in to configure semantic filter settings.
-      </div>
-    );
-  }
-
   return (
     <div style={{ width: "100%" }}>
       {isLoading ? (
-        <Skeleton active />
+        <>
+          <Form form={form} style={{ display: "none" }} />
+          <Skeleton active />
+        </>
       ) : isError ? (
-        <Alert
-          type="error"
-          message="Could not load MCP Semantic Filter settings"
-          description={error instanceof Error ? error.message : undefined}
-          style={{ marginBottom: 24 }}
-        />
+        <>
+          <Form form={form} style={{ display: "none" }} />
+          <Alert
+            type="error"
+            message="Could not load MCP Semantic Filter settings"
+            description={error instanceof Error ? error.message : undefined}
+            style={{ marginBottom: 24 }}
+          />
+        </>
       ) : (
         <>
           <Alert
