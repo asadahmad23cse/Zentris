@@ -4,9 +4,19 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
+  --background-start-rgb: 247, 249, 252;
   --background-end-rgb: 255, 255, 255;
-  --neutral-border: #dcddeb;
+  --neutral-border: #d7dce8;
+  --zentris-ink: #101828;
+  --zentris-muted: #667085;
+  --zentris-subtle: #f6f8fb;
+  --zentris-panel: #ffffff;
+  --zentris-line: #e6eaf2;
+  --zentris-blue: #2563eb;
+  --zentris-blue-strong: #1d4ed8;
+  --zentris-cyan: #0891b2;
+  --zentris-green: #16a34a;
+  --zentris-shadow: 0 18px 45px rgba(16, 24, 40, 0.08);
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -19,7 +29,145 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  background:
+    radial-gradient(circle at 12% -10%, rgba(37, 99, 235, 0.10), transparent 34%),
+    radial-gradient(circle at 88% 0%, rgba(8, 145, 178, 0.08), transparent 30%),
+    linear-gradient(180deg, rgb(var(--background-start-rgb)) 0%, rgb(var(--background-end-rgb)) 55%);
+  min-height: 100vh;
+}
+
+* {
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.16);
+}
+
+.zentris-dashboard-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(247, 249, 252, 0.92) 100%),
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 30%);
+}
+
+.zentris-main-surface {
+  min-width: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(247, 249, 252, 0.98)),
+    repeating-linear-gradient(90deg, rgba(16, 24, 40, 0.025) 0 1px, transparent 1px 96px);
+}
+
+.zentris-page-frame {
+  width: 100%;
+  max-width: 1760px;
+  margin: 0 auto;
+}
+
+.zentris-navbar {
+  border-bottom: 1px solid rgba(214, 220, 232, 0.88);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03), 0 18px 45px rgba(16, 24, 40, 0.04);
+  backdrop-filter: blur(18px);
+}
+
+.zentris-sidebar {
+  border-right: 1px solid rgba(214, 220, 232, 0.86);
+  background: rgba(255, 255, 255, 0.72) !important;
+  box-shadow: 12px 0 36px rgba(16, 24, 40, 0.04);
+  backdrop-filter: blur(18px);
+}
+
+.custom-sidebar-menu .ant-menu-item,
+.custom-sidebar-menu .ant-menu-submenu-title {
+  margin-block: 2px !important;
+  color: #344054;
+}
+
+.custom-sidebar-menu .ant-menu-item-selected {
+  color: var(--zentris-blue) !important;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.12), rgba(8, 145, 178, 0.08)) !important;
+  box-shadow: inset 3px 0 0 var(--zentris-blue);
+}
+
+.custom-sidebar-menu .ant-menu-item:hover,
+.custom-sidebar-menu .ant-menu-submenu-title:hover {
+  color: #182230 !important;
+  background: rgba(37, 99, 235, 0.07) !important;
+}
+
+.zentris-card {
+  border: 1px solid var(--zentris-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.zentris-command-band {
+  border: 1px solid rgba(214, 220, 232, 0.9);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 251, 0.9)),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.08), rgba(8, 145, 178, 0.08));
+  box-shadow: var(--zentris-shadow);
+}
+
+.zentris-kpi {
+  border-left: 1px solid var(--zentris-line);
+}
+
+.zentris-table-shell {
+  border: 1px solid var(--zentris-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 30px rgba(16, 24, 40, 0.055);
+}
+
+.zentris-table-shell thead tr {
+  background: #f8fafc;
+}
+
+.zentris-table-shell th {
+  color: #344054 !important;
+  font-weight: 650 !important;
+}
+
+.zentris-table-shell tbody tr {
+  border-top: 1px solid #eef2f7;
+}
+
+.zentris-table-shell tbody tr:hover {
+  background: #f8fbff;
+}
+
+.zentris-empty-state {
+  min-height: 210px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.92));
+}
+
+.zentris-primary-button {
+  background: linear-gradient(135deg, var(--zentris-blue), var(--zentris-cyan)) !important;
+  border: 0 !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.zentris-primary-button:hover {
+  filter: brightness(0.98);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.28);
+}
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--zentris-blue) !important;
+  font-weight: 650;
+}
+
+.ant-select-selector,
+.ant-input,
+.ant-input-affix-wrapper {
+  border-color: #d7dce8 !important;
+  box-shadow: none !important;
 }
 
 @layer utilities {
