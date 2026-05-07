@@ -55,7 +55,12 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="zentris-table-shell overflow-x-auto w-full max-w-full box-border">
+    <div
+      className="zentris-table-shell overflow-x-auto w-full max-w-full box-border"
+      role="region"
+      aria-busy={isLoading}
+      aria-label="Dashboard data table"
+    >
       <Table className="[&_td]:py-2 [&_th]:py-2 table-fixed w-full box-border" style={{ minWidth: "400px" }}>
         <TableHead>
           {table.getHeaderGroups().map((headerGroup) => (
