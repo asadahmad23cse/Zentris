@@ -1,5 +1,13 @@
 import { isAdminRole } from "@/utils/roles";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+import {
+  ApiOutlined,
+  AppstoreAddOutlined,
+  CheckCircleOutlined,
+  GlobalOutlined,
+  QuestionCircleOutlined,
+  SafetyCertificateOutlined,
+  ThunderboltOutlined,
+} from "@ant-design/icons";
 import { Button, Tab, TabGroup, TabList, TabPanel, TabPanels, Text, Title } from "@tremor/react";
 import NewBadge from "../common_components/NewBadge";
 import { Descriptions, Modal, Select, Tooltip, Typography } from "antd";
@@ -63,6 +71,11 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
   const [isDeletingServer, setIsDeletingServer] = useState(false);
   const [byokModalServer, setByokModalServer] = useState<MCPServer | null>(null);
   const isInternalUser = userRole === "Internal User";
+  const totalServers = serversWithHealth.length;
+  const visibleServers = filteredServers.length;
+  const healthyServers = serversWithHealth.filter((server) => server.status === "healthy").length;
+  const protectedServers = serversWithHealth.filter((server) => server.auth_type && server.auth_type !== "none").length;
+  const networkedServers = serversWithHealth.filter((server) => server.transport || server.url).length;
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -239,11 +252,23 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
 
   if (!accessToken || !userRole || !userID) {
     console.log("Missing required authentication parameters", { accessToken, userRole, userID });
-    return <div className="p-6 text-center text-gray-500">Missing required authentication parameters.</div>;
+    return (
+      <div className="flex min-h-[calc(100vh-96px)] items-center justify-center px-6 py-10">
+        <div className="zentris-card max-w-md px-6 py-7 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-blue-100 bg-blue-50 text-blue-600">
+            <SafetyCertificateOutlined />
+          </div>
+          <Title className="!mb-1 !text-lg !font-semibold !text-slate-950">Session Required</Title>
+          <Text className="text-slate-600">
+            Sign in again to manage MCP servers, credentials, and access groups.
+          </Text>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="w-full h-full p-6">
+    <div className="w-full h-full px-6 py-7">
       <Modal
         open={isDeleteModalOpen}
         title="Delete MCP Server?"
@@ -297,36 +322,85 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
           setDiscoveryVisible(true);
         }}
       />
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <Title>MCP Servers</Title>
-            {filteredServers.length > 0 && (
-              <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
-                {filteredServers.length}
+      <div className="zentris-command-band px-5 py-5">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="min-w-0">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                <ThunderboltOutlined />
+                MCP Control Plane
               </span>
+              <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600">
+                {isInternalUser ? "Internal user access" : "Admin workspace"}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Title className="!mb-0 !text-2xl !font-semibold !text-slate-950">MCP Servers</Title>
+              {visibleServers > 0 && (
+                <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200">
+                  {visibleServers} visible
+                </span>
+              )}
+            </div>
+            <Text className="mt-1 max-w-2xl text-slate-600">
+              Govern server access, credentials, discovery, network reachability, and operational health from one workspace.
+            </Text>
+          </div>
+          <div className="grid min-w-full grid-cols-2 gap-3 sm:min-w-[520px] sm:grid-cols-4">
+            <div className="zentris-kpi pl-3">
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                <ApiOutlined /> Total
+              </div>
+              <div className="mt-1 text-2xl font-semibold text-slate-950">{totalServers}</div>
+            </div>
+            <div className="zentris-kpi pl-3">
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                <CheckCircleOutlined /> Healthy
+              </div>
+              <div className="mt-1 text-2xl font-semibold text-emerald-600">{healthyServers}</div>
+            </div>
+            <div className="zentris-kpi pl-3">
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                <SafetyCertificateOutlined /> Protected
+              </div>
+              <div className="mt-1 text-2xl font-semibold text-slate-950">{protectedServers}</div>
+            </div>
+            <div className="zentris-kpi pl-3">
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                <GlobalOutlined /> Routed
+              </div>
+              <div className="mt-1 text-2xl font-semibold text-slate-950">{networkedServers}</div>
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+            <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1">Discovery-ready</span>
+            <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1">Credential governance</span>
+            <span className="rounded-lg border border-slate-200 bg-white px-2.5 py-1">Team-aware routing</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {isAdminRole(userRole) && (
+              <Button className="zentris-primary-button flex-shrink-0" onClick={() => setDiscoveryVisible(true)}>
+                <span className="inline-flex items-center gap-2">
+                  <AppstoreAddOutlined />
+                  Add New MCP Server
+                </span>
+              </Button>
+            )}
+            {!isAdminRole(userRole) && (
+              <Button
+                className="flex-shrink-0"
+                onClick={() => {
+                  setPrefillData(null);
+                  setModalVisible(true);
+                }}
+                variant="secondary"
+              >
+                Submit MCP Server
+              </Button>
             )}
           </div>
-          <Text className="text-tremor-content mt-1">Configure and manage your MCP servers</Text>
-        </div>
-        <div className="flex items-center gap-2">
-          {isAdminRole(userRole) && (
-            <Button className="flex-shrink-0" onClick={() => setDiscoveryVisible(true)}>
-              + Add New MCP Server
-            </Button>
-          )}
-          {!isAdminRole(userRole) && (
-            <Button
-              className="flex-shrink-0"
-              onClick={() => {
-                setPrefillData(null);
-                setModalVisible(true);
-              }}
-              variant="secondary"
-            >
-              + Submit MCP Server
-            </Button>
-          )}
         </div>
       </div>
       <MCPDiscovery
@@ -344,8 +418,8 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
         }}
         accessToken={accessToken}
       />
-      <TabGroup className="w-full h-full">
-        <TabList className="flex justify-between mt-2 w-full items-center">
+      <TabGroup className="mt-5 w-full h-full">
+        <TabList className="flex justify-between w-full items-center border-b border-slate-200">
           <div className="flex">
             <Tab>All Servers</Tab>
             <Tab>Connect</Tab>
@@ -372,9 +446,10 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
               <div className="w-full h-full">
                 <div className="w-full">
                   <div className="flex flex-col space-y-4">
-                    <div className="flex items-center gap-6 bg-white rounded-lg px-4 py-3 border border-gray-200">
+                    <div className="zentris-card flex flex-col gap-4 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
                       <div className="flex items-center gap-2">
-                        <Text className="text-sm font-medium text-gray-600 whitespace-nowrap">Team</Text>
+                        <Text className="text-sm font-medium text-slate-600 whitespace-nowrap">Team</Text>
                         <Select value={selectedTeam} onChange={handleTeamChange} style={{ width: 220 }} size="middle">
                           <Option value="all">
                             <span className="font-medium">{isInternalUser ? "All Available Servers" : "All Servers"}</span>
@@ -389,9 +464,9 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
                           ))}
                         </Select>
                       </div>
-                      <div className="h-6 w-px bg-gray-200"></div>
+                      <div className="hidden h-6 w-px bg-slate-200 sm:block"></div>
                       <div className="flex items-center gap-2">
-                        <Text className="text-sm font-medium text-gray-600 whitespace-nowrap">
+                        <Text className="text-sm font-medium text-slate-600 whitespace-nowrap">
                           Access Group
                           <Tooltip title="An MCP Access Group is a set of users or teams that have permission to access specific MCP servers. Use access groups to control and organize who can connect to which servers.">
                             <QuestionCircleOutlined style={{ marginLeft: 4, color: "#9ca3af" }} />
@@ -408,17 +483,22 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
                           ))}
                         </Select>
                       </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                        {visibleServers} matching servers
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="w-full mt-6">
+                <div className="w-full mt-5">
                   <DataTable
                     data={filteredServers}
                     columns={columns}
                     renderSubComponent={() => <div></div>}
                     getRowCanExpand={() => false}
                     isLoading={isLoadingServers}
-                    noDataMessage="No MCP servers configured. Click '+ Add New MCP Server' to get started."
+                    noDataMessage="No MCP servers configured yet. Start with discovery or add a custom server to connect production tools."
                     loadingMessage="Loading MCP servers..."
                     enableSorting={true}
                   />
