@@ -347,25 +347,25 @@ const MCPServers: React.FC<MCPServerProps> = ({ accessToken, userRole, userID })
             </Text>
           </div>
           <div className="grid min-w-full grid-cols-2 gap-3 sm:min-w-[520px] sm:grid-cols-4">
-            <div className="zentris-kpi pl-3">
+            <div className="zentris-kpi pl-3" aria-label={`${totalServers} total MCP servers`}>
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                 <ApiOutlined /> Total
               </div>
               <div className="mt-1 text-2xl font-semibold text-slate-950">{totalServers}</div>
             </div>
-            <div className="zentris-kpi pl-3">
+            <div className="zentris-kpi pl-3" aria-label={`${healthyServers} healthy MCP servers`}>
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                 <CheckCircleOutlined /> Healthy
               </div>
               <div className="mt-1 text-2xl font-semibold text-emerald-600">{healthyServers}</div>
             </div>
-            <div className="zentris-kpi pl-3">
+            <div className="zentris-kpi pl-3" aria-label={`${protectedServers} protected MCP servers`}>
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                 <SafetyCertificateOutlined /> Protected
               </div>
               <div className="mt-1 text-2xl font-semibold text-slate-950">{protectedServers}</div>
             </div>
-            <div className="zentris-kpi pl-3">
+            <div className="zentris-kpi pl-3" aria-label={`${networkedServers} routed MCP servers`}>
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                 <GlobalOutlined /> Routed
               </div>
