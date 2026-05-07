@@ -13,7 +13,7 @@ import NotificationManager from "../molecules/notifications_manager";
 import { ThunderboltOutlined, BranchesOutlined } from "@ant-design/icons";
 
 interface AddAutoRouterTabProps {
-  form: FormInstance;
+  form?: FormInstance;
   handleOk: () => void;
   accessToken: string;
   userRole: string;
@@ -30,7 +30,10 @@ interface ComplexityTiers {
 
 const { Title, Link } = Typography;
 
-const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form, handleOk, accessToken, userRole }) => {
+const AddAutoRouterTab: React.FC<AddAutoRouterTabProps> = ({ form: externalForm, handleOk, accessToken, userRole }) => {
+  const [internalForm] = Form.useForm();
+  const form = externalForm ?? internalForm;
+
   // State for connection testing
   const [isResultModalVisible, setIsResultModalVisible] = useState<boolean>(false);
   const [isTestingConnection, setIsTestingConnection] = useState<boolean>(false);
