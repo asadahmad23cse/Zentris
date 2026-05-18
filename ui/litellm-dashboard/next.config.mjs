@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const nextConfig = {
-  output: "export",
+  // output: "export" removed — static export breaks dev server auth/routing
   basePath: "",
   assetPrefix: "",
   turbopack: {
