@@ -490,7 +490,7 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
       width={1400}
       className="custom-code-modal"
       closable={true}
-      destroyOnClose
+      destroyOnHidden
     >
       <div className="flex flex-col h-[80vh]">
         {/* Header */}

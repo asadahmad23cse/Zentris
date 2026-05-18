@@ -60,7 +60,7 @@ export function AccessGroupCreateModal({
       okText="Create Group"
       cancelText="Cancel"
       confirmLoading={createMutation.isPending}
-      destroyOnClose
+      destroyOnHidden
     >
       <AccessGroupBaseForm form={form} />
     </Modal>

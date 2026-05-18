@@ -86,7 +86,7 @@ export function EvaluationSettingsModal({
       width={640}
       footer={null}
       closeIcon={<CloseOutlined />}
-      destroyOnClose
+      destroyOnHidden
     >
       <p className="text-sm text-gray-500 mb-4">
         {guardrailName
