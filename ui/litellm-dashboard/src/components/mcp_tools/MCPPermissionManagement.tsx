@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Form, Select, Tooltip, Collapse, Input, Space, Button, Switch } from "antd";
+import type { CollapseProps } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { MCPServer } from "./types";
-const { Panel } = Collapse;
 
 interface MCPPermissionManagementProps {
   availableAccessGroups: string[];
@@ -50,10 +50,12 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
     }
   }, [mcpServer, form]);
 
-  return (
-    <Collapse className="bg-gray-50 border border-gray-200 rounded-lg" expandIconPosition="end" ghost={false}>
-      <Panel
-        header={
+  const collapseItems: CollapseProps["items"] = [
+    {
+      key: "permissions",
+      className: "border-0",
+      forceRender: true,
+      label: (
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -61,11 +63,8 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
             </div>
             <p className="text-sm text-gray-600 ml-4">Configure access permissions and security settings (Optional)</p>
           </div>
-        }
-        key="permissions"
-        className="border-0"
-        forceRender
-      >
+      ),
+      children: (
         <div className="space-y-6 pt-4">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -221,8 +220,17 @@ const MCPPermissionManagement: React.FC<MCPPermissionManagementProps> = ({
             </Form.List>
           </Form.Item>
         </div>
-      </Panel>
-    </Collapse>
+      ),
+    },
+  ];
+
+  return (
+    <Collapse
+      className="bg-gray-50 border border-gray-200 rounded-lg"
+      expandIconPosition="end"
+      ghost={false}
+      items={collapseItems}
+    />
   );
 };
 
