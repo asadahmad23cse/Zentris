@@ -136,6 +136,7 @@ const EditHashicorpVaultModal: React.FC<EditHashicorpVaultModalProps> = ({
       title="Edit Hashicorp Vault Configuration"
       open={isVisible}
       width={700}
+      forceRender
       footer={
         <Space>
           <Button onClick={handleCancel} disabled={isPending}>

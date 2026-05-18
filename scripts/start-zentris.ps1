@@ -7,7 +7,7 @@ $PgBin = "C:\Program Files\PostgreSQL\18\bin"
 $PgData = Join-Path $Root ".local\postgres-data"
 $PgLog = Join-Path $Logs "local-postgres.log"
 $ProxyDatabaseName = "zentris_dev"
-$DatabaseUrl = "postgresql://llmproxy:dbpassword9090@localhost:55432/$ProxyDatabaseName"
+$DatabaseUrl = "postgresql://llmproxy:dbpassword9090@127.0.0.1:55432/$ProxyDatabaseName"
 $JwtSecret = "local-dev-only-jwt-secret-change-before-production-0123456789"
 $ConfirmationSecret = "local-dev-only-confirmation-secret-change-before-production-0123456789"
 
@@ -51,16 +51,42 @@ if (-not (Test-Path (Join-Path $PgData "PG_VERSION"))) {
 
 if (-not (Test-Port 55432)) {
   Write-Host "Starting project-local Postgres on port 55432..."
-  & (Join-Path $PgBin "pg_ctl.exe") -D $PgData -l $PgLog -o "-p 55432" start | Out-Host
-  Start-Sleep -Seconds 5
+  
+  # Remove stale postmaster.pid if postgres is not actually running
+  $pidFile = Join-Path $PgData "postmaster.pid"
+  if (Test-Path $pidFile) {
+    Write-Host "Removing stale postmaster.pid..."
+    Remove-Item $pidFile -Force -ErrorAction SilentlyContinue
+  }
+  
+  # Port 55432 is set in postgresql.conf (no -o flag needed - it was broken on Windows)
+  & (Join-Path $PgBin "pg_ctl.exe") -D $PgData -l $PgLog start | Out-Host
+  
+  # Wait for Postgres to be ready (up to 30 seconds)
+  $pgReady = $false
+  for ($i = 0; $i -lt 30; $i++) {
+    Start-Sleep -Seconds 1
+    & (Join-Path $PgBin "pg_isready.exe") -h 127.0.0.1 -p 55432 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+      $pgReady = $true
+      Write-Host "Postgres is ready after $($i+1) seconds."
+      break
+    }
+    Write-Host "Waiting for Postgres... ($($i+1)s)"
+  }
+  if (-not $pgReady) {
+    Write-Warning "Postgres did not become ready in 30 seconds. Proceeding anyway..."
+  }
+} else {
+  Write-Host "Postgres already running on port 55432."
 }
 
 Write-Host "Ensuring proxy database and role exist..."
-& (Join-Path $PgBin "psql.exe") -h localhost -p 55432 -U postgres -d postgres -v ON_ERROR_STOP=1 -c "DO `$`$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'llmproxy') THEN CREATE ROLE llmproxy LOGIN PASSWORD 'dbpassword9090' SUPERUSER; END IF; END `$`$;" | Out-Host
-$dbCheckOutput = & (Join-Path $PgBin "psql.exe") -h localhost -p 55432 -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$ProxyDatabaseName'"
+& (Join-Path $PgBin "psql.exe") -h 127.0.0.1 -p 55432 -U postgres -d postgres -v ON_ERROR_STOP=1 -c "DO `$`$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'llmproxy') THEN CREATE ROLE llmproxy LOGIN PASSWORD 'dbpassword9090' SUPERUSER; END IF; END `$`$;"
+$dbCheckOutput = & (Join-Path $PgBin "psql.exe") -h 127.0.0.1 -p 55432 -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$ProxyDatabaseName'"
 $dbExists = if ($dbCheckOutput) { $dbCheckOutput.Trim() } else { "" }
 if ($dbExists -ne "1") {
-  & (Join-Path $PgBin "createdb.exe") -h localhost -p 55432 -U postgres -O llmproxy $ProxyDatabaseName | Out-Host
+  & (Join-Path $PgBin "createdb.exe") -h 127.0.0.1 -p 55432 -U postgres -O llmproxy $ProxyDatabaseName
 }
 
 if (-not (Test-Port 6379)) {
@@ -76,7 +102,7 @@ if (-not (Test-Port 6379)) {
 
 Write-Host "Syncing proxy database schema..."
 $env:DATABASE_URL = $DatabaseUrl
-prisma db push --schema (Join-Path $Root "schema.prisma") | Out-Host
+prisma db push --schema (Join-Path $Root "schema.prisma")
 
 Write-Host "Restarting app processes..."
 Stop-PortProcess 3000
@@ -113,8 +139,46 @@ Start-ProcessLogged "npm.cmd" @("run", "dev") $Root (Join-Path $Logs "backend-de
 $Dashboard = Join-Path $Root "ui\litellm-dashboard"
 Start-ProcessLogged "npm.cmd" @("run", "dev", "--", "-p", "3001") $Dashboard (Join-Path $Dashboard "logs\dashboard-dev.out.log") (Join-Path $Dashboard "logs\dashboard-dev.err.log")
 
-Write-Host "Waiting for services..."
-Start-Sleep -Seconds 45
+Write-Host "Waiting for services to become ready..."
+
+# Wait for proxy (port 4000) - up to 90 seconds
+Write-Host "  Waiting for LiteLLM proxy on port 4000..."
+$proxyReady = $false
+for ($i = 0; $i -lt 90; $i++) {
+  Start-Sleep -Seconds 1
+  if (Test-Port 4000) {
+    # Port is open, now check health endpoint
+    try {
+      $r = Invoke-WebRequest -UseBasicParsing "http://localhost:4000/health/liveliness" -TimeoutSec 3 -ErrorAction Stop
+      if ($r.StatusCode -eq 200) {
+        $proxyReady = $true
+        Write-Host "  Proxy ready after $($i+1) seconds."
+        break
+      }
+    } catch { }
+  }
+  if ($i % 10 -eq 9) { Write-Host "  Still waiting for proxy... ($($i+1)s)" }
+}
+if (-not $proxyReady) {
+  Write-Warning "LiteLLM proxy did not become ready. Dashboard may redirect to login. Check logs\litellm-proxy.err.log"
+}
+
+# Wait for backend (port 3000) - up to 30 seconds
+Write-Host "  Waiting for backend on port 3000..."
+for ($i = 0; $i -lt 30; $i++) {
+  Start-Sleep -Seconds 1
+  try {
+    $r = Invoke-WebRequest -UseBasicParsing "http://localhost:3000/health" -TimeoutSec 3 -ErrorAction Stop
+    if ($r.StatusCode -eq 200) { Write-Host "  Backend ready after $($i+1) seconds."; break }
+  } catch { }
+}
+
+# Wait for dashboard (port 3001) - up to 60 seconds
+Write-Host "  Waiting for dashboard on port 3001..."
+for ($i = 0; $i -lt 60; $i++) {
+  Start-Sleep -Seconds 1
+  if (Test-Port 3001) { Write-Host "  Dashboard ready after $($i+1) seconds."; break }
+}
 
 $checks = @(
   @{ Name = "Zentris backend"; Url = "http://localhost:3000/health" },

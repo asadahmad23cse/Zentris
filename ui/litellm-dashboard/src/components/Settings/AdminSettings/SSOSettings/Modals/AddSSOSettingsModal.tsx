@@ -43,6 +43,7 @@ const AddSSOSettingsModal: React.FC<AddSSOSettingsModalProps> = ({ isVisible, on
       title="Add SSO"
       open={isVisible}
       width={800}
+      forceRender
       footer={
         <Space>
           <Button onClick={handleCancel} disabled={isPending}>

@@ -127,6 +127,7 @@ const EditSSOSettingsModal: React.FC<EditSSOSettingsModalProps> = ({ isVisible, 
       title="Edit SSO Settings"
       open={isVisible}
       width={800}
+      forceRender
       footer={
         <Space>
           <Button onClick={handleCancel} disabled={isPending}>
