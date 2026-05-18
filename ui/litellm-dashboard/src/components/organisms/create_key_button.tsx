@@ -888,6 +888,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                   </span>
                 }
                 name="key_alias"
+                initialValue=""
                 rules={[
                   {
                     required: true,
