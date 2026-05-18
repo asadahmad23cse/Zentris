@@ -3,7 +3,7 @@ import { Select } from "antd";
 import { VectorStore } from "./types";
 import { vectorStoreListCall } from "../networking";
 interface VectorStoreSelectorProps {
-  onChange: (selectedVectorStores: string[]) => void;
+  onChange?: (selectedVectorStores: string[]) => void;
   value?: string[];
   className?: string;
   accessToken: string;

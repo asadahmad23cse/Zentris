@@ -110,6 +110,7 @@ export function EditProjectModal({
       onCancel={onClose}
       width={720}
       destroyOnHidden
+      forceRender
       footer={[
         <Button key="cancel" onClick={onClose}>
           Cancel

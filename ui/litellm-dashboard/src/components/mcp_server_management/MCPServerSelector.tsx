@@ -4,7 +4,7 @@ import { Select } from "antd";
 import React from "react";
 
 interface MCPServerSelectorProps {
-  onChange: (selected: { servers: string[]; accessGroups: string[] }) => void;
+  onChange?: (selected: { servers: string[]; accessGroups: string[] }) => void;
   value?: {
     servers: string[];
     accessGroups: string[];
@@ -53,7 +53,7 @@ const MCPServerSelector: React.FC<MCPServerSelectorProps> = ({
   const handleChange = (selected: string[]) => {
     const servers = selected.filter((v) => !accessGroups.includes(v));
     const accessGroupsSelected = selected.filter((v) => accessGroups.includes(v));
-    onChange({ servers, accessGroups: accessGroupsSelected });
+    onChange?.({ servers, accessGroups: accessGroupsSelected });
   };
 
   return (

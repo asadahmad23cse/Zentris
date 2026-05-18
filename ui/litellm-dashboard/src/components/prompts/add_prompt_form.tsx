@@ -129,6 +129,7 @@ const AddPromptForm: React.FC<AddPromptFormProps> = ({ visible, onClose, accessT
         </Button>,
       ]}
       width={600}
+      forceRender
     >
       <Form form={form} layout="vertical" requiredMark={false}>
         <Form.Item

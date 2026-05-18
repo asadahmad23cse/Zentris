@@ -3,7 +3,6 @@ import { Typography, Collapse } from "antd";
 import type { MCPEvent } from "../../mcp_tools/types";
 
 const { Text } = Typography;
-const { Panel } = Collapse;
 
 interface MCPEventsDisplayProps {
   events: MCPEvent[];
@@ -170,60 +169,66 @@ const MCPEventsDisplay: React.FC<MCPEventsDisplayProps> = ({ events, className }
           size="small"
           expandIconPosition="start"
           defaultActiveKey={toolsEvent ? ["list-tools"] : mcpCallEvents.map((_, index) => `mcp-call-${index}`)}
-        >
-          {/* List Tools Panel */}
-          {toolsEvent && (
-            <Panel header="List tools" key="list-tools">
-              <div>
-                {toolsEvent.item?.tools?.map((tool, index) => (
-                  <div key={index} className="tool-item">
-                    {tool.name}
-                  </div>
-                ))}
-              </div>
-            </Panel>
-          )}
-
-          {/* MCP Call Panels */}
-          {mcpCallEvents.map((callEvent, index) => (
-            <Panel header={callEvent.item?.name || "Tool call"} key={`mcp-call-${index}`}>
-              <div>
-                {/* Request section */}
-                <div className="mcp-section">
-                  <div className="mcp-section-header">Request</div>
-                  <div className="mcp-code-block">
-                    {callEvent.item?.arguments && (
-                      <pre className="mcp-json">
-                        {(() => {
-                          try {
-                            return JSON.stringify(JSON.parse(callEvent.item.arguments), null, 2);
-                          } catch (e) {
-                            return callEvent.item.arguments;
-                          }
-                        })()}
-                      </pre>
-                    )}
-                  </div>
-                </div>
-
-                {/* Approved section */}
-                <div className="mcp-section">
-                  <div className="mcp-approved">
-                    <span className="mcp-checkmark">✓</span> Approved
-                  </div>
-                </div>
-
-                {/* Response section */}
-                {callEvent.item?.output && (
+          items={[
+            ...(toolsEvent
+              ? [
+                  {
+                    key: "list-tools",
+                    label: "List tools",
+                    children: (
+                      <div>
+                        {toolsEvent.item?.tools?.map((tool, index) => (
+                          <div key={index} className="tool-item">
+                            {tool.name}
+                          </div>
+                        ))}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...mcpCallEvents.map((callEvent, index) => ({
+              key: `mcp-call-${index}`,
+              label: callEvent.item?.name || "Tool call",
+              children: (
+                <div>
+                  {/* Request section */}
                   <div className="mcp-section">
-                    <div className="mcp-section-header">Response</div>
-                    <div className="mcp-response-content">{callEvent.item.output}</div>
+                    <div className="mcp-section-header">Request</div>
+                    <div className="mcp-code-block">
+                      {callEvent.item?.arguments && (
+                        <pre className="mcp-json">
+                          {(() => {
+                            try {
+                              return JSON.stringify(JSON.parse(callEvent.item.arguments), null, 2);
+                            } catch (e) {
+                              return callEvent.item.arguments;
+                            }
+                          })()}
+                        </pre>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            </Panel>
-          ))}
-        </Collapse>
+
+                  {/* Approved section */}
+                  <div className="mcp-section">
+                    <div className="mcp-approved">
+                      <span className="mcp-checkmark">✓</span> Approved
+                    </div>
+                  </div>
+
+                  {/* Response section */}
+                  {callEvent.item?.output && (
+                    <div className="mcp-section">
+                      <div className="mcp-section-header">Response</div>
+                      <div className="mcp-response-content">{callEvent.item.output}</div>
+                    </div>
+                  )}
+                </div>
+              ),
+            })),
+          ]}
+        />
       </div>
     </div>
   );

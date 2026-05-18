@@ -142,7 +142,7 @@ const VectorStoreManagement: React.FC<VectorStoreProps> = ({ accessToken, userID
         </div>
 
         <Text className="mb-4">
-          <p>You can use vector stores to store and retrieve LLM embeddings.</p>
+          You can use vector stores to store and retrieve LLM embeddings.
         </Text>
 
         <TabGroup>

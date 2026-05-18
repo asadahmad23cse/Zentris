@@ -64,7 +64,7 @@ const MCPServerCostConfig: React.FC<MCPServerCostConfigProps> = ({
               onChange={handleDefaultCostChange}
               disabled={disabled}
               style={{ width: "200px" }}
-              addonBefore="$"
+              prefix="$"
             />
             <Text className="block mt-1 text-gray-500 text-sm">
               Set a default cost for all tool calls to this server
@@ -116,7 +116,7 @@ const MCPServerCostConfig: React.FC<MCPServerCostConfigProps> = ({
                                 onChange={(cost) => handleToolCostChange(tool.name, cost)}
                                 disabled={disabled}
                                 style={{ width: "120px" }}
-                                addonBefore="$"
+                                prefix="$"
                               />
                             </div>
                           </div>

@@ -22,6 +22,12 @@ function LoginPageContent() {
   const router = useRouter();
   const { workers, selectWorker } = useWorker();
   const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null);
+  const dashboardHome = () => {
+    if (typeof window !== "undefined" && window.location.port === "3001") {
+      return "/?login=success";
+    }
+    return "/ui/?login=success";
+  };
 
   // Pre-select worker from URL param (e.g. /ui/login?worker=team-b)
   useEffect(() => {
@@ -54,7 +60,7 @@ function LoginPageContent() {
         params.delete("code");
         const cleanSearch = params.toString();
         window.history.replaceState(null, "", window.location.pathname + (cleanSearch ? `?${cleanSearch}` : ""));
-        router.replace("/ui/?login=success");
+        router.replace(dashboardHome());
       });
       return;
     }
@@ -70,7 +76,7 @@ function LoginPageContent() {
         "",
         window.location.pathname + (cleanSearch ? `?${cleanSearch}` : ""),
       );
-      router.replace("/ui/?login=success");
+      router.replace(dashboardHome());
       return;
     }
 
@@ -89,7 +95,7 @@ function LoginPageContent() {
       if (returnUrl) {
         router.replace(returnUrl);
       } else {
-        router.replace("/ui");
+        router.replace(dashboardHome());
       }
       return;
     }
@@ -123,12 +129,14 @@ function LoginPageContent() {
           if (selectedWorker) {
             selectWorker(selectedWorker.worker_id);
             // Stay on the CP's UI — proxyBaseUrl already points at the worker
-            router.push("/ui/?login=success");
+            router.push(dashboardHome());
           } else {
             // Normal (non-control-plane) login — follow the server's redirect
             const returnUrl = consumeReturnUrl();
             if (returnUrl) {
               router.push(returnUrl);
+            } else if (typeof window !== "undefined" && window.location.port === "3001") {
+              router.push(dashboardHome());
             } else {
               router.push(data.redirect_url);
             }

@@ -100,6 +100,7 @@ const SpendLogsSettingsModal: React.FC<SpendLogsSettingsModalProps> = ({ isVisib
     <Modal
       title={<Typography.Title level={5}>Spend Logs Settings</Typography.Title>}
       open={isVisible}
+      forceRender
       footer={
         <Space>
           <Button onClick={handleCancel} disabled={isPending || isDeletingField || isLoadingConfig}>

@@ -238,6 +238,7 @@ export const CreateUserButton: React.FC<CreateuserProps> = ({
         footer={null}
         onOk={handleOk}
         onCancel={handleCancel}
+        forceRender
       >
         <Space direction="vertical" size="middle">
           <Text className="mb-1">Create a User who can own keys</Text>

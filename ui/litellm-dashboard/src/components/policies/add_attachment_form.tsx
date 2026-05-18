@@ -206,6 +206,7 @@ const AddAttachmentForm: React.FC<AddAttachmentFormProps> = ({
       onCancel={handleClose}
       footer={null}
       width={600}
+      forceRender
     >
       <Form
         form={form}

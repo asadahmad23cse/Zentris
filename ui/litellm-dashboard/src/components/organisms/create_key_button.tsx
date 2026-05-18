@@ -672,7 +672,20 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
         </Button>
       )}
       <Modal open={isModalVisible} width={1000} footer={null} onOk={handleOk} onCancel={handleCancel} forceRender>
-        <Form form={form} onFinish={handleCreate} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
+        <Form
+          form={form}
+          onFinish={handleCreate}
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
+          labelAlign="left"
+          initialValues={{
+            team_id: team ? team.team_id : null,
+            key_alias: "",
+            key_type: "llm_api",
+            duration: null,
+            mcp_tool_permissions: {},
+          }}
+        >
           {/* Section 1: Key Ownership */}
           <div className="mb-8">
             <Title className="mb-4">Key Ownership</Title>
@@ -798,10 +811,9 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                     <InfoCircleOutlined style={{ marginLeft: "4px" }} />
                   </Tooltip>
                 </span>
-              }
-              name="team_id"
-              initialValue={team ? team.team_id : null}
-              className="mt-4"
+                }
+                name="team_id"
+                className="mt-4"
               rules={[
                 {
                   required: keyOwner === "service_account",
@@ -889,7 +901,6 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                   </span>
                 }
                 name="key_alias"
-                initialValue=""
                 rules={[
                   {
                     required: true,
@@ -953,11 +964,9 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                   </span>
                 }
                 name="key_type"
-                initialValue="llm_api"
                 className="mt-4"
               >
                 <Select
-                  defaultValue="llm_api"
                   placeholder="Select key type"
                   style={{ width: "100%" }}
                   optionLabelProp="label"
@@ -1045,7 +1054,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                     name="budget_duration"
                     help={`Team Reset Budget: ${team?.budget_duration !== null && team?.budget_duration !== undefined ? team?.budget_duration : "None"}`}
                   >
-                    <BudgetDurationDropdown onChange={(value) => form.setFieldValue("budget_duration", value)} />
+                    <BudgetDurationDropdown />
                   </Form.Item>
                   <Form.Item
                     className="mt-4"
@@ -1280,10 +1289,8 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                         ? "Select existing pass through routes or enter new ones"
                         : "Premium feature - Upgrade to set pass through routes by key"
                     }
-                  >
-                    <PassThroughRoutesSelector
-                      onChange={(values: string[]) => form.setFieldValue("allowed_passthrough_routes", values)}
-                      value={form.getFieldValue("allowed_passthrough_routes")}
+                    >
+                      <PassThroughRoutesSelector
                       accessToken={accessToken}
                       placeholder={
                         !premiumUser
@@ -1308,8 +1315,6 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                     help="Select vector stores this key can access. Leave empty for access to all vector stores"
                   >
                     <VectorStoreSelector
-                      onChange={(values: string[]) => form.setFieldValue("allowed_vector_store_ids", values)}
-                      value={form.getFieldValue("allowed_vector_store_ids")}
                       accessToken={accessToken}
                       placeholder="Select vector stores (optional)"
                     />
@@ -1367,8 +1372,6 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                         help="Select MCP servers or access groups this key can access"
                       >
                         <MCPServerSelector
-                          onChange={(val: any) => form.setFieldValue("allowed_mcp_servers_and_groups", val)}
-                          value={form.getFieldValue("allowed_mcp_servers_and_groups")}
                           accessToken={accessToken}
                           teamId={selectedCreateKeyTeam?.team_id ?? null}
                           placeholder="Select MCP servers or access groups (optional)"
@@ -1376,7 +1379,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                       </Form.Item>
 
                       {/* Hidden field to register mcp_tool_permissions with the form */}
-                      <Form.Item name="mcp_tool_permissions" initialValue={{}} hidden>
+                      <Form.Item name="mcp_tool_permissions" hidden>
                         <Input type="hidden" />
                       </Form.Item>
 
@@ -1419,8 +1422,6 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                         help="Select agents or access groups this key can access"
                       >
                         <AgentSelector
-                          onChange={(val: any) => form.setFieldValue("allowed_agents_and_groups", val)}
-                          value={form.getFieldValue("allowed_agents_and_groups")}
                           accessToken={accessToken}
                           placeholder="Select agents or access groups (optional)"
                         />
@@ -1538,7 +1539,7 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
                         />
                       </div>
                     </AccordionBody>
-                    <Form.Item name="duration" hidden initialValue={null}>
+                    <Form.Item name="duration" hidden>
                       <Input />
                     </Form.Item>
                   </Accordion>

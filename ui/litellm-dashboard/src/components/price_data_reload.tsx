@@ -489,7 +489,7 @@ const PriceDataReload: React.FC<PriceDataReloadProps> = ({
             max={168} // 1 week max
             value={hours}
             onChange={(value) => setHours(value || 6)}
-            addonAfter="hours"
+            suffix="hours"
             style={{ width: "100%" }}
           />
         </div>

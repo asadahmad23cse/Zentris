@@ -4,8 +4,6 @@ import { AgentCreateInfo, AgentCredentialFieldMetadata } from "../networking";
 import { AGENT_FORM_CONFIG } from "./agent_config";
 import CostConfigFields from "./cost_config_fields";
 
-const { Panel } = Collapse;
-
 interface DynamicAgentFormFieldsProps {
   agentTypeInfo: AgentCreateInfo;
 }
@@ -64,11 +62,16 @@ const DynamicAgentFormFields: React.FC<DynamicAgentFormFieldsProps> = ({
         </Form.Item>
       ))}
 
-      <Collapse style={{ marginBottom: 16 }}>
-        <Panel header={AGENT_FORM_CONFIG.cost.title} key={AGENT_FORM_CONFIG.cost.key}>
-          <CostConfigFields />
-        </Panel>
-      </Collapse>
+      <Collapse
+        style={{ marginBottom: 16 }}
+        items={[
+          {
+            key: AGENT_FORM_CONFIG.cost.key,
+            label: AGENT_FORM_CONFIG.cost.title,
+            children: <CostConfigFields />,
+          },
+        ]}
+      />
     </>
   );
 };

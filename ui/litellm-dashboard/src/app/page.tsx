@@ -210,6 +210,12 @@ function CreateKeyPageContent() {
     setCreateClicked(() => !createClicked);
   };
   const redirectToLogin = authLoading === false && token === null && invitation_id === null;
+  const getLoginUrl = () => {
+    if (typeof window !== "undefined" && window.location.port === "3001") {
+      return `${window.location.origin}/login`;
+    }
+    return (proxyBaseUrl || "") + "/ui/login";
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -248,7 +254,7 @@ function CreateKeyPageContent() {
       // Store the current URL so we can redirect back after login
       storeReturnUrl();
       // Build login URL with return URL parameter
-      const baseLoginUrl = (proxyBaseUrl || "") + "/ui/login";
+      const baseLoginUrl = getLoginUrl();
       const dest = buildLoginUrlWithReturn(baseLoginUrl);
       // Replace instead of assigning to avoid back-button loops
       window.location.replace(dest);

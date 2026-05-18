@@ -25,15 +25,23 @@ vi.mock("@tremor/react", () => ({
 }));
 
 vi.mock("antd", () => {
-  const CollapseComponent = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
-  const PanelComponent = ({ children, header }: { children: React.ReactNode; header: React.ReactNode }) => (
+  const CollapseComponent = ({ children, items }: { children?: React.ReactNode; items?: any[] }) => (
+    <div>
+      {children}
+      {items?.map((item) => (
+        <div key={item.key}>
+          <div>{item.label}</div>
+          <div>{item.children}</div>
+        </div>
+      ))}
+    </div>
+  );
+  CollapseComponent.Panel = ({ children, header }: { children: React.ReactNode; header: React.ReactNode }) => (
     <div>
       <div>{header}</div>
       <div>{children}</div>
     </div>
   );
-  PanelComponent.displayName = "Collapse.Panel";
-  CollapseComponent.Panel = PanelComponent;
   const TableComponent = ({ dataSource, columns }: { dataSource?: unknown[]; columns?: { title: string }[] }) => (
     <table>
       <thead>

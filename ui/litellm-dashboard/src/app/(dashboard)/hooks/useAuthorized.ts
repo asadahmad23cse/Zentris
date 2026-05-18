@@ -23,7 +23,10 @@ const useAuthorized = () => {
   // Helper function to redirect to login while preserving the current URL
   const redirectToLogin = useCallback(() => {
     storeReturnUrl();
-    const baseLoginUrl = `${getProxyBaseUrl()}/ui/login`;
+    const baseLoginUrl =
+      typeof window !== "undefined" && window.location.port === "3001"
+        ? `${window.location.origin}/login`
+        : `${getProxyBaseUrl()}/ui/login`;
     const loginUrlWithReturn = buildLoginUrlWithReturn(baseLoginUrl);
     router.replace(loginUrlWithReturn);
   }, [router]);

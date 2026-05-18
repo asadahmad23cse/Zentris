@@ -10,7 +10,7 @@ interface Agent {
 }
 
 interface AgentSelectorProps {
-  onChange: (selected: { 
+  onChange?: (selected: { 
     agents: string[]; 
     accessGroups: string[];
   }) => void;
@@ -91,7 +91,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
     const accessGroupsSelected = selected
       .filter((v) => v.startsWith("group:"))
       .map((v) => v.replace("group:", ""));
-    onChange({ agents: agentsSelected, accessGroups: accessGroupsSelected });
+    onChange?.({ agents: agentsSelected, accessGroups: accessGroupsSelected });
   };
 
   return (
