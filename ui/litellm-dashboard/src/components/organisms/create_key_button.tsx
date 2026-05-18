@@ -574,8 +574,9 @@ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOp
     if (!pendingPrefillModels) {
       form.setFieldValue("models", []);
     }
-    // Clear MCP server selection when team changes (available servers may differ)
-    form.setFieldValue("allowed_mcp_servers_and_groups", { servers: [], accessGroups: [] });
+    // Clear MCP server selection when team changes (available servers may differ).
+    // Keep this unset instead of an empty object to avoid rc-field-form deep comparison warnings.
+    form.setFieldValue("allowed_mcp_servers_and_groups", undefined);
   }, [selectedCreateKeyTeam, selectedProjectId, accessToken, userID, userRole, form]);
 
   // Apply deferred model prefill once the available model list arrives.
