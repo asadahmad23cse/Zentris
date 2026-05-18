@@ -219,6 +219,7 @@ const BulkEditUserModal: React.FC<BulkEditUserModalProps> = ({
       footer={null}
       title={updateAllUsers ? "Bulk Edit All Users" : `Bulk Edit ${selectedUsers.length} User(s)`}
       width={800}
+      forceRender
     >
       {allowAllUsers && (
         <div className="mb-4">

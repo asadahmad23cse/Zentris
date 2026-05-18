@@ -62,6 +62,7 @@ export function CreateProjectModal({
       onCancel={handleCancel}
       width={720}
       destroyOnHidden
+      forceRender
       footer={[
         <Button key="cancel" onClick={handleCancel}>
           Cancel

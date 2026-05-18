@@ -156,6 +156,7 @@ const MemberModal = <T extends BaseMember>({
       width={1000}
       footer={null}
       onCancel={onCancel}
+      forceRender
     >
       <Form form={form} onFinish={handleSubmit} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
         {config.showEmail && (

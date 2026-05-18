@@ -11,8 +11,6 @@ import ReasoningContent from "../playground/chat_ui/ReasoningContent";
 import MCPEventsDisplay from "../playground/chat_ui/MCPEventsDisplay";
 import { ChatMessage } from "./types";
 
-const { Panel } = Collapse;
-
 // Keys whose values must be redacted in tool args display
 const REDACTED_KEY_PATTERNS = /token|key|secret|password|auth/i;
 
@@ -452,81 +450,85 @@ function ToolCard({ message }: ToolCardProps) {
           border: "1px solid #e5e7eb",
           borderRadius: 8,
         }}
-      >
-        <Panel
-          header={
-            <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
-              <ToolOutlined style={{ color: "#6b7280" }} />
-              <span style={{ color: "#374151", fontWeight: 500 }}>
-                {message.toolName ?? "Tool call"}
+        items={[
+          {
+            key: "tool",
+            label: (
+              <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+                <ToolOutlined style={{ color: "#6b7280" }} />
+                <span style={{ color: "#374151", fontWeight: 500 }}>
+                  {message.toolName ?? "Tool call"}
+                </span>
               </span>
-            </span>
-          }
-          key="tool"
-        >
-          {redactedArgs !== undefined && (
-            <div style={{ marginBottom: message.toolResult ? 12 : 0 }}>
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  color: "#9ca3af",
-                  marginBottom: 4,
-                }}
-              >
-                Arguments
-              </div>
-              <pre
-                style={{
-                  margin: 0,
-                  padding: "8px 10px",
-                  backgroundColor: "#f3f4f6",
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontFamily:
-                    'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                  color: "#374151",
-                }}
-              >
-                {JSON.stringify(redactedArgs, null, 2)}
-              </pre>
-            </div>
-          )}
+            ),
+            children: (
+              <>
+                {redactedArgs !== undefined && (
+                  <div style={{ marginBottom: message.toolResult ? 12 : 0 }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        color: "#9ca3af",
+                        marginBottom: 4,
+                      }}
+                    >
+                      Arguments
+                    </div>
+                    <pre
+                      style={{
+                        margin: 0,
+                        padding: "8px 10px",
+                        backgroundColor: "#f3f4f6",
+                        borderRadius: 6,
+                        fontSize: 12,
+                        fontFamily:
+                          'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        color: "#374151",
+                      }}
+                    >
+                      {JSON.stringify(redactedArgs, null, 2)}
+                    </pre>
+                  </div>
+                )}
 
-          {message.toolResult && (
-            <div>
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  color: "#9ca3af",
-                  marginBottom: 4,
-                }}
-              >
-                Result
-              </div>
-              <div
-                style={{
-                  fontSize: 13,
-                  color: "#374151",
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                  fontFamily:
-                    'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                }}
-              >
-                {message.toolResult}
-              </div>
-            </div>
-          )}
-        </Panel>
-      </Collapse>
+                {message.toolResult && (
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        color: "#9ca3af",
+                        marginBottom: 4,
+                      }}
+                    >
+                      Result
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        color: "#374151",
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        fontFamily:
+                          'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                      }}
+                    >
+                      {message.toolResult}
+                    </div>
+                  </div>
+                )}
+              </>
+            ),
+          },
+        ]}
+      />
       <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4 }}>
         {formatTimestamp(message.timestamp)}
       </div>

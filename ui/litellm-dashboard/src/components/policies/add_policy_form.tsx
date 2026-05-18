@@ -393,6 +393,7 @@ const AddPolicyForm: React.FC<AddPolicyFormProps> = ({
       onCancel={handleClose}
       footer={null}
       width={700}
+      forceRender
     >
       <Form
         form={form}

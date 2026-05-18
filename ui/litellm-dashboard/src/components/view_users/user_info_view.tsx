@@ -671,6 +671,7 @@ export default function UserInfoView({
         footer={null}
         width={500}
         maskClosable={!isAddingTeam}
+        forceRender
       >
         <Form
           layout="vertical"

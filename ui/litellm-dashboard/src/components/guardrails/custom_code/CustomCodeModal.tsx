@@ -14,7 +14,7 @@ import {
 import { createGuardrailCall, updateGuardrailCall, testCustomCodeGuardrail } from "../../networking";
 import NotificationsManager from "../../molecules/notifications_manager";
 
-const { Panel } = Collapse;
+// const { Panel } = Collapse;
 const { TextArea } = Input;
 
 // Code templates
@@ -613,109 +613,111 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
               onChange={(keys) => setTestExpanded(keys.includes("test"))}
               className="mt-3 bg-white border border-gray-200 rounded-lg flex-shrink-0"
               expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
-            >
-              <Panel
-                header={
-                  <span className="flex items-center gap-2 text-sm font-medium">
-                    <PlayCircleOutlined className="text-blue-500" />
-                    Test Your Guardrail
-                  </span>
-                }
-                key="test"
-              >
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="block text-xs font-medium text-gray-600">Test Input (JSON)</label>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Load example:</span>
-                        <button
-                          type="button"
-                          onClick={() => setTestInput(JSON.stringify(TEST_INPUT_EXAMPLES.pre_call.data, null, 2))}
-                          className="px-2 py-1 text-xs rounded border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
-                        >
-                          Pre-call
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setTestInput(JSON.stringify(TEST_INPUT_EXAMPLES.pre_mcp_call.data, null, 2))}
-                          className="px-2 py-1 text-xs rounded border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors"
-                        >
-                          Pre MCP
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setTestInput(JSON.stringify(TEST_INPUT_EXAMPLES.post_call.data, null, 2))}
-                          className="px-2 py-1 text-xs rounded border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
-                        >
-                          Post-call
-                        </button>
+              items={[
+                {
+                  key: "test",
+                  label: (
+                    <span className="flex items-center gap-2 text-sm font-medium">
+                      <PlayCircleOutlined className="text-blue-500" />
+                      Test Your Guardrail
+                    </span>
+                  ),
+                  children: (
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-xs font-medium text-gray-600">Test Input (JSON)</label>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">Load example:</span>
+                            <button
+                              type="button"
+                              onClick={() => setTestInput(JSON.stringify(TEST_INPUT_EXAMPLES.pre_call.data, null, 2))}
+                              className="px-2 py-1 text-xs rounded border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
+                            >
+                              Pre-call
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setTestInput(JSON.stringify(TEST_INPUT_EXAMPLES.pre_mcp_call.data, null, 2))}
+                              className="px-2 py-1 text-xs rounded border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors"
+                            >
+                              Pre MCP
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setTestInput(JSON.stringify(TEST_INPUT_EXAMPLES.post_call.data, null, 2))}
+                              className="px-2 py-1 text-xs rounded border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                            >
+                              Post-call
+                            </button>
+                          </div>
+                        </div>
+                        <div className="mb-2 p-2 bg-gray-50 rounded text-xs text-gray-600 border border-gray-200">
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                            <div><strong>texts</strong>: Message content (always)</div>
+                            <div><strong>images</strong>: Base64 images (vision)</div>
+                            <div><strong>tools</strong>: Tool definitions <span className="text-orange-600">(pre_call)</span>, MCP as OpenAI tool <span className="text-purple-600">(pre_mcp_call)</span></div>
+                            <div><strong>tool_calls</strong>: LLM tool calls <span className="text-green-600">(post_call)</span></div>
+                            <div><strong>structured_messages</strong>: Full messages <span className="text-orange-600">(pre_call)</span></div>
+                            <div><strong>model</strong>: Model name (always)</div>
+                          </div>
+                        </div>
+                        <TextArea
+                          value={testInput}
+                          onChange={(e) => setTestInput(e.target.value)}
+                          rows={8}
+                          className="font-mono text-xs"
+                          placeholder='{"texts": ["test message"], ...}'
+                        />
                       </div>
-                    </div>
-                    <div className="mb-2 p-2 bg-gray-50 rounded text-xs text-gray-600 border border-gray-200">
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                        <div><strong>texts</strong>: Message content (always)</div>
-                        <div><strong>images</strong>: Base64 images (vision)</div>
-                        <div><strong>tools</strong>: Tool definitions <span className="text-orange-600">(pre_call)</span>, MCP as OpenAI tool <span className="text-purple-600">(pre_mcp_call)</span></div>
-                        <div><strong>tool_calls</strong>: LLM tool calls <span className="text-green-600">(post_call)</span></div>
-                        <div><strong>structured_messages</strong>: Full messages <span className="text-orange-600">(pre_call)</span></div>
-                        <div><strong>model</strong>: Model name (always)</div>
-                      </div>
-                    </div>
-                    <TextArea
-                      value={testInput}
-                      onChange={(e) => setTestInput(e.target.value)}
-                      rows={8}
-                      className="font-mono text-xs"
-                      placeholder='{"texts": ["test message"], ...}'
-                    />
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Button
-                      size="xs"
-                      onClick={handleTest}
-                      disabled={isTesting}
-                      icon={PlayCircleOutlined}
-                    >
-                      {isTesting ? "Running..." : "Run Test"}
-                    </Button>
-                    {testResult && (
-                      <div className={`flex items-center gap-2 text-sm ${
-                        testResult.error ? "text-red-600" :
-                        testResult.action === "allow" ? "text-green-600" :
-                        testResult.action === "block" ? "text-orange-600" :
-                        "text-blue-600"
-                      }`}>
-                        {testResult.error ? (
-                          <>
-                            <CloseCircleOutlined />
-                            <span>
-                              {testResult.error_type && <span className="font-medium">[{testResult.error_type}] </span>}
-                              {testResult.error}
-                            </span>
-                          </>
-                        ) : testResult.action === "allow" ? (
-                          <><CheckCircleOutlined /> Allowed</>
-                        ) : testResult.action === "block" ? (
-                          <><CloseCircleOutlined /> Blocked: {testResult.reason}</>
-                        ) : testResult.action === "modify" ? (
-                          <>
-                            <CheckCircleOutlined /> Modified
-                            {testResult.texts && testResult.texts.length > 0 && (
-                              <span className="text-xs text-gray-500 ml-1">
-                                → {testResult.texts[0].substring(0, 50)}{testResult.texts[0].length > 50 ? "..." : ""}
-                              </span>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          size="xs"
+                          onClick={handleTest}
+                          disabled={isTesting}
+                          icon={PlayCircleOutlined}
+                        >
+                          {isTesting ? "Running..." : "Run Test"}
+                        </Button>
+                        {testResult && (
+                          <div className={`flex items-center gap-2 text-sm ${
+                            testResult.error ? "text-red-600" :
+                            testResult.action === "allow" ? "text-green-600" :
+                            testResult.action === "block" ? "text-orange-600" :
+                            "text-blue-600"
+                          }`}>
+                            {testResult.error ? (
+                              <>
+                                <CloseCircleOutlined />
+                                <span>
+                                  {testResult.error_type && <span className="font-medium">[{testResult.error_type}] </span>}
+                                  {testResult.error}
+                                </span>
+                              </>
+                            ) : testResult.action === "allow" ? (
+                              <><CheckCircleOutlined /> Allowed</>
+                            ) : testResult.action === "block" ? (
+                              <><CloseCircleOutlined /> Blocked: {testResult.reason}</>
+                            ) : testResult.action === "modify" ? (
+                              <>
+                                <CheckCircleOutlined /> Modified
+                                {testResult.texts && testResult.texts.length > 0 && (
+                                  <span className="text-xs text-gray-500 ml-1">
+                                    → {testResult.texts[0].substring(0, 50)}{testResult.texts[0].length > 50 ? "..." : ""}
+                                  </span>
+                                )}
+                              </>
+                            ) : (
+                              <><CheckCircleOutlined /> {testResult.action || "Unknown"}</>
                             )}
-                          </>
-                        ) : (
-                          <><CheckCircleOutlined /> {testResult.action || "Unknown"}</>
+                          </div>
                         )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              </Panel>
-            </Collapse>
+                    </div>
+                  ),
+                },
+              ]}
+            />
             {/* Contribution CTA Banner */}
             <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
@@ -751,13 +753,11 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
               defaultActiveKey={["Return Values"]}
               className="primitives-collapse bg-transparent border-0"
               expandIconPosition="end"
-            >
-              {Object.entries(PRIMITIVES).map(([category, primitives]) => (
-                <Panel
-                  header={<span className="text-sm font-medium text-gray-700">{category}</span>}
-                  key={category}
-                  className="bg-white mb-2 rounded-lg border border-gray-200"
-                >
+              items={Object.entries(PRIMITIVES).map(([category, primitives]) => ({
+                key: category,
+                className: "bg-white mb-2 rounded-lg border border-gray-200",
+                label: <span className="text-sm font-medium text-gray-700">{category}</span>,
+                children: (
                   <div className="space-y-2">
                     {primitives.map((p) => (
                       <button
@@ -782,9 +782,9 @@ const CustomCodeModal: React.FC<CustomCodeModalProps> = ({
                       </button>
                     ))}
                   </div>
-                </Panel>
-              ))}
-            </Collapse>
+                ),
+              }))}
+            />
           </div>
         </div>
 

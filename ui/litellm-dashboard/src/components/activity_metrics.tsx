@@ -322,28 +322,28 @@ export const ActivityMetrics: React.FC<ActivityMetricsProps> = ({ modelMetrics, 
       </div>
 
       {/* Individual Model Sections */}
-      <Collapse defaultActiveKey={modelNames[0]}>
-        {modelNames.map((modelName) => (
-          <Collapse.Panel
-            key={modelName}
-            header={
-              <div className="flex justify-between items-center w-full">
-                <Title>{modelMetrics[modelName].label || "Unknown Item"}</Title>
-                <div className="flex space-x-4 text-sm text-gray-500">
-                  <span>${formatNumberWithCommas(modelMetrics[modelName].total_spend, 2)}</span>
-                  <span>{modelMetrics[modelName].total_requests.toLocaleString()} requests</span>
-                </div>
+      <Collapse
+        defaultActiveKey={modelNames[0] ? [modelNames[0]] : undefined}
+        items={modelNames.map((modelName) => ({
+          key: modelName,
+          label: (
+            <div className="flex justify-between items-center w-full">
+              <Title>{modelMetrics[modelName].label || "Unknown Item"}</Title>
+              <div className="flex space-x-4 text-sm text-gray-500">
+                <span>${formatNumberWithCommas(modelMetrics[modelName].total_spend, 2)}</span>
+                <span>{modelMetrics[modelName].total_requests.toLocaleString()} requests</span>
               </div>
-            }
-          >
+            </div>
+          ),
+          children: (
             <ModelSection
               modelName={modelName || "Unknown Model"}
               metrics={modelMetrics[modelName]}
               hidePromptCachingMetrics={hidePromptCachingMetrics}
             />
-          </Collapse.Panel>
-        ))}
-      </Collapse>
+          ),
+        }))}
+      />
     </div>
   );
 };
