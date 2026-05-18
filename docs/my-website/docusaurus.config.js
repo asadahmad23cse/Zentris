@@ -287,7 +287,7 @@ const config = {
           { to: '/release_notes', label: 'Changelog', position: 'left' },
           { to: '/blog', label: 'Blog', position: 'left' },
           {
-            href: 'https://github.com/BerriAI/litellm',
+            href: 'https://github.com/asadahmad23cse/Zentris',
             position: 'right',
             className: 'header-github-link',
             'aria-label': 'GitHub repository',
@@ -334,7 +334,7 @@ const config = {
             items: [
               {
                 label: 'GitHub',
-                href: 'https://github.com/BerriAI/litellm/',
+                href: 'https://github.com/asadahmad23cse/Zentris/',
               },
             ],
           },

@@ -3,6 +3,8 @@ $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
 $Logs = Join-Path $Root "logs"
+$Dashboard = Join-Path $Root "ui\litellm-dashboard"
+$DashboardLogs = Join-Path $Dashboard "logs"
 $PgBin = "C:\Program Files\PostgreSQL\18\bin"
 $PgData = Join-Path $Root ".local\postgres-data"
 $PgLog = Join-Path $Logs "local-postgres.log"
@@ -12,6 +14,7 @@ $JwtSecret = "local-dev-only-jwt-secret-change-before-production-0123456789"
 $ConfirmationSecret = "local-dev-only-confirmation-secret-change-before-production-0123456789"
 
 New-Item -ItemType Directory -Force -Path $Logs | Out-Null
+New-Item -ItemType Directory -Force -Path $DashboardLogs | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $Root ".local") | Out-Null
 
 function Test-Port([int]$Port) {
@@ -29,13 +32,63 @@ function Stop-PortProcess([int]$Port) {
     }
 }
 
+function Invoke-NativeCommand([string]$FilePath, [string[]]$ArgumentList) {
+  & $FilePath @ArgumentList
+  if ($LASTEXITCODE -ne 0) {
+    throw "$FilePath failed with exit code $LASTEXITCODE."
+  }
+}
+
 function Start-ProcessLogged([string]$FilePath, [string[]]$ArgumentList, [string]$WorkingDirectory, [string]$OutLog, [string]$ErrLog) {
-  Start-Process -FilePath $FilePath `
+  return Start-Process -FilePath $FilePath `
     -ArgumentList $ArgumentList `
     -WorkingDirectory $WorkingDirectory `
     -RedirectStandardOutput $OutLog `
     -RedirectStandardError $ErrLog `
+    -PassThru `
     -WindowStyle Hidden
+}
+
+function Test-ProcessRunning([System.Diagnostics.Process]$Process, [string]$Name, [string]$ErrLog) {
+  if ($null -eq $Process) {
+    Write-Warning "$Name did not start. Check $ErrLog"
+    return $false
+  }
+
+  $Process.Refresh()
+  if ($Process.HasExited) {
+    Write-Warning "$Name exited with code $($Process.ExitCode). Check $ErrLog"
+    return $false
+  }
+
+  return $true
+}
+
+function Open-DashboardUrl([string]$Url) {
+  try {
+    Start-Process -FilePath "explorer.exe" -ArgumentList $Url -ErrorAction Stop
+  } catch {
+    Write-Warning "Could not open dashboard automatically: $($_.Exception.Message)"
+    Write-Host "Open this URL manually: $Url"
+  }
+}
+
+function Get-DashboardLaunchUrl() {
+  $loginUrl = "http://localhost:4000/v2/login"
+  $fallbackUrl = "http://localhost:3001/login"
+  try {
+    $body = @{ username = "admin"; password = "sk-1234" } | ConvertTo-Json -Compress
+    $response = Invoke-WebRequest -UseBasicParsing -Uri $loginUrl -Method Post -ContentType "application/json" -Body $body -TimeoutSec 10
+    $setCookie = $response.Headers["Set-Cookie"]
+    if ($setCookie -and $setCookie -match "token=([^;]+)") {
+      $encodedToken = [System.Uri]::EscapeDataString($Matches[1])
+      return "http://localhost:3001/login?token=$encodedToken"
+    }
+  } catch {
+    Write-Warning "Could not create local dashboard login session automatically: $($_.Exception.Message)"
+  }
+
+  return $fallbackUrl
 }
 
 Write-Host "Starting Zentris local services..."
@@ -46,7 +99,7 @@ if (-not (Test-Path (Join-Path $PgBin "pg_ctl.exe"))) {
 
 if (-not (Test-Path (Join-Path $PgData "PG_VERSION"))) {
   Write-Host "Initializing project-local Postgres data directory..."
-  & (Join-Path $PgBin "initdb.exe") -D $PgData -U postgres -A trust | Out-Host
+  Invoke-NativeCommand (Join-Path $PgBin "initdb.exe") @("-D", $PgData, "-U", "postgres", "-A", "trust")
 }
 
 if (-not (Test-Port 55432)) {
@@ -59,8 +112,9 @@ if (-not (Test-Port 55432)) {
     Remove-Item $pidFile -Force -ErrorAction SilentlyContinue
   }
   
-  # Port 55432 is set in postgresql.conf (no -o flag needed - it was broken on Windows)
-  & (Join-Path $PgBin "pg_ctl.exe") -D $PgData -l $PgLog start | Out-Host
+  # Port 55432 is set in postgresql.conf. Avoid piping pg_ctl output on Windows because
+  # the launcher can appear stuck after pg_ctl prints "server started".
+  Invoke-NativeCommand (Join-Path $PgBin "pg_ctl.exe") @("-D", $PgData, "-l", $PgLog, "-w", "-t", "30", "start")
   
   # Wait for Postgres to be ready (up to 30 seconds)
   $pgReady = $false
@@ -118,11 +172,12 @@ $env:REDIS_HOST = "localhost"
 $env:REDIS_PORT = "6379"
 $env:REDIS_PASSWORD = ""
 $env:DATABASE_URL = $DatabaseUrl
-Start-Process -FilePath "C:\Users\ASAD AHMAD\miniconda3\pythonw.exe" `
+$ProxyProcess = Start-Process -FilePath "C:\Users\ASAD AHMAD\miniconda3\pythonw.exe" `
   -ArgumentList @("-m", "litellm.proxy.proxy_cli", "--config", "proxy_server_config.yaml", "--port", "4000", "--host", "0.0.0.0", "--use_prisma_db_push") `
   -WorkingDirectory $Root `
   -RedirectStandardOutput (Join-Path $Logs "litellm-proxy.out.log") `
   -RedirectStandardError (Join-Path $Logs "litellm-proxy.err.log") `
+  -PassThru `
   -WindowStyle Hidden
 
 $env:REDIS_URL = "redis://localhost:6379"
@@ -134,10 +189,9 @@ $env:LOG_LEVEL = "info"
 $env:PORT = "3000"
 $env:JWT_SECRET = $JwtSecret
 $env:CONFIRMATION_TOKEN_SECRET = $ConfirmationSecret
-Start-ProcessLogged "npm.cmd" @("run", "dev") $Root (Join-Path $Logs "backend-dev.out.log") (Join-Path $Logs "backend-dev.err.log")
+$BackendProcess = Start-ProcessLogged "npm.cmd" @("run", "dev") $Root (Join-Path $Logs "backend-dev.out.log") (Join-Path $Logs "backend-dev.err.log")
 
-$Dashboard = Join-Path $Root "ui\litellm-dashboard"
-Start-ProcessLogged "npm.cmd" @("run", "dev", "--", "-p", "3001") $Dashboard (Join-Path $Dashboard "logs\dashboard-dev.out.log") (Join-Path $Dashboard "logs\dashboard-dev.err.log")
+$DashboardProcess = Start-ProcessLogged "npm.cmd" @("run", "dev", "--", "-p", "3001") $Dashboard (Join-Path $DashboardLogs "dashboard-dev.out.log") (Join-Path $DashboardLogs "dashboard-dev.err.log")
 
 Write-Host "Waiting for services to become ready..."
 
@@ -146,6 +200,7 @@ Write-Host "  Waiting for LiteLLM proxy on port 4000..."
 $proxyReady = $false
 for ($i = 0; $i -lt 90; $i++) {
   Start-Sleep -Seconds 1
+  if (-not (Test-ProcessRunning $ProxyProcess "LiteLLM proxy" (Join-Path $Logs "litellm-proxy.err.log"))) { break }
   if (Test-Port 4000) {
     # Port is open, now check health endpoint
     try {
@@ -167,6 +222,7 @@ if (-not $proxyReady) {
 Write-Host "  Waiting for backend on port 3000..."
 for ($i = 0; $i -lt 30; $i++) {
   Start-Sleep -Seconds 1
+  if (-not (Test-ProcessRunning $BackendProcess "Zentris backend" (Join-Path $Logs "backend-dev.err.log"))) { break }
   try {
     $r = Invoke-WebRequest -UseBasicParsing "http://localhost:3000/health" -TimeoutSec 3 -ErrorAction Stop
     if ($r.StatusCode -eq 200) { Write-Host "  Backend ready after $($i+1) seconds."; break }
@@ -177,7 +233,11 @@ for ($i = 0; $i -lt 30; $i++) {
 Write-Host "  Waiting for dashboard on port 3001..."
 for ($i = 0; $i -lt 60; $i++) {
   Start-Sleep -Seconds 1
-  if (Test-Port 3001) { Write-Host "  Dashboard ready after $($i+1) seconds."; break }
+  if (-not (Test-ProcessRunning $DashboardProcess "Zentris dashboard" (Join-Path $DashboardLogs "dashboard-dev.err.log"))) { break }
+  try {
+    $r = Invoke-WebRequest -UseBasicParsing "http://localhost:3001" -TimeoutSec 3 -ErrorAction Stop
+    if ($r.StatusCode -eq 200) { Write-Host "  Dashboard ready after $($i+1) seconds."; break }
+  } catch { }
 }
 
 $checks = @(
@@ -195,7 +255,8 @@ foreach ($check in $checks) {
   }
 }
 
-Start-Process "http://localhost:3001"
+$DashboardUrl = Get-DashboardLaunchUrl
+Open-DashboardUrl $DashboardUrl
 Write-Host ""
 Write-Host "Zentris is ready:"
 Write-Host "  Dashboard: http://localhost:3001"

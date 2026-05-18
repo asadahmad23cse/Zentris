@@ -8,7 +8,7 @@
         "file_search_cost_per_gb_per_day": 0.0,
         "input_cost_per_audio_token": 0.0,
         "input_cost_per_token": 0.0,
-        "litellm_provider": "one of https://docs.litellm.ai/docs/providers",
+        "litellm_provider": "one of https://github.com/asadahmad23cse/Zentris/docs/providers",
         "max_input_tokens": "max input tokens, if the provider specifies it. if not default to max_tokens",
         "max_output_tokens": "max output tokens, if the provider specifies it. if not default to max_tokens",
         "max_tokens": "LEGACY parameter. set to max_output_tokens if provider specifies it. IF not set to max_input_tokens, if provider specifies it.",

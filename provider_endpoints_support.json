@@ -34,7 +34,7 @@
   "providers": {
     "a2a": {
       "display_name": "A2A (Agent-to-Agent) (`a2a`)",
-      "url": "https://docs.litellm.ai/docs/providers/a2a",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/a2a",
       "endpoints": {
         "chat_completions": true,
         "messages": false,
@@ -51,7 +51,7 @@
     },
     "abliteration": {
       "display_name": "Abliteration (`abliteration`)",
-      "url": "https://docs.litellm.ai/docs/providers/abliteration",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/abliteration",
       "endpoints": {
         "chat_completions": true,
         "messages": false,
@@ -68,7 +68,7 @@
     },
     "aiml": {
       "display_name": "AI/ML API (`aiml`)",
-      "url": "https://docs.litellm.ai/docs/providers/aiml",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/aiml",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -86,7 +86,7 @@
     },
     "ai21": {
       "display_name": "AI21 (`ai21`)",
-      "url": "https://docs.litellm.ai/docs/providers/ai21",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/ai21",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -104,7 +104,7 @@
     },
     "ai21_chat": {
       "display_name": "AI21 Chat (`ai21_chat`)",
-      "url": "https://docs.litellm.ai/docs/providers/ai21",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/ai21",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -122,7 +122,7 @@
     },
     "amazon_nova": {
       "display_name": "Amazon Nova (`amazon_nova`)",
-      "url": "https://docs.litellm.ai/docs/providers/amazon_nova",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/amazon_nova",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -140,7 +140,7 @@
     },
     "anthropic": {
       "display_name": "Anthropic (`anthropic`)",
-      "url": "https://docs.litellm.ai/docs/providers/anthropic",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/anthropic",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -160,7 +160,7 @@
     },
     "anthropic_text": {
       "display_name": "Anthropic Text (`anthropic_text`)",
-      "url": "https://docs.litellm.ai/docs/providers/anthropic",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/anthropic",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -195,7 +195,7 @@
     },
     "assemblyai": {
       "display_name": "AssemblyAI (`assemblyai`)",
-      "url": "https://docs.litellm.ai/docs/pass_through/assembly_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/pass_through/assembly_ai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -213,7 +213,7 @@
     },
     "auto_router": {
       "display_name": "Auto Router (`auto_router`)",
-      "url": "https://docs.litellm.ai/docs/proxy/auto_routing",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/proxy/auto_routing",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -231,7 +231,7 @@
     },
     "bedrock": {
       "display_name": "AWS - Bedrock (`bedrock`)",
-      "url": "https://docs.litellm.ai/docs/providers/bedrock",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/bedrock",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -255,7 +255,7 @@
     },
     "s3_vectors": {
       "display_name": "AWS S3 Vectors (`s3_vectors`)",
-      "url": "https://docs.litellm.ai/docs/providers/s3_vectors",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/s3_vectors",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -275,7 +275,7 @@
     },
     "sagemaker": {
       "display_name": "AWS - Sagemaker (`sagemaker`)",
-      "url": "https://docs.litellm.ai/docs/providers/aws_sagemaker",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/aws_sagemaker",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -293,7 +293,7 @@
     },
     "aws_polly": {
       "display_name": "AWS - Polly (`aws_polly`)",
-      "url": "https://docs.litellm.ai/docs/providers/aws_polly",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/aws_polly",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -309,7 +309,7 @@
     },
     "azure": {
       "display_name": "Azure (`azure`)",
-      "url": "https://docs.litellm.ai/docs/providers/azure",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/azure",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -331,7 +331,7 @@
     },
     "azure_ai": {
       "display_name": "Azure AI (`azure_ai`)",
-      "url": "https://docs.litellm.ai/docs/providers/azure_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/azure_ai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -353,7 +353,7 @@
     },
     "azure_ai/doc-intelligence": {
       "display_name": "Azure AI Document Intelligence (`azure_ai/doc-intelligence`)",
-      "url": "https://docs.litellm.ai/docs/providers/azure_document_intelligence",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/azure_document_intelligence",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -370,7 +370,7 @@
     },
     "azure_ai/agents": {
       "display_name": "Azure AI Foundry Agents (`azure_ai/agents`)",
-      "url": "https://docs.litellm.ai/docs/providers/azure_ai_agents",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/azure_ai_agents",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -388,7 +388,7 @@
     },
     "azure_text": {
       "display_name": "Azure Text (`azure_text`)",
-      "url": "https://docs.litellm.ai/docs/providers/azure",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/azure",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -406,7 +406,7 @@
     },
     "baseten": {
       "display_name": "Baseten (`baseten`)",
-      "url": "https://docs.litellm.ai/docs/providers/baseten",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/baseten",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -424,7 +424,7 @@
     },
     "bytez": {
       "display_name": "Bytez (`bytez`)",
-      "url": "https://docs.litellm.ai/docs/providers/bytez",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/bytez",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -442,7 +442,7 @@
     },
     "cerebras": {
       "display_name": "Cerebras (`cerebras`)",
-      "url": "https://docs.litellm.ai/docs/providers/cerebras",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/cerebras",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -460,7 +460,7 @@
     },
     "charity_engine": {
       "display_name": "Charity Engine (`charity_engine`)",
-      "url": "https://docs.litellm.ai/docs/providers/charity_engine",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/charity_engine",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -494,7 +494,7 @@
     },
     "clarifai": {
       "display_name": "Clarifai (`clarifai`)",
-      "url": "https://docs.litellm.ai/docs/providers/clarifai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/clarifai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -512,7 +512,7 @@
     },
     "cloudflare": {
       "display_name": "Cloudflare AI Workers (`cloudflare`)",
-      "url": "https://docs.litellm.ai/docs/providers/cloudflare_workers",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/cloudflare_workers",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -530,7 +530,7 @@
     },
     "codestral": {
       "display_name": "Codestral (`codestral`)",
-      "url": "https://docs.litellm.ai/docs/providers/codestral",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/codestral",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -548,7 +548,7 @@
     },
     "cohere": {
       "display_name": "Cohere (`cohere`)",
-      "url": "https://docs.litellm.ai/docs/providers/cohere",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/cohere",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -566,7 +566,7 @@
     },
     "cohere_chat": {
       "display_name": "Cohere Chat (`cohere_chat`)",
-      "url": "https://docs.litellm.ai/docs/providers/cohere",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/cohere",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -584,7 +584,7 @@
     },
     "cometapi": {
       "display_name": "CometAPI (`cometapi`)",
-      "url": "https://docs.litellm.ai/docs/providers/cometapi",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/cometapi",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -602,7 +602,7 @@
     },
     "compactifai": {
       "display_name": "CompactifAI (`compactifai`)",
-      "url": "https://docs.litellm.ai/docs/providers/compactifai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/compactifai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -620,7 +620,7 @@
     },
     "custom": {
       "display_name": "Custom (`custom`)",
-      "url": "https://docs.litellm.ai/docs/providers/custom_llm_server",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/custom_llm_server",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -638,7 +638,7 @@
     },
     "custom_openai": {
       "display_name": "Custom OpenAI (`custom_openai`)",
-      "url": "https://docs.litellm.ai/docs/providers/openai_compatible",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/openai_compatible",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -656,7 +656,7 @@
     },
     "dashscope": {
       "display_name": "Dashscope (`dashscope`)",
-      "url": "https://docs.litellm.ai/docs/providers/dashscope",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/dashscope",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -674,7 +674,7 @@
     },
     "databricks": {
       "display_name": "Databricks (`databricks`)",
-      "url": "https://docs.litellm.ai/docs/providers/databricks",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/databricks",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -692,7 +692,7 @@
     },
     "dataforseo": {
       "display_name": "DataForSEO (`dataforseo`)",
-      "url": "https://docs.litellm.ai/docs/search/dataforseo",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/dataforseo",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -709,7 +709,7 @@
     },
     "datarobot": {
       "display_name": "DataRobot (`datarobot`)",
-      "url": "https://docs.litellm.ai/docs/providers/datarobot",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/datarobot",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -727,7 +727,7 @@
     },
     "deepgram": {
       "display_name": "Deepgram (`deepgram`)",
-      "url": "https://docs.litellm.ai/docs/providers/deepgram",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/deepgram",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -745,7 +745,7 @@
     },
     "deepinfra": {
       "display_name": "DeepInfra (`deepinfra`)",
-      "url": "https://docs.litellm.ai/docs/providers/deepinfra",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/deepinfra",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -763,7 +763,7 @@
     },
     "deepseek": {
       "display_name": "Deepseek (`deepseek`)",
-      "url": "https://docs.litellm.ai/docs/providers/deepseek",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/deepseek",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -781,7 +781,7 @@
     },
     "duckduckgo": {
       "display_name": "DuckDuckGo (`duckduckgo`)",
-      "url": "https://docs.litellm.ai/docs/search/duckduckgo",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/duckduckgo",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -798,7 +798,7 @@
     },
     "elevenlabs": {
       "display_name": "ElevenLabs (`elevenlabs`)",
-      "url": "https://docs.litellm.ai/docs/providers/elevenlabs",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/elevenlabs",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -816,7 +816,7 @@
     },
     "exa_ai": {
       "display_name": "Exa AI (`exa_ai`)",
-      "url": "https://docs.litellm.ai/docs/search/exa_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/exa_ai",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -833,7 +833,7 @@
     },
     "brave": {
       "display_name": "Brave Search (`brave`)",
-      "url": "https://docs.litellm.ai/docs/search/brave",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/brave",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -850,7 +850,7 @@
     },
     "empower": {
       "display_name": "Empower (`empower`)",
-      "url": "https://docs.litellm.ai/docs/providers/empower",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/empower",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -868,7 +868,7 @@
     },
     "fal_ai": {
       "display_name": "Fal AI (`fal_ai`)",
-      "url": "https://docs.litellm.ai/docs/providers/fal_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/fal_ai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -886,7 +886,7 @@
     },
     "featherless_ai": {
       "display_name": "Featherless AI (`featherless_ai`)",
-      "url": "https://docs.litellm.ai/docs/providers/featherless_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/featherless_ai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -904,7 +904,7 @@
     },
     "fireworks_ai": {
       "display_name": "Fireworks AI (`fireworks_ai`)",
-      "url": "https://docs.litellm.ai/docs/providers/fireworks_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/fireworks_ai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -922,7 +922,7 @@
     },
     "firecrawl": {
       "display_name": "Firecrawl (`firecrawl`)",
-      "url": "https://docs.litellm.ai/docs/search/firecrawl",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/firecrawl",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -939,7 +939,7 @@
     },
     "linkup": {
       "display_name": "Linkup (`linkup`)",
-      "url": "https://docs.litellm.ai/docs/search/linkup",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/linkup",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -956,7 +956,7 @@
     },
     "friendliai": {
       "display_name": "FriendliAI (`friendliai`)",
-      "url": "https://docs.litellm.ai/docs/providers/friendliai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/friendliai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -974,7 +974,7 @@
     },
     "galadriel": {
       "display_name": "Galadriel (`galadriel`)",
-      "url": "https://docs.litellm.ai/docs/providers/galadriel",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/galadriel",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -992,7 +992,7 @@
     },
     "github_copilot": {
       "display_name": "GitHub Copilot (`github_copilot`)",
-      "url": "https://docs.litellm.ai/docs/providers/github_copilot",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/github_copilot",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1010,7 +1010,7 @@
     },
     "chatgpt": {
       "display_name": "ChatGPT Subscription (`chatgpt`)",
-      "url": "https://docs.litellm.ai/docs/providers/chatgpt",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/chatgpt",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1028,7 +1028,7 @@
     },
     "github": {
       "display_name": "GitHub Models (`github`)",
-      "url": "https://docs.litellm.ai/docs/providers/github",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/github",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1046,7 +1046,7 @@
     },
     "gmi": {
       "display_name": "GMI Cloud (`gmi`)",
-      "url": "https://docs.litellm.ai/docs/providers/gmi_cloud",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/gmi_cloud",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1064,7 +1064,7 @@
     },
     "vertex_ai": {
       "display_name": "Google - Vertex AI (`vertex_ai`)",
-      "url": "https://docs.litellm.ai/docs/providers/vertex",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/vertex",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1090,7 +1090,7 @@
     },
     "gemini": {
       "display_name": "Google AI Studio - Gemini (`gemini`)",
-      "url": "https://docs.litellm.ai/docs/providers/gemini",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/gemini",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1113,7 +1113,7 @@
     },
     "gradient_ai": {
       "display_name": "GradientAI (`gradient_ai`)",
-      "url": "https://docs.litellm.ai/docs/providers/gradient_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/gradient_ai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1131,7 +1131,7 @@
     },
     "groq": {
       "display_name": "Groq AI (`groq`)",
-      "url": "https://docs.litellm.ai/docs/providers/groq",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/groq",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1149,7 +1149,7 @@
     },
     "heroku": {
       "display_name": "Heroku (`heroku`)",
-      "url": "https://docs.litellm.ai/docs/providers/heroku",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/heroku",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1167,7 +1167,7 @@
     },
     "hosted_vllm": {
       "display_name": "Hosted VLLM (`hosted_vllm`)",
-      "url": "https://docs.litellm.ai/docs/providers/vllm",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/vllm",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1186,7 +1186,7 @@
     },
     "huggingface": {
       "display_name": "Huggingface (`huggingface`)",
-      "url": "https://docs.litellm.ai/docs/providers/huggingface",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/huggingface",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1204,7 +1204,7 @@
     },
     "hyperbolic": {
       "display_name": "Hyperbolic (`hyperbolic`)",
-      "url": "https://docs.litellm.ai/docs/providers/hyperbolic",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/hyperbolic",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1222,7 +1222,7 @@
     },
     "watsonx": {
       "display_name": "IBM - Watsonx.ai (`watsonx`)",
-      "url": "https://docs.litellm.ai/docs/providers/watsonx",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/watsonx",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1240,7 +1240,7 @@
     },
     "infinity": {
       "display_name": "Infinity (`infinity`)",
-      "url": "https://docs.litellm.ai/docs/providers/infinity",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/infinity",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -1256,7 +1256,7 @@
     },
     "jina_ai": {
       "display_name": "Jina AI (`jina_ai`)",
-      "url": "https://docs.litellm.ai/docs/providers/jina_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/jina_ai",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -1272,7 +1272,7 @@
     },
     "lambda_ai": {
       "display_name": "Lambda AI (`lambda_ai`)",
-      "url": "https://docs.litellm.ai/docs/providers/lambda_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/lambda_ai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1290,7 +1290,7 @@
     },
     "lemonade": {
       "display_name": "Lemonade (`lemonade`)",
-      "url": "https://docs.litellm.ai/docs/providers/lemonade",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/lemonade",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1308,7 +1308,7 @@
     },
     "litellm_proxy": {
       "display_name": "LiteLLM Proxy (`litellm_proxy`)",
-      "url": "https://docs.litellm.ai/docs/providers/litellm_proxy",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/litellm_proxy",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1326,7 +1326,7 @@
     },
     "llamafile": {
       "display_name": "Llamafile (`llamafile`)",
-      "url": "https://docs.litellm.ai/docs/providers/llamafile",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/llamafile",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1344,7 +1344,7 @@
     },
     "lm_studio": {
       "display_name": "LM Studio (`lm_studio`)",
-      "url": "https://docs.litellm.ai/docs/providers/lm_studio",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/lm_studio",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1362,7 +1362,7 @@
     },
     "maritalk": {
       "display_name": "Maritalk (`maritalk`)",
-      "url": "https://docs.litellm.ai/docs/providers/maritalk",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/maritalk",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1380,7 +1380,7 @@
     },
     "meta_llama": {
       "display_name": "Meta - Llama API (`meta_llama`)",
-      "url": "https://docs.litellm.ai/docs/providers/meta_llama",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/meta_llama",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1398,7 +1398,7 @@
     },
     "mistral": {
       "display_name": "Mistral AI API (`mistral`)",
-      "url": "https://docs.litellm.ai/docs/providers/mistral",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/mistral",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1417,7 +1417,7 @@
     },
     "moonshot": {
       "display_name": "Moonshot (`moonshot`)",
-      "url": "https://docs.litellm.ai/docs/providers/moonshot",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/moonshot",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1435,7 +1435,7 @@
     },
     "docker_model_runner": {
       "display_name": "Docker Model Runner (`docker_model_runner`)",
-      "url": "https://docs.litellm.ai/docs/providers/docker_model_runner",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/docker_model_runner",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1453,7 +1453,7 @@
     },
     "morph": {
       "display_name": "Morph (`morph`)",
-      "url": "https://docs.litellm.ai/docs/providers/morph",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/morph",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1487,7 +1487,7 @@
     },
     "nebius": {
       "display_name": "Nebius AI Studio (`nebius`)",
-      "url": "https://docs.litellm.ai/docs/providers/nebius",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/nebius",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1505,7 +1505,7 @@
     },
     "nlp_cloud": {
       "display_name": "NLP Cloud (`nlp_cloud`)",
-      "url": "https://docs.litellm.ai/docs/providers/nlp_cloud",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/nlp_cloud",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1541,7 +1541,7 @@
     },
     "nscale": {
       "display_name": "Nscale (`nscale`)",
-      "url": "https://docs.litellm.ai/docs/providers/nscale",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/nscale",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1559,7 +1559,7 @@
     },
     "nvidia_nim": {
       "display_name": "Nvidia NIM (`nvidia_nim`)",
-      "url": "https://docs.litellm.ai/docs/providers/nvidia_nim",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/nvidia_nim",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1577,7 +1577,7 @@
     },
     "oci": {
       "display_name": "OCI (`oci`)",
-      "url": "https://docs.litellm.ai/docs/providers/oci",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/oci",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1595,7 +1595,7 @@
     },
     "ollama": {
       "display_name": "Ollama (`ollama`)",
-      "url": "https://docs.litellm.ai/docs/providers/ollama",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/ollama",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1613,7 +1613,7 @@
     },
     "ollama_chat": {
       "display_name": "Ollama Chat (`ollama_chat`)",
-      "url": "https://docs.litellm.ai/docs/providers/ollama",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/ollama",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1631,7 +1631,7 @@
     },
     "oobabooga": {
       "display_name": "Oobabooga (`oobabooga`)",
-      "url": "https://docs.litellm.ai/docs/providers/openai_compatible",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/openai_compatible",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1649,7 +1649,7 @@
     },
     "openai": {
       "display_name": "OpenAI (`openai`)",
-      "url": "https://docs.litellm.ai/docs/providers/openai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/openai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1680,7 +1680,7 @@
     },
     "openai_like": {
       "display_name": "OpenAI-like (`openai_like`)",
-      "url": "https://docs.litellm.ai/docs/providers/openai_compatible",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/openai_compatible",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -1697,7 +1697,7 @@
     },
     "openrouter": {
       "display_name": "OpenRouter (`openrouter`)",
-      "url": "https://docs.litellm.ai/docs/providers/openrouter",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/openrouter",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1715,7 +1715,7 @@
     },
     "ovhcloud": {
       "display_name": "OVHCloud AI Endpoints (`ovhcloud`)",
-      "url": "https://docs.litellm.ai/docs/providers/ovhcloud",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/ovhcloud",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1733,7 +1733,7 @@
     },
     "parallel_ai": {
       "display_name": "Parallel AI (`parallel_ai`)",
-      "url": "https://docs.litellm.ai/docs/search/parallel_ai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/parallel_ai",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -1750,7 +1750,7 @@
     },
     "perplexity": {
       "display_name": "Perplexity AI (`perplexity`)",
-      "url": "https://docs.litellm.ai/docs/providers/perplexity",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/perplexity",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1769,7 +1769,7 @@
     },
     "petals": {
       "display_name": "Petals (`petals`)",
-      "url": "https://docs.litellm.ai/docs/providers/petals",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/petals",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1803,7 +1803,7 @@
     },
     "publicai": {
       "display_name": "PublicAI (`publicai`)",
-      "url": "https://docs.litellm.ai/docs/providers/publicai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/publicai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1821,7 +1821,7 @@
     },
     "predibase": {
       "display_name": "Predibase (`predibase`)",
-      "url": "https://docs.litellm.ai/docs/providers/predibase",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/predibase",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1839,7 +1839,7 @@
     },
     "recraft": {
       "display_name": "Recraft (`recraft`)",
-      "url": "https://docs.litellm.ai/docs/providers/recraft",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/recraft",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -1855,7 +1855,7 @@
     },
     "replicate": {
       "display_name": "Replicate (`replicate`)",
-      "url": "https://docs.litellm.ai/docs/providers/replicate",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/replicate",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1873,7 +1873,7 @@
     },
     "runwayml": {
       "display_name": "RunwayML (`runwayml`)",
-      "url": "https://docs.litellm.ai/docs/providers/runwayml/videos",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/runwayml/videos",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -1890,7 +1890,7 @@
     },
     "sagemaker_chat": {
       "display_name": "Sagemaker Chat (`sagemaker_chat`)",
-      "url": "https://docs.litellm.ai/docs/providers/aws_sagemaker",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/aws_sagemaker",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1908,7 +1908,7 @@
     },
     "searxng": {
       "display_name": "SearXNG (`searxng`)",
-      "url": "https://docs.litellm.ai/docs/search/searxng",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/searxng",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -1925,7 +1925,7 @@
     },
     "sambanova": {
       "display_name": "Sambanova (`sambanova`)",
-      "url": "https://docs.litellm.ai/docs/providers/sambanova",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/sambanova",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1943,7 +1943,7 @@
     },
     "sap": {
       "display_name": "SAP Generative AI Hub (`sap`)",
-      "url": "https://docs.litellm.ai/docs/providers/sap",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/sap",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1961,7 +1961,7 @@
     },
     "scaleway": {
       "display_name": "Scaleway (`scaleway`)",
-      "url": "https://docs.litellm.ai/docs/providers/scaleway",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/scaleway",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -1979,7 +1979,7 @@
     },
     "snowflake": {
       "display_name": "Snowflake (`snowflake`)",
-      "url": "https://docs.litellm.ai/docs/providers/snowflake",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/snowflake",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2013,7 +2013,7 @@
     },
     "text-completion-codestral": {
       "display_name": "Text Completion Codestral (`text-completion-codestral`)",
-      "url": "https://docs.litellm.ai/docs/providers/codestral",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/codestral",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2031,7 +2031,7 @@
     },
     "text-completion-openai": {
       "display_name": "Text Completion OpenAI (`text-completion-openai`)",
-      "url": "https://docs.litellm.ai/docs/providers/text_completion_openai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/text_completion_openai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2049,7 +2049,7 @@
     },
     "together_ai": {
       "display_name": "Together AI (`together_ai`)",
-      "url": "https://docs.litellm.ai/docs/providers/togetherai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/togetherai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2067,28 +2067,28 @@
     },
     "topaz": {
       "display_name": "Topaz (`topaz`)",
-      "url": "https://docs.litellm.ai/docs/providers/topaz",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/topaz",
       "endpoints": {
         "image_variations": true
       }
     },
     "tavily": {
       "display_name": "Tavily (`tavily`)",
-      "url": "https://docs.litellm.ai/docs/search/tavily",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/tavily",
       "endpoints": {
         "search": true
       }
     },
     "serper": {
       "display_name": "Serper (`serper`)",
-      "url": "https://docs.litellm.ai/docs/search/serper",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/serper",
       "endpoints": {
         "search": true
       }
     },
     "triton": {
       "display_name": "Triton (`triton`)",
-      "url": "https://docs.litellm.ai/docs/providers/triton-inference-server",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/triton-inference-server",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2106,7 +2106,7 @@
     },
     "v0": {
       "display_name": "V0 (`v0`)",
-      "url": "https://docs.litellm.ai/docs/providers/v0",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/v0",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2124,7 +2124,7 @@
     },
     "vercel_ai_gateway": {
       "display_name": "Vercel AI Gateway (`vercel_ai_gateway`)",
-      "url": "https://docs.litellm.ai/docs/providers/vercel_ai_gateway",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/vercel_ai_gateway",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2142,7 +2142,7 @@
     },
     "vllm": {
       "display_name": "VLLM (`vllm`)",
-      "url": "https://docs.litellm.ai/docs/providers/vllm",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/vllm",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2161,7 +2161,7 @@
     },
     "volcengine": {
       "display_name": "Volcengine (`volcengine`)",
-      "url": "https://docs.litellm.ai/docs/providers/volcano",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/volcano",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2179,7 +2179,7 @@
     },
     "voyage": {
       "display_name": "Voyage AI (`voyage`)",
-      "url": "https://docs.litellm.ai/docs/providers/voyage",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/voyage",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -2195,7 +2195,7 @@
     },
     "wandb": {
       "display_name": "WandB Inference (`wandb`)",
-      "url": "https://docs.litellm.ai/docs/providers/wandb_inference",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/wandb_inference",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2213,7 +2213,7 @@
     },
     "watsonx_text": {
       "display_name": "Watsonx Text (`watsonx_text`)",
-      "url": "https://docs.litellm.ai/docs/providers/watsonx",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/watsonx",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2231,7 +2231,7 @@
     },
     "xai": {
       "display_name": "xAI (`xai`)",
-      "url": "https://docs.litellm.ai/docs/providers/xai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/xai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2250,7 +2250,7 @@
     },
     "xinference": {
       "display_name": "Xinference (`xinference`)",
-      "url": "https://docs.litellm.ai/docs/providers/xinference",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/xinference",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -2266,7 +2266,7 @@
     },
     "zai": {
       "display_name": "Z.AI (Zhipu AI) (`zai`)",
-      "url": "https://docs.litellm.ai/docs/providers/zai",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/zai",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2284,7 +2284,7 @@
     },
     "ragflow": {
       "display_name": "RAGFlow (`ragflow`)",
-      "url": "https://docs.litellm.ai/docs/providers/ragflow",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/ragflow",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2303,7 +2303,7 @@
     },
     "cursor": {
       "display_name": "Cursor BYOK (`cursor`)",
-      "url": "https://docs.litellm.ai/docs/providers/cursor",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/cursor",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2321,7 +2321,7 @@
     },
     "langgraph": {
       "display_name": "LangGraph (`langgraph`)",
-      "url": "https://docs.litellm.ai/docs/providers/langgraph",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/langgraph",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2339,7 +2339,7 @@
     },
     "vertex_ai/agent_engine": {
       "display_name": "Vertex AI Agent Engine (`vertex_ai/agent_engine`)",
-      "url": "https://docs.litellm.ai/docs/providers/vertex_ai_agent_engine",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/vertex_ai_agent_engine",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2357,7 +2357,7 @@
     },
     "pydantic_ai_agents": {
       "display_name": "Pydantic AI Agents (`pydantic_ai_agents`)",
-      "url": "https://docs.litellm.ai/docs/providers/pydantic_ai_agent",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/pydantic_ai_agent",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -2374,7 +2374,7 @@
     },
     "stability": {
       "display_name": "Stability AI (`stability`)",
-      "url": "https://docs.litellm.ai/docs/providers/stability",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/stability",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -2391,7 +2391,7 @@
     },
     "venice": {
       "display_name": "Venice.ai (`venice`)",
-      "url": "https://docs.litellm.ai/docs/providers/venice",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/venice",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2409,7 +2409,7 @@
     },
     "gigachat": {
       "display_name": "GigaChat (`gigachat`)",
-      "url": "https://docs.litellm.ai/docs/providers/gigachat",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/gigachat",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2419,21 +2419,21 @@
     },
     "google_pse": {
       "display_name": "Google PSE (`google_pse`)",
-      "url": "https://docs.litellm.ai/docs/search/google_pse",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search/google_pse",
       "endpoints": {
         "search": true
       }
     },
     "milvus": {
       "display_name": "Milvus (`milvus`)",
-      "url": "https://docs.litellm.ai/docs/providers/milvus_vector_stores",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/milvus_vector_stores",
       "endpoints": {
         "vector_stores_search": true
       }
     },
     "minimax": {
       "display_name": "Minimax (`minimax`)",
-      "url": "https://docs.litellm.ai/docs/providers/minimax",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/minimax",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2442,14 +2442,14 @@
     },
     "pg_vector": {
       "display_name": "PG Vector (`pg_vector`)",
-      "url": "https://docs.litellm.ai/docs/providers/pg_vector",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/pg_vector",
       "endpoints": {
         "vector_stores_search": true
       }
     },
     "helicone": {
       "display_name": "Helicone (`helicone`)",
-      "url": "https://docs.litellm.ai/docs/providers/helicone",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/helicone",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2458,7 +2458,7 @@
     },
     "llamagate": {
       "display_name": "LlamaGate (`llamagate`)",
-      "url": "https://docs.litellm.ai/docs/providers/llamagate",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/llamagate",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2467,7 +2467,7 @@
     },
     "xiaomi_mimo": {
       "display_name": "Xiaomi Mimo (`xiaomi_mimo`)",
-      "url": "https://docs.litellm.ai/docs/providers/xiaomi_mimo",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/xiaomi_mimo",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2476,7 +2476,7 @@
     },
     "manus": {
       "display_name": "Manus (`manus`)",
-      "url": "https://docs.litellm.ai/docs/providers/manus",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/manus",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2495,7 +2495,7 @@
     },
     "sarvam": {
       "display_name": "Sarvam (`sarvam`)",
-      "url": "https://docs.litellm.ai/docs/providers/sarvam",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/sarvam",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2504,7 +2504,7 @@
     },
     "bedrock_mantle": {
       "display_name": "Bedrock Mantle (`bedrock_mantle`)",
-      "url": "https://docs.litellm.ai/docs/providers/bedrock",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/bedrock",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2521,7 +2521,7 @@
     },
     "searchapi": {
       "display_name": "SearchAPI (`searchapi`)",
-      "url": "https://docs.litellm.ai/docs/providers/searchapi",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/searchapi",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -2539,7 +2539,7 @@
     },
     "black_forest_labs": {
       "display_name": "Black Forest Labs (`black_forest_labs`)",
-      "url": "https://docs.litellm.ai/docs/providers/black_forest_labs",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/black_forest_labs",
       "endpoints": {
         "chat_completions": false,
         "messages": false,
@@ -2556,7 +2556,7 @@
     },
     "charity_engine": {
       "display_name": "Charity Engine (`charity_engine`)",
-      "url": "https://docs.litellm.ai/docs/providers/charity_engine",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/providers/charity_engine",
       "endpoints": {
         "chat_completions": true,
         "messages": true,
@@ -2577,7 +2577,7 @@
       "display_name": "A2A (Agent-to-Agent) protocol for agent communication",
       "leftnav_label": "/a2a",
       "provider_json_field": "a2a",
-      "url": "https://docs.litellm.ai/docs/a2a",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/a2a",
       "bridges_to_chat_completion": true
     },
     "messages": {
@@ -2585,7 +2585,7 @@
       "display_name": "Anthropic Messages API",
       "leftnav_label": "/messages",
       "provider_json_field": "messages",
-      "url": "https://docs.litellm.ai/docs/anthropic_unified",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/anthropic_unified",
       "bridges_to_chat_completion": true
     },
     "anthropic_count_tokens": {
@@ -2593,98 +2593,98 @@
       "display_name": "Anthropic Count Tokens API",
       "leftnav_label": "/count_tokens",
       "provider_json_field": "count_tokens",
-      "url": "https://docs.litellm.ai/docs/anthropic_count_tokens"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/anthropic_count_tokens"
     },
     "apply_guardrail": {
       "docs_label": "apply_guardrail",
       "display_name": "Unified Apply Guardrail API",
       "leftnav_label": "/guardrails/apply_guardrail",
       "provider_json_field": "apply_guardrail",
-      "url": "https://docs.litellm.ai/docs/apply_guardrail"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/apply_guardrail"
     },
     "assistants": {
       "docs_label": "assistants",
       "display_name": "OpenAI Assistants API",
       "leftnav_label": "/assistants",
       "provider_json_field": "assistants",
-      "url": "https://docs.litellm.ai/docs/assistants"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/assistants"
     },
     "audio_transcription": {
       "docs_label": "audio_transcription",
       "display_name": "OpenAI Audio Transcription API",
       "leftnav_label": "/audio/transcriptions",
       "provider_json_field": "audio_transcriptions",
-      "url": "https://docs.litellm.ai/docs/audio_transcription"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/audio_transcription"
     },
     "batches": {
       "docs_label": "batches",
       "display_name": "OpenAI Batches API",
       "leftnav_label": "/batches",
       "provider_json_field": "batches",
-      "url": "https://docs.litellm.ai/docs/batches"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/batches"
     },
     "bedrock_invoke": {
       "docs_label": "bedrock_invoke",
       "display_name": "Bedrock Invoke API",
       "leftnav_label": "/invoke",
       "provider_json_field": "bedrock_invoke",
-      "url": "https://docs.litellm.ai/docs/bedrock_invoke"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/bedrock_invoke"
     },
     "bedrock_converse": {
       "docs_label": "bedrock_converse",
       "display_name": "Bedrock Converse API",
       "leftnav_label": "/converse",
       "provider_json_field": "bedrock_converse",
-      "url": "https://docs.litellm.ai/docs/bedrock_converse"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/bedrock_converse"
     },
     "chat_completions": {
       "docs_label": "chat_completions",
       "display_name": "OpenAI Chat Completions API",
       "leftnav_label": "/chat/completions",
       "provider_json_field": "chat_completions",
-      "url": "https://docs.litellm.ai/docs/chat_completions"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/chat_completions"
     },
     "container_files": {
       "docs_label": "container_files",
       "display_name": "OpenAI Container Files API",
       "leftnav_label": "/create/container/files",
       "provider_json_field": "container_files",
-      "url": "https://docs.litellm.ai/docs/container_files"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/container_files"
     },
     "container": {
       "docs_label": "containers",
       "display_name": "OpenAI Containers API",
       "leftnav_label": "/container",
       "provider_json_field": "container",
-      "url": "https://docs.litellm.ai/docs/containers"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/containers"
     },
     "embeddings": {
       "docs_label": "embedding/supported_embedding",
       "display_name": "OpenAI Embeddings API",
       "leftnav_label": "/embeddings",
       "provider_json_field": "embeddings",
-      "url": "https://docs.litellm.ai/docs/embedding/supported_embedding"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/embedding/supported_embedding"
     },
     "files": {
       "docs_label": "files",
       "display_name": "OpenAI Files API",
       "leftnav_label": "/files",
       "provider_json_field": "files",
-      "url": "https://docs.litellm.ai/docs/proxy/litellm_managed_files"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/proxy/litellm_managed_files"
     },
     "fine_tuning": {
       "docs_label": "fine_tuning",
       "display_name": "OpenAI Fine-Tuning API",
       "leftnav_label": "/fine_tuning",
       "provider_json_field": "fine_tuning",
-      "url": "https://docs.litellm.ai/docs/proxy/managed_finetuning"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/proxy/managed_finetuning"
     },
     "generateContent": {
       "docs_label": "generateContent",
       "display_name": "Google GenerateContent API",
       "leftnav_label": "/generateContent",
       "provider_json_field": "generateContent",
-      "url": "https://docs.litellm.ai/docs/generateContent",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/generateContent",
       "bridges_to_chat_completion": true
     },
     "image_edits": {
@@ -2692,28 +2692,28 @@
       "display_name": "OpenAI Images Edits API",
       "leftnav_label": "/images/edits",
       "provider_json_field": "image_edits",
-      "url": "https://docs.litellm.ai/docs/image_edits"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/image_edits"
     },
     "image_generations": {
       "docs_label": "image_generation",
       "display_name": "OpenAI Images Generations API",
       "leftnav_label": "/images/generations",
       "provider_json_field": "image_generations",
-      "url": "https://docs.litellm.ai/docs/image_generation"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/image_generation"
     },
     "image_variations": {
       "docs_label": "image_variations",
       "display_name": "OpenAI Images Variations API",
       "leftnav_label": "/images/variations",
       "provider_json_field": "image_variations",
-      "url": "https://docs.litellm.ai/docs/image_variations"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/image_variations"
     },
     "interactions": {
       "docs_label": "interactions",
       "display_name": "Google Interactions API",
       "leftnav_label": "/interactions",
       "provider_json_field": "interactions",
-      "url": "https://docs.litellm.ai/docs/interactions",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/interactions",
       "bridges_to_chat_completion": true
     },
     "mcp": {
@@ -2721,56 +2721,56 @@
       "display_name": "Model Context Protocol (MCP)",
       "leftnav_label": "/mcp",
       "provider_json_field": "mcp",
-      "url": "https://docs.litellm.ai/docs/mcp"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/mcp"
     },
     "moderation": {
       "docs_label": "moderation",
       "display_name": "OpenAI Moderations API",
       "leftnav_label": "/moderations",
       "provider_json_field": "moderations",
-      "url": "https://docs.litellm.ai/docs/moderation"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/moderation"
     },
     "ocr": {
       "docs_label": "ocr",
       "display_name": "Mistral OCR API",
       "leftnav_label": "/ocr",
       "provider_json_field": "ocr",
-      "url": "https://docs.litellm.ai/docs/ocr"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/ocr"
     },
     "rag_ingest": {
       "docs_label": "rag_ingest",
       "display_name": "RAG Ingest API",
       "leftnav_label": "/rag/ingest",
       "provider_json_field": "rag_ingest",
-      "url": "https://docs.litellm.ai/docs/rag_ingest"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/rag_ingest"
     },
     "rag_query": {
       "docs_label": "rag_query",
       "display_name": "RAG Query API",
       "leftnav_label": "/rag/query",
       "provider_json_field": "rag_query",
-      "url": "https://docs.litellm.ai/docs/rag_query"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/rag_query"
     },
     "realtime": {
       "docs_label": "realtime",
       "display_name": "OpenAI Realtime API",
       "leftnav_label": "/realtime",
       "provider_json_field": "realtime",
-      "url": "https://docs.litellm.ai/docs/realtime"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/realtime"
     },
     "rerank": {
       "docs_label": "rerank",
       "display_name": "Cohere Rerank API",
       "leftnav_label": "/rerank",
       "provider_json_field": "rerank",
-      "url": "https://docs.litellm.ai/docs/rerank"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/rerank"
     },
     "responses": {
       "docs_label": "response_api",
       "display_name": "OpenAI Responses API",
       "leftnav_label": "/responses",
       "provider_json_field": "responses",
-      "url": "https://docs.litellm.ai/docs/response_api",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/response_api",
       "bridges_to_chat_completion": true
     },
     "response_api_compact": {
@@ -2778,28 +2778,28 @@
       "display_name": "OpenAI Responses API",
       "leftnav_label": "/responses",
       "provider_json_field": "compact",
-      "url": "https://docs.litellm.ai/docs/response_api"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/response_api"
     },
     "search": {
       "docs_label": "search",
       "display_name": "Search API",
       "leftnav_label": "/search",
       "provider_json_field": "search",
-      "url": "https://docs.litellm.ai/docs/search"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/search"
     },
     "skills": {
       "docs_label": "skills",
       "display_name": "Anthropic Skills API",
       "leftnav_label": "/skills",
       "provider_json_field": "skills",
-      "url": "https://docs.litellm.ai/docs/skills"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/skills"
     },
     "text_completion": {
       "docs_label": "text_completion",
       "display_name": "OpenAI Completions API",
       "leftnav_label": "/completions",
       "provider_json_field": "text_completion",
-      "url": "https://docs.litellm.ai/docs/text_completion",
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/text_completion",
       "bridges_to_chat_completion": true
     },
     "text_to_speech": {
@@ -2807,35 +2807,35 @@
       "display_name": "OpenAI Text-to-Speech API",
       "leftnav_label": "/audio/speech",
       "provider_json_field": "audio_speech",
-      "url": "https://docs.litellm.ai/docs/text_to_speech"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/text_to_speech"
     },
     "vector_store_files": {
       "docs_label": "vector_store_files",
       "display_name": "OpenAI Vector Store Files API",
       "leftnav_label": "/vector_stores/files",
       "provider_json_field": "vector_store_files",
-      "url": "https://docs.litellm.ai/docs/vector_store_files"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/vector_store_files"
     },
     "vector_stores_create": {
       "docs_label": "vector_stores_create",
       "display_name": "OpenAI Vector Stores Create API",
       "leftnav_label": "/vector_stores/create",
       "provider_json_field": "vector_stores_create",
-      "url": "https://docs.litellm.ai/docs/vector_stores/create"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/vector_stores/create"
     },
     "vector_stores_search": {
       "docs_label": "vector_stores_search",
       "display_name": "OpenAI Vector Stores Search API",
       "leftnav_label": "/vector_stores/search",
       "provider_json_field": "vector_stores_search",
-      "url": "https://docs.litellm.ai/docs/vector_stores/search"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/vector_stores/search"
     },
     "videos": {
       "docs_label": "videos",
       "display_name": "OpenAI Videos API",
       "leftnav_label": "/videos",
       "provider_json_field": "video_generations",
-      "url": "https://docs.litellm.ai/docs/videos"
+      "url": "https://github.com/asadahmad23cse/Zentris/docs/videos"
     }
   }
 }

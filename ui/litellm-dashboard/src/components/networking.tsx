@@ -433,10 +433,20 @@ export const getUiConfig = async () => {
   console.log("Getting UI config");
   /**Special route to get the proxy base url and server root path */
   const url = defaultProxyBaseUrl
-    ? `${defaultProxyBaseUrl}/Zentris/.well-known/Zentris-ui-config`
-    : `/Zentris/.well-known/Zentris-ui-config`;
+    ? `${defaultProxyBaseUrl}/.well-known/litellm-ui-config`
+    : `/.well-known/litellm-ui-config`;
   const response = await fetch(url);
-  const jsonData: ZentrisWellKnownUiConfig = await response.json();
+  const jsonData: ZentrisWellKnownUiConfig = response.ok
+    ? await response.json()
+    : {
+        server_root_path: "/",
+        proxy_base_url: defaultProxyBaseUrl,
+        auto_redirect_to_sso: false,
+        admin_ui_disabled: false,
+        sso_configured: false,
+        is_control_plane: false,
+        workers: [],
+      };
   /**
    * Update the proxy base url and server root path
    */
