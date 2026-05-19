@@ -9,13 +9,41 @@ $PgBin = "C:\Program Files\PostgreSQL\18\bin"
 $PgData = Join-Path $Root ".local\postgres-data"
 $PgLog = Join-Path $Logs "local-postgres.log"
 $ProxyDatabaseName = "zentris_dev"
-$DatabaseUrl = "postgresql://llmproxy:dbpassword9090@127.0.0.1:55432/$ProxyDatabaseName"
-$JwtSecret = "local-dev-only-jwt-secret-change-before-production-0123456789"
-$ConfirmationSecret = "local-dev-only-confirmation-secret-change-before-production-0123456789"
+$LocalState = Join-Path $Root ".local"
+$MasterKeyFile = Join-Path $LocalState "litellm-master-key.txt"
+$DbPasswordFile = Join-Path $LocalState "postgres-password.txt"
+$JwtSecretFile = Join-Path $LocalState "jwt-secret.txt"
+$ConfirmationSecretFile = Join-Path $LocalState "confirmation-secret.txt"
 
 New-Item -ItemType Directory -Force -Path $Logs | Out-Null
 New-Item -ItemType Directory -Force -Path $DashboardLogs | Out-Null
-New-Item -ItemType Directory -Force -Path (Join-Path $Root ".local") | Out-Null
+New-Item -ItemType Directory -Force -Path $LocalState | Out-Null
+
+function New-UrlSafeSecret([string]$Prefix = "") {
+  $bytes = New-Object byte[] 32
+  [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+  $token = [Convert]::ToBase64String($bytes).TrimEnd("=").Replace("+", "-").Replace("/", "_")
+  return "$Prefix$token"
+}
+
+function Get-OrCreateSecret([string]$Path, [string]$Prefix = "") {
+  if (Test-Path $Path) {
+    $existing = (Get-Content -Raw -Path $Path).Trim()
+    if ($existing) {
+      return $existing
+    }
+  }
+
+  $secret = New-UrlSafeSecret $Prefix
+  Set-Content -Path $Path -Value $secret -NoNewline -Encoding UTF8
+  return $secret
+}
+
+$MasterKey = if ($env:LITELLM_MASTER_KEY) { $env:LITELLM_MASTER_KEY } else { Get-OrCreateSecret $MasterKeyFile "sk-zentris-" }
+$DbPassword = Get-OrCreateSecret $DbPasswordFile
+$JwtSecret = if ($env:JWT_SECRET) { $env:JWT_SECRET } else { Get-OrCreateSecret $JwtSecretFile }
+$ConfirmationSecret = if ($env:CONFIRMATION_TOKEN_SECRET) { $env:CONFIRMATION_TOKEN_SECRET } else { Get-OrCreateSecret $ConfirmationSecretFile }
+$DatabaseUrl = "postgresql://llmproxy:$DbPassword@127.0.0.1:55432/$ProxyDatabaseName"
 
 function Test-Port([int]$Port) {
   return [bool](Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -eq $Port } | Select-Object -First 1)
@@ -77,7 +105,7 @@ function Get-DashboardLaunchUrl() {
   $loginUrl = "http://localhost:4000/v2/login"
   $fallbackUrl = "http://localhost:3001/login"
   try {
-    $body = @{ username = "admin"; password = "sk-1234" } | ConvertTo-Json -Compress
+    $body = @{ username = "admin"; password = $MasterKey } | ConvertTo-Json -Compress
     $response = Invoke-WebRequest -UseBasicParsing -Uri $loginUrl -Method Post -ContentType "application/json" -Body $body -TimeoutSec 10
     $setCookie = $response.Headers["Set-Cookie"]
     if ($setCookie -and $setCookie -match "token=([^;]+)") {
@@ -136,7 +164,7 @@ if (-not (Test-Port 55432)) {
 }
 
 Write-Host "Ensuring proxy database and role exist..."
-& (Join-Path $PgBin "psql.exe") -h 127.0.0.1 -p 55432 -U postgres -d postgres -v ON_ERROR_STOP=1 -c "DO `$`$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'llmproxy') THEN CREATE ROLE llmproxy LOGIN PASSWORD 'dbpassword9090' SUPERUSER; END IF; END `$`$;"
+& (Join-Path $PgBin "psql.exe") -h 127.0.0.1 -p 55432 -U postgres -d postgres -v ON_ERROR_STOP=1 -c "DO `$`$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'llmproxy') THEN CREATE ROLE llmproxy LOGIN PASSWORD '$DbPassword' SUPERUSER; ELSE ALTER ROLE llmproxy WITH PASSWORD '$DbPassword'; END IF; END `$`$;"
 $dbCheckOutput = & (Join-Path $PgBin "psql.exe") -h 127.0.0.1 -p 55432 -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$ProxyDatabaseName'"
 $dbExists = if ($dbCheckOutput) { $dbCheckOutput.Trim() } else { "" }
 if ($dbExists -ne "1") {
@@ -166,6 +194,7 @@ Start-Sleep -Seconds 2
 
 $env:PYTHONIOENCODING = "utf-8"
 $env:PYTHONUTF8 = "1"
+$env:LITELLM_MASTER_KEY = $MasterKey
 $env:JWT_SECRET = $JwtSecret
 $env:CONFIRMATION_TOKEN_SECRET = $ConfirmationSecret
 $env:REDIS_HOST = "localhost"
@@ -182,7 +211,7 @@ $ProxyProcess = Start-Process -FilePath "C:\Users\ASAD AHMAD\miniconda3\pythonw.
 
 $env:REDIS_URL = "redis://localhost:6379"
 $env:LITELLM_BASE_URL = "http://localhost:4000"
-$env:LITELLM_API_KEY = "sk-1234"
+$env:LITELLM_API_KEY = $MasterKey
 $env:MAX_SESSION_MESSAGES = "20"
 $env:CIRCUIT_BREAKER_ENABLED = "true"
 $env:LOG_LEVEL = "info"
@@ -263,4 +292,4 @@ Write-Host "  Dashboard: http://localhost:3001"
 Write-Host "  Backend:   http://localhost:3000/health"
 Write-Host "  Proxy:     http://localhost:4000"
 Write-Host ""
-Write-Host "Proxy admin fallback credentials: username admin, password sk-1234"
+Write-Host "Proxy admin fallback credentials: username admin, password stored at $MasterKeyFile"

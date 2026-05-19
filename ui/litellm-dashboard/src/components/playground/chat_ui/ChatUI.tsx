@@ -44,7 +44,7 @@ import { makeOpenAIAudioTranscriptionRequest } from "../llm_calls/audio_transcri
 import { makeOpenAIChatCompletionRequest } from "../llm_calls/chat_completion";
 import { makeOpenAIEmbeddingsRequest } from "../llm_calls/embeddings_api";
 import { Agent, fetchAvailableAgents } from "../llm_calls/fetch_agents";
-import { fetchAvailableModels, ModelGroup } from "../llm_calls/fetch_models";
+import { fetchAvailableModels, isConcreteModelGroup, ModelGroup } from "../llm_calls/fetch_models";
 import { makeOpenAIImageEditsRequest } from "../llm_calls/image_edits";
 import { makeOpenAIImageGenerationRequest } from "../llm_calls/image_generation";
 import { makeOpenAIResponsesRequest } from "../llm_calls/responses_api";
@@ -99,6 +99,7 @@ const MCP_SUPPORTED_ENDPOINTS = new Set<EndpointType>([
   EndpointType.RESPONSES,
   EndpointType.MCP,
 ]);
+const DEFAULT_PLAYGROUND_MODEL = "gpt-4o";
 
 const ChatUI: React.FC<ChatUIProps> = ({
   accessToken,
@@ -398,12 +399,18 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
         setModelInfo(uniqueModels);
 
-        // check for selection overlap or empty model list
+        // Check for selection overlap or empty model list. Wildcard model groups are
+        // intentionally hidden from playground requests because they are routing
+        // patterns, not concrete model IDs.
         const hasSelection = uniqueModels.some((m) => m.model_group === selectedModel);
         if (!uniqueModels.length) {
           setSelectedModel(undefined);
+          sessionStorage.removeItem("selectedModel");
         } else if (!hasSelection) {
-          setSelectedModel(uniqueModels[0].model_group);
+          const fallbackModel =
+            uniqueModels.find((model) => model.model_group === DEFAULT_PLAYGROUND_MODEL)?.model_group ??
+            uniqueModels[0].model_group;
+          setSelectedModel(fallbackModel);
         }
       } catch (error) {
         console.error("Error fetching model info:", error);
@@ -613,7 +620,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
       EndpointType.TRANSCRIPTION,
     ];
 
-    if (modelRequiredEndpoints.includes(endpointType as EndpointType) && !selectedModel) {
+    if (modelRequiredEndpoints.includes(endpointType as EndpointType) && !isConcreteModelGroup(selectedModel)) {
       NotificationsManager.fromBackend("Please select a model before sending a request");
       return;
     }
@@ -922,8 +929,8 @@ const ChatUI: React.FC<ChatUIProps> = ({
       if (signal.aborted) {
         console.log("Request was cancelled");
       } else {
-        console.error("Error fetching response", error);
-        updateTextUI("assistant", "Error fetching response:" + error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        updateTextUI("assistant", "Error fetching response:" + errorMessage);
       }
     } finally {
       setIsLoading(false);
@@ -970,6 +977,12 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
   const onModelChange = (value: string) => {
     console.log(`selected ${value}`);
+    if (value !== "custom" && !isConcreteModelGroup(value)) {
+      setSelectedModel(undefined);
+      setShowCustomModelInput(false);
+      NotificationsManager.fromBackend("Please select a concrete model, for example gpt-4o.");
+      return;
+    }
     setSelectedModel(value);
 
     setShowCustomModelInput(value === "custom");
@@ -1179,7 +1192,9 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     )}
                   </Text>
                   <Select
-                    value={selectedModel}
+                    value={
+                      selectedModel === "custom" || isConcreteModelGroup(selectedModel) ? selectedModel : undefined
+                    }
                     placeholder="Select a Model"
                     onChange={onModelChange}
                     options={[
@@ -1188,6 +1203,9 @@ const ChatUI: React.FC<ChatUIProps> = ({
                         new Set(
                           modelInfo
                             .filter((option) => {
+                              if (!isConcreteModelGroup(option.model_group)) {
+                                return false;
+                              }
                               if (!option.mode) {
                                 //If no mode, show all models
                                 return true;

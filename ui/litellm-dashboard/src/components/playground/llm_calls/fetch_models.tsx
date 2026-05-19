@@ -7,6 +7,11 @@ export interface ModelGroup {
   mode?: string;
 }
 
+export const isConcreteModelGroup = (modelGroup?: string): boolean => {
+  const normalizedModelGroup = modelGroup?.trim();
+  return Boolean(normalizedModelGroup && !normalizedModelGroup.includes("*"));
+};
+
 /**
  * Fetches available models using modelHubCall and formats them for the selection dropdown.
  */
@@ -16,10 +21,12 @@ export const fetchAvailableModels = async (accessToken: string): Promise<ModelGr
     console.log("model_info:", fetchedModels);
 
     if (fetchedModels?.data.length > 0) {
-      const models: ModelGroup[] = fetchedModels.data.map((item: any) => ({
-        model_group: item.model_group, // Display the model_group to the user
-        mode: item?.mode, // Save the mode for auto-selection of endpoint type
-      }));
+      const models: ModelGroup[] = fetchedModels.data
+        .map((item: any) => ({
+          model_group: item.model_group, // Display the model_group to the user
+          mode: item?.mode, // Save the mode for auto-selection of endpoint type
+        }))
+        .filter((model: ModelGroup) => isConcreteModelGroup(model.model_group));
 
       // Sort models alphabetically by label
       models.sort((a, b) => a.model_group.localeCompare(b.model_group));
@@ -27,7 +34,6 @@ export const fetchAvailableModels = async (accessToken: string): Promise<ModelGr
     }
     return [];
   } catch (error) {
-    console.error("Error fetching model info:", error);
     throw error;
   }
 };
