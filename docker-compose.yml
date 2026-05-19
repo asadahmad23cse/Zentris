@@ -31,11 +31,12 @@ services:
     ports:
       - "4000:4000" # Map the container port to the host, change the host port if necessary
     environment:
-      DATABASE_URL: "postgresql://llmproxy:dbpassword9090@db:5432/litellm"
+      DATABASE_URL: "postgresql://llmproxy:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/litellm"
+      LITELLM_MASTER_KEY: "${LITELLM_MASTER_KEY:?set LITELLM_MASTER_KEY}"
       STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
       REDIS_URL: "redis://redis:6379/0" # required by security middleware + replay protection
-      JWT_SECRET: "${JWT_SECRET:-change-me-in-production}"
-      CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET:-change-me-in-production}"
+      JWT_SECRET: "${JWT_SECRET:?set JWT_SECRET}"
+      CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET:?set CONFIRMATION_TOKEN_SECRET}"
       CONFIRMATION_TOKEN_TTL_SECONDS: "${CONFIRMATION_TOKEN_TTL_SECONDS:-300}"
       STREAMING_ROLLING_BUFFER_CHARS: "${STREAMING_ROLLING_BUFFER_CHARS:-256}"
       STREAMING_SUSPICIOUS_EVENT_LIMIT: "${STREAMING_SUSPICIOUS_EVENT_LIMIT:-3}"
@@ -75,7 +76,7 @@ services:
     environment:
       POSTGRES_DB: litellm
       POSTGRES_USER: llmproxy
-      POSTGRES_PASSWORD: dbpassword9090
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}"
     ports:
       - "5432:5432"
     volumes:
@@ -122,7 +123,7 @@ services:
       - "3001:3000"
     environment:
       GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
-      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}"
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD}"
       GF_USERS_DEFAULT_THEME: "light"
     volumes:
       - grafana_data:/var/lib/grafana
