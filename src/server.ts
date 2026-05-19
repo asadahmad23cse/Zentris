@@ -12,6 +12,16 @@ export const buildServer = async () => {
     requestTimeout: 60_000
   });
 
+  app.addHook("onSend", async (_request, reply, payload) => {
+    reply.header("X-Content-Type-Options", "nosniff");
+    reply.header("X-Frame-Options", "DENY");
+    reply.header("Referrer-Policy", "no-referrer");
+    reply.header("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    reply.header("Cross-Origin-Resource-Policy", "same-origin");
+    reply.header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'");
+    return payload;
+  });
+
   await app.register(rateLimit, {
     global: true,
     max: config.RATE_LIMIT_MAX,

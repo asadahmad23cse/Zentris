@@ -42,6 +42,19 @@ describe("health endpoints", () => {
     assert.equal(response.json().status, "ok");
   });
 
+  test("health responses include defensive security headers", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/health/liveness"
+    });
+
+    assert.equal(response.headers["x-content-type-options"], "nosniff");
+    assert.equal(response.headers["x-frame-options"], "DENY");
+    assert.equal(response.headers["referrer-policy"], "no-referrer");
+    assert.equal(response.headers["cross-origin-resource-policy"], "same-origin");
+    assert.equal(response.headers["content-security-policy"], "default-src 'none'; frame-ancestors 'none'; base-uri 'none'");
+  });
+
   test("readiness endpoint reports ready when Redis responds", async () => {
     sandbox.stub(redisClient, "ping").resolves("PONG");
 
