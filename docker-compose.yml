@@ -3,8 +3,10 @@ services:
     image: nginx:1.27-alpine
     container_name: zentris_nginx
     depends_on:
-      - litellm
-      - dashboard
+      litellm:
+        condition: service_healthy
+      dashboard:
+        condition: service_started
     ports:
       - "80:80"
       - "443:443"
@@ -43,8 +45,10 @@ services:
     env_file:
       - .env # Load local .env file
     depends_on:
-      - db  # Indicates that this service depends on the 'db' service, ensuring 'db' starts first
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:  # Defines the health check configuration for the container
       test:
         - CMD-SHELL
@@ -60,13 +64,22 @@ services:
       dockerfile: docker/Dockerfile.dashboard
     container_name: zentris_dashboard
     depends_on:
-      - litellm
+      litellm:
+        condition: service_healthy
     environment:
       NEXT_PUBLIC_BASE_URL: "http://localhost"
       NEXT_PUBLIC_USE_REWRITES: "false"
       NODE_ENV: "production"
     ports:
       - "3000:3000"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "fetch('http://localhost:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     restart: unless-stopped
 
   db:
