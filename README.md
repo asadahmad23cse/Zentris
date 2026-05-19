@@ -1,17 +1,15 @@
-<h1 align="center">
-        🚅 Zentris
-    </h1>
-    <p align="center">
-        <p align="center">Call 100+ LLMs in OpenAI format. [Bedrock, Azure, OpenAI, VertexAI, Anthropic, Groq, etc.]
-        </p>
-        <p align="center">
-        <a href="https://render.com/deploy?repo=https://github.com/asadahmad23cse/Zentris" target="_blank" rel="nofollow"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render"></a>
-        <a href="https://railway.app/template/HLP0Ub?referralCode=jch2ME">
-          <img src="https://railway.app/button.svg" alt="Deploy on Railway">
-        </a>
-        </p>
-    </p>
-<h4 align="center"><a href="https://docs.litellm.ai/docs/simple_proxy" target="_blank">Zentris Proxy Server (AI Gateway)</a> | <a href="https://docs.litellm.ai/docs/enterprise#hosted-litellm-proxy" target="_blank"> Hosted Proxy</a> | <a href="https://docs.litellm.ai/docs/enterprise"target="_blank">Enterprise Tier</a></h4>
+<h1 align="center">Zentris</h1>
+<p align="center">
+  <strong>Production-grade AI gateway and security runtime for 100+ LLM providers.</strong>
+</p>
+<p align="center">
+  OpenAI-compatible routing for Bedrock, Azure, OpenAI, Vertex AI, Anthropic, Groq, and more.
+</p>
+<p align="center">
+  <a href="https://render.com/deploy?repo=https://github.com/asadahmad23cse/Zentris" target="_blank" rel="nofollow"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render"></a>
+  <a href="https://railway.app/template/HLP0Ub?referralCode=jch2ME"><img src="https://railway.app/button.svg" alt="Deploy on Railway"></a>
+</p>
+<h4 align="center"><a href="https://docs.litellm.ai/docs/simple_proxy" target="_blank">Zentris Proxy Server (AI Gateway)</a> | <a href="https://docs.litellm.ai/docs/enterprise#hosted-litellm-proxy" target="_blank">Hosted Proxy</a> | <a href="https://docs.litellm.ai/docs/enterprise" target="_blank">Enterprise Tier</a></h4>
 <h4 align="center">
     <a href="https://pypi.org/project/litellm/" target="_blank">
         <img src="https://img.shields.io/pypi/v/litellm.svg" alt="PyPI Version">

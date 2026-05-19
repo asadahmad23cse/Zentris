@@ -1074,9 +1074,16 @@ export default function ComplianceUI({
                 );
                 return (
                   <div key={fw.name} className="rounded-lg overflow-hidden">
-                    <button
-                      type="button"
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={() => toggleFramework(fw.name)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          toggleFramework(fw.name);
+                        }
+                      }}
                       className="w-full flex items-center gap-2 px-3 py-2.5 text-left bg-gray-50 hover:bg-gray-100 transition-colors rounded-lg border border-gray-200"
                     >
                       {isExpanded ? (
@@ -1108,7 +1115,7 @@ export default function ComplianceUI({
                       >
                         {fwSelectedCount === fwPromptCount ? "Clear" : "All"}
                       </button>
-                    </button>
+                    </div>
 
                     {isExpanded && (
                       <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-gray-100 pl-3">

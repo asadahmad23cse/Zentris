@@ -63,14 +63,15 @@ export default function UsageIndicator({ accessToken, width = 220 }: UsageIndica
       setError(null);
 
       try {
-        const [usageResult, licenseResult] = await Promise.all([
-          getRemainingUsers(accessToken),
-          getLicenseInfo(accessToken).catch(() => null), // Don't fail if license endpoint unavailable
-        ]);
+        const usageResult = await getRemainingUsers(accessToken);
+        const licenseResult = await getLicenseInfo(accessToken).catch(() => null);
         setData(usageResult);
         setLicenseInfo(licenseResult);
+        setError(null);
       } catch (err) {
         console.error("Failed to fetch usage data:", err);
+        setData(null);
+        setLicenseInfo(null);
         setError("Failed to load usage data");
       } finally {
         setIsLoading(false);

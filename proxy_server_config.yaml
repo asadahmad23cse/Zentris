@@ -155,8 +155,8 @@ litellm_settings:
   success_callback: ["prometheus"]
   # max_budget: 100 
   # budget_duration: 30d
-  num_retries: 5
-  request_timeout: 600
+  num_retries: 0
+  request_timeout: 30
   telemetry: False
   context_window_fallbacks: [{"gpt-3.5-turbo": ["gpt-3.5-turbo-large"]}]
   default_team_settings: 
@@ -205,7 +205,7 @@ router_settings:
   model_group_alias: {"my-special-fake-model-alias-name": "fake-openai-endpoint-3"} 
 
 general_settings: 
-  master_key: sk-1234 # [OPTIONAL] Use to enforce auth on proxy. See - https://docs.litellm.ai/docs/proxy/virtual_keys
+  master_key: os.environ/LITELLM_MASTER_KEY # Required for proxy auth. scripts/start-zentris.ps1 generates a local-only key.
   store_model_in_db: True
   proxy_budget_rescheduler_min_time: 60
   proxy_budget_rescheduler_max_time: 64
@@ -228,4 +228,4 @@ general_settings:
   # settings for using redis caching
   # REDIS_HOST: redis-16337.c322.us-east-1-2.ec2.cloud.redislabs.com
   # REDIS_PORT: "16337"
-  # REDIS_PASSWORD: 
+  # REDIS_PASSWORD:

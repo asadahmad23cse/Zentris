@@ -6,13 +6,21 @@ import * as fetchModelsModule from "../llm_calls/fetch_models";
 // Mock the fetchAvailableModels function
 vi.mock("../llm_calls/fetch_models", () => ({
   fetchAvailableModels: vi.fn(),
+  isConcreteModelGroup: vi.fn((modelGroup?: string) => {
+    const normalizedModelGroup = modelGroup?.trim();
+    return Boolean(normalizedModelGroup && !normalizedModelGroup.includes("*"));
+  }),
 }));
 
 // Mock other networking functions that cause errors
-vi.mock("../networking", () => ({
+vi.mock("../../networking", () => ({
+  callMCPTool: vi.fn(),
+  fetchMCPServers: vi.fn().mockResolvedValue({ data: [] }),
+  listMCPTools: vi.fn().mockResolvedValue({ data: [] }),
   tagListCall: vi.fn().mockResolvedValue({ data: [] }),
   vectorStoreListCall: vi.fn().mockResolvedValue({ data: [] }),
   getGuardrailsList: vi.fn().mockResolvedValue({ data: [] }),
+  getPoliciesList: vi.fn().mockResolvedValue({ policies: [] }),
   modelHubCall: vi.fn().mockResolvedValue({ data: [] }),
 }));
 
@@ -179,6 +187,42 @@ describe("ChatUI", () => {
       expect(screen.queryByText("SpeechModel")).toBeNull();
       expect(screen.queryByText("ImageModel")).toBeNull();
       expect(screen.queryByText("ResponsesModel")).toBeNull();
+    });
+  });
+
+  it("hides wildcard model groups from the playground model selector", async () => {
+    (fetchModelsModule.fetchAvailableModels as any).mockResolvedValueOnce([
+      { model_group: "gpt-4o", mode: "chat" },
+      { model_group: "*", mode: "chat" },
+      { model_group: "anthropic/*", mode: "chat" },
+    ]);
+
+    render(
+      <ChatUI
+        accessToken="1234567890"
+        token="1234567890"
+        userRole="user"
+        userID="1234567890"
+        disabledPersonalKeyCreation={false}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Test Key")).toBeInTheDocument();
+    });
+
+    const selectModelLabel = screen.getByText("Select Model");
+    const modelSelect = selectModelLabel.closest("div")?.querySelector(".ant-select-selector");
+    expect(modelSelect).toBeTruthy();
+
+    act(() => {
+      fireEvent.mouseDown(modelSelect!);
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByText("gpt-4o").length).toBeGreaterThan(0);
+      expect(screen.queryByText("*")).toBeNull();
+      expect(screen.queryByText("anthropic/*")).toBeNull();
     });
   });
 

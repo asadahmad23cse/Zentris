@@ -1628,7 +1628,6 @@ export const organizationListCall = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Failed to create key:", error);
     throw error;
   }
 };
@@ -8507,9 +8506,8 @@ export const getLicenseInfo = async (
 
     const data = await response.json();
     return data;
-  } catch (error) {
-    console.error("Failed to fetch license info:", error);
-    throw error;
+  } catch {
+    return null;
   }
 };
 
