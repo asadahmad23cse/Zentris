@@ -14,6 +14,7 @@ const validConfig = (overrides: Partial<AppConfig> = {}): AppConfig => ({
   JWT_SECRET: "jwt-secret-1234567890-1234567890",
   RATE_LIMIT_MAX: 30,
   RATE_LIMIT_WINDOW: "1 minute",
+  REQUEST_BODY_LIMIT_BYTES: 1_048_576,
   CONFIRMATION_TOKEN_SECRET: "confirmation-secret-1234567890-1234567890",
   CONFIRMATION_TOKEN_TTL_SECONDS: 120,
   CONFIRMATION_TOKEN_MAX_CLOCK_SKEW_SECONDS: 15,
@@ -98,6 +99,18 @@ describe("configuration validation", () => {
           })
         ),
       /CONFIRMATION_TOKEN_TTL_SECONDS.*CONFIRMATION_TOKEN_MAX_CLOCK_SKEW_SECONDS/
+    );
+  });
+
+  test("rejects unsafe request body limits", () => {
+    assert.throws(
+      () =>
+        validateConfig(
+          validConfig({
+            REQUEST_BODY_LIMIT_BYTES: 10_000_000
+          })
+        ),
+      /REQUEST_BODY_LIMIT_BYTES/
     );
   });
 });

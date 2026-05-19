@@ -13,6 +13,7 @@ export interface AppConfig {
   JWT_SECRET: string;
   RATE_LIMIT_MAX: number;
   RATE_LIMIT_WINDOW: string;
+  REQUEST_BODY_LIMIT_BYTES: number;
   CONFIRMATION_TOKEN_SECRET: string;
   CONFIRMATION_TOKEN_TTL_SECONDS: number;
   CONFIRMATION_TOKEN_MAX_CLOCK_SKEW_SECONDS: number;
@@ -136,6 +137,10 @@ export const validateConfig = (candidate: AppConfig): void => {
     issues.push("PORT must be between 1 and 65535");
   }
 
+  if (candidate.REQUEST_BODY_LIMIT_BYTES < 16_384 || candidate.REQUEST_BODY_LIMIT_BYTES > 1_048_576) {
+    issues.push("REQUEST_BODY_LIMIT_BYTES must be between 16384 and 1048576");
+  }
+
   if (candidate.CONFIRMATION_TOKEN_TTL_SECONDS > 900) {
     issues.push("CONFIRMATION_TOKEN_TTL_SECONDS must not exceed 900 seconds");
   }
@@ -191,6 +196,7 @@ export const config: AppConfig = {
   JWT_SECRET: getRequiredEnv("JWT_SECRET"),
   RATE_LIMIT_MAX: getNumberEnv("RATE_LIMIT_MAX", 30),
   RATE_LIMIT_WINDOW: getStringEnv("RATE_LIMIT_WINDOW", "1 minute"),
+  REQUEST_BODY_LIMIT_BYTES: getNumberEnv("REQUEST_BODY_LIMIT_BYTES", 1_048_576),
   CONFIRMATION_TOKEN_SECRET: getStringEnv(
     "CONFIRMATION_TOKEN_SECRET",
     `${getRequiredEnv("JWT_SECRET")}-tool-confirmation`

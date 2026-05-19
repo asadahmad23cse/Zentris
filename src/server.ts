@@ -9,7 +9,8 @@ import { logger } from "./utils/logger";
 export const buildServer = async () => {
   const app = Fastify({
     loggerInstance: logger,
-    requestTimeout: 60_000
+    requestTimeout: 60_000,
+    bodyLimit: config.REQUEST_BODY_LIMIT_BYTES
   });
 
   app.addHook("onSend", async (_request, reply, payload) => {
