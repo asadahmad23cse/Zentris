@@ -5,6 +5,8 @@ dotenv.config();
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
 export interface AppConfig {
+  NODE_ENV: string;
+  ZENTRIS_STRICT_CONFIG: boolean;
   REDIS_URL: string;
   LITELLM_BASE_URL: string;
   LITELLM_API_KEY: string;
@@ -25,6 +27,16 @@ export interface AppConfig {
   CIRCUIT_BREAKER_ENABLED: boolean;
   LOG_LEVEL: LogLevel;
   PORT: number;
+}
+
+export class ConfigValidationError extends Error {
+  public readonly issues: string[];
+
+  public constructor(issues: string[]) {
+    super(`Invalid Zentris configuration: ${issues.join("; ")}`);
+    this.name = "ConfigValidationError";
+    this.issues = issues;
+  }
 }
 
 const LOG_LEVELS: ReadonlyArray<LogLevel> = ["debug", "info", "warn", "error"];
@@ -87,7 +99,92 @@ const getLogLevel = (): LogLevel => {
   return rawValue;
 };
 
+const isPlaceholderSecret = (value: string): boolean => {
+  const normalized = value.trim().toLowerCase();
+  return (
+    normalized.includes("replace_with") ||
+    normalized.includes("change-me") ||
+    normalized.includes("your-key") ||
+    normalized.includes("test-secret") ||
+    normalized === "secret" ||
+    normalized === "password"
+  );
+};
+
+const isValidUrl = (value: string, allowedProtocols: ReadonlyArray<string>): boolean => {
+  try {
+    const parsed = new URL(value);
+    return allowedProtocols.includes(parsed.protocol);
+  } catch {
+    return false;
+  }
+};
+
+export const validateConfig = (candidate: AppConfig): void => {
+  const issues: string[] = [];
+  const strict = candidate.NODE_ENV === "production" || candidate.ZENTRIS_STRICT_CONFIG;
+
+  if (!isValidUrl(candidate.REDIS_URL, ["redis:", "rediss:"])) {
+    issues.push("REDIS_URL must be a valid redis:// or rediss:// URL");
+  }
+
+  if (!isValidUrl(candidate.LITELLM_BASE_URL, ["http:", "https:"])) {
+    issues.push("LITELLM_BASE_URL must be a valid http:// or https:// URL");
+  }
+
+  if (candidate.PORT < 1 || candidate.PORT > 65535) {
+    issues.push("PORT must be between 1 and 65535");
+  }
+
+  if (candidate.CONFIRMATION_TOKEN_TTL_SECONDS > 900) {
+    issues.push("CONFIRMATION_TOKEN_TTL_SECONDS must not exceed 900 seconds");
+  }
+
+  if (candidate.CONFIRMATION_TOKEN_MAX_CLOCK_SKEW_SECONDS > 60) {
+    issues.push("CONFIRMATION_TOKEN_MAX_CLOCK_SKEW_SECONDS must not exceed 60 seconds");
+  }
+
+  if (candidate.STREAMING_ROLLING_BUFFER_CHARS < 128) {
+    issues.push("STREAMING_ROLLING_BUFFER_CHARS must be at least 128");
+  }
+
+  if (candidate.MAX_SESSION_MESSAGES > 100) {
+    issues.push("MAX_SESSION_MESSAGES must not exceed 100");
+  }
+
+  if (strict) {
+    if (candidate.JWT_SECRET.length < 32 || isPlaceholderSecret(candidate.JWT_SECRET)) {
+      issues.push("JWT_SECRET must be a non-placeholder secret with at least 32 characters");
+    }
+
+    if (
+      candidate.CONFIRMATION_TOKEN_SECRET.length < 32 ||
+      isPlaceholderSecret(candidate.CONFIRMATION_TOKEN_SECRET)
+    ) {
+      issues.push("CONFIRMATION_TOKEN_SECRET must be a non-placeholder secret with at least 32 characters");
+    }
+
+    if (candidate.JWT_SECRET === candidate.CONFIRMATION_TOKEN_SECRET) {
+      issues.push("JWT_SECRET and CONFIRMATION_TOKEN_SECRET must be distinct");
+    }
+
+    if (candidate.LITELLM_API_KEY.length < 16 || isPlaceholderSecret(candidate.LITELLM_API_KEY)) {
+      issues.push("LITELLM_API_KEY must be a real upstream credential");
+    }
+
+    if (candidate.LOG_LEVEL === "debug") {
+      issues.push("LOG_LEVEL=debug is not allowed in strict production mode");
+    }
+  }
+
+  if (issues.length > 0) {
+    throw new ConfigValidationError(issues);
+  }
+};
+
 export const config: AppConfig = {
+  NODE_ENV: getStringEnv("NODE_ENV", "development"),
+  ZENTRIS_STRICT_CONFIG: getBooleanEnv("ZENTRIS_STRICT_CONFIG", false),
   REDIS_URL: getRequiredEnv("REDIS_URL"),
   LITELLM_BASE_URL: getRequiredEnv("LITELLM_BASE_URL"),
   LITELLM_API_KEY: getRequiredEnv("LITELLM_API_KEY"),
@@ -115,3 +212,5 @@ export const config: AppConfig = {
   LOG_LEVEL: getLogLevel(),
   PORT: getNumberEnv("PORT")
 };
+
+validateConfig(config);
