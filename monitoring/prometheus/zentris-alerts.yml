@@ -1,0 +1,20 @@
+groups:
+  - name: zentris-availability
+    rules:
+      - alert: LiteLLMProxyDown
+        expr: up{job="litellm"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "LiteLLM proxy is unavailable"
+          description: "Prometheus has been unable to scrape the LiteLLM proxy for more than 2 minutes."
+
+      - alert: LiteLLMProxyScrapeSlow
+        expr: scrape_duration_seconds{job="litellm"} > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "LiteLLM proxy scrape is slow"
+          description: "Prometheus scrape duration for the LiteLLM proxy has been above 5 seconds for 5 minutes."

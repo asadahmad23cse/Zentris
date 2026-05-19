@@ -106,6 +106,7 @@ services:
     volumes:
       - prometheus_data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus:/etc/prometheus/rules:ro
     ports:
       - "9090:9090"
     command:
