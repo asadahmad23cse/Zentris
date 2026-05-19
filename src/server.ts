@@ -3,7 +3,7 @@ import rateLimit from "@fastify/rate-limit";
 import authMiddleware from "./auth/authMiddleware";
 import { config } from "./config";
 import chatRoutes from "./routes/chat";
-import { redisClient } from "./services/redisClient";
+import { checkRedisHealth, redisClient } from "./services/redisClient";
 import { logger } from "./utils/logger";
 
 export const buildServer = async () => {
@@ -19,6 +19,27 @@ export const buildServer = async () => {
   });
 
   app.get("/health", async () => ({ status: "ok", service: "zentris", timestamp: Date.now() }));
+
+  app.get("/health/liveness", async () => ({
+    status: "ok",
+    service: "zentris",
+    timestamp: Date.now(),
+    uptimeSeconds: Math.round(process.uptime())
+  }));
+
+  app.get("/health/readiness", async (_request, reply) => {
+    const redis = await checkRedisHealth();
+    const ready = redis.ok;
+
+    return reply.code(ready ? 200 : 503).send({
+      status: ready ? "ready" : "not_ready",
+      service: "zentris",
+      timestamp: Date.now(),
+      dependencies: {
+        redis
+      }
+    });
+  });
 
   await app.register(authMiddleware);
   await app.register(chatRoutes);
