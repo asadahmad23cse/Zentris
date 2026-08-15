@@ -53,6 +53,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ConfigProvider, theme } from "antd";
 
+const isLegacyInvalidAccessToken = (token: string): boolean => {
+  const [headerSegment, _payloadSegment, signatureSegment] = token.split(".");
+  if (!headerSegment || !signatureSegment) {
+    return true;
+  }
+
+  try {
+    const padded = headerSegment.padEnd(headerSegment.length + ((4 - (headerSegment.length % 4)) % 4), "=");
+    const header = JSON.parse(atob(padded.replace(/-/g, "+").replace(/_/g, "/")));
+    return header?.alg !== "HS256" || signatureSegment === "public";
+  } catch {
+    return true;
+  }
+};
+
 function PublicHome() {
   const chatHref = "/ui/chat";
   const modelHubHref = "/ui/model_hub";
@@ -487,6 +502,7 @@ function CreateKeyPageContent() {
     setCreateClicked(() => !createClicked);
   };
   const redirectToLogin = authLoading === false && token === null && invitation_id === null;
+  const hasDashboardPageRequest = searchParams.has("page");
   useEffect(() => {
     let cancelled = false;
 
@@ -500,7 +516,7 @@ function CreateKeyPageContent() {
       if (cancelled) return;
 
       const raw = getCookie("token");
-      const valid = raw && !isJwtExpired(raw) ? raw : null;
+      const valid = raw && !isJwtExpired(raw) && !isLegacyInvalidAccessToken(raw) ? raw : null;
 
       // If token exists but is invalid/expired, clear it so downstream code
       // doesn't keep trying to use it and cause redirect spasms.
@@ -521,6 +537,15 @@ function CreateKeyPageContent() {
 
   // Redirect legacy query-param pages to their new path-based routes
   const isLegacyRedirect = page in LEGACY_REDIRECTS;
+  useEffect(() => {
+    if (!redirectToLogin || !hasDashboardPageRequest) {
+      return;
+    }
+
+    const target = `/ui/?${searchParams.toString()}`;
+    router.replace(`/ui/login?redirect_to=${encodeURIComponent(target)}`);
+  }, [hasDashboardPageRequest, redirectToLogin, router, searchParams]);
+
   useEffect(() => {
     if (!authLoading && isLegacyRedirect) {
       const base = (proxyBaseUrl || "") + "/ui";
@@ -719,6 +744,9 @@ function CreateKeyPageContent() {
   }
 
   if (redirectToLogin) {
+    if (hasDashboardPageRequest) {
+      return <LoadingScreen />;
+    }
     return <PublicHome />;
   }
 
