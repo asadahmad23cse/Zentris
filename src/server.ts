@@ -95,7 +95,6 @@ export const buildServer = async (options: ServerOptions = {}) => {
     });
   });
 
-  await app.register(publicRoutes, options.publicRoutes ?? {});
   if (config.ZENTRIS_DEMO_ENABLED) {
     await app.register(demoRoutes);
   }
