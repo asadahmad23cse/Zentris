@@ -143,11 +143,7 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
   app.get("/public/model_hub/info", async () => ({
     docs_title: "Zentris Gateway",
     custom_docs_description: "Public model catalog for the Zentris AI security runtime.",
-    Zentris_version: "1.0.0",
-    useful_links: {
-      "Backend health": { url: "/health/readiness", index: 1 },
-      "Chat API": { url: "/v1/public/chat", index: 2 }
-    }
+    Zentris_version: "1.0.0"
   }));
 
   app.get("/public/model_hub", async () => PUBLIC_MODELS);
