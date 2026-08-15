@@ -17,7 +17,7 @@ interface LiteLLMResponse {
   choices?: LiteLLMChoice[];
 }
 
-const DEFAULT_MODEL = "gpt-4o";
+const DEFAULT_MODEL = "gpt-4o-mini";
 const DEFAULT_TEMPERATURE = 0.7;
 const REQUEST_TIMEOUT_MS = 30_000;
 const RETRY_BACKOFF_MS = [500, 1000] as const;
