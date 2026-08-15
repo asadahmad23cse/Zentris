@@ -281,7 +281,7 @@ describe("Zentris integration", { concurrency: 1 }, () => {
   before(async () => {
     process.env.REDIS_URL = process.env.REDIS_URL ?? "redis://localhost:6379";
     process.env.LITELLM_BASE_URL = process.env.LITELLM_BASE_URL ?? "http://localhost:4000";
-    process.env.LITELLM_API_KEY = process.env.LITELLM_API_KEY ?? "sk-test-key";
+    process.env.LITELLM_API_KEY = process.env.LITELLM_API_KEY ?? "sk-test-key-1234567890";
     process.env.JWT_SECRET = process.env.JWT_SECRET ?? "integration-test-secret";
     process.env.SERVER_SYSTEM_PROMPT =
       process.env.SERVER_SYSTEM_PROMPT ?? "Server controlled prompt for integration tests.";
@@ -304,6 +304,9 @@ describe("Zentris integration", { concurrency: 1 }, () => {
       chatRoutes: {
         litellmChat: (...args) => llmChatStub(...args),
         streamChat: (...args) => streamChatStub(...args)
+      },
+      publicRoutes: {
+        litellmChat: (...args) => llmChatStub(...args)
       }
     });
     await app.ready();
@@ -322,6 +325,40 @@ describe("Zentris integration", { concurrency: 1 }, () => {
     if (redisClient.status !== "end") {
       redisClient.disconnect();
     }
+  });
+
+  test("Test 0a: public LLM status returns ok without exposing secrets", async () => {
+    llmChatStub.resolves("OK");
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/public/llm-status"
+    });
+
+    assert.equal(response.statusCode, 200);
+    const body = response.json();
+    assert.equal(body.status, "ok");
+    assert.equal(body.provider, "openai");
+    assert.equal(body.model, "gpt-4o-mini");
+    assert.equal(body.keyConfigured, true);
+    assert.equal(body.sample, "OK");
+    assert.equal(response.payload.includes(process.env.LITELLM_API_KEY ?? "sk-test-key"), false);
+  });
+
+  test("Test 0b: public LLM status sanitizes upstream errors", async () => {
+    llmChatStub.rejects(new Error("401 invalid key sk-should-not-leak-1234567890"));
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/public/llm-status"
+    });
+
+    assert.equal(response.statusCode, 200);
+    const body = response.json();
+    assert.equal(body.status, "upstream_error");
+    assert.equal(body.error.statusCode, 0);
+    assert.match(body.error.reason, /invalid key/);
+    assert.equal(response.payload.includes("sk-should-not-leak"), false);
   });
 
   test("Test 1: clean message passes all guards", async () => {

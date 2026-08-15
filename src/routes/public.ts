@@ -5,6 +5,7 @@ import { wrapUntrustedData } from "../guards/ragWrapper";
 import { type LLMChat, ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
 import { createAccessToken } from "../auth/jwt";
+import { LiteLLMClient, LiteLLMError } from "../llm/litellmClient";
 import { type AuthenticatedIdentity, type ChatMessage, type ToolInvocation } from "../types";
 
 interface PublicChatBody {
@@ -121,9 +122,46 @@ const normalizeHistory = (history: PublicChatBody["history"]): ChatMessage[] =>
     timestamp: message.timestamp ?? Date.now()
   }));
 
+const redactSensitiveText = (value: string): string =>
+  value
+    .replace(/\bsk-[A-Za-z0-9_-]{12,}\b/g, "[REDACTED_KEY]")
+    .replace(/\bBearer\s+[A-Za-z0-9._-]+/gi, "Bearer [REDACTED]")
+    .slice(0, 240);
+
+const summarizeLLMError = (error: unknown): { statusCode: number; reason: string } => {
+  if (error instanceof LiteLLMError) {
+    let reason = error.llmReason;
+
+    try {
+      const parsed = JSON.parse(error.llmReason) as {
+        error?: { message?: unknown; type?: unknown; code?: unknown };
+      };
+      const providerError = parsed.error;
+      const parts = [providerError?.code, providerError?.type, providerError?.message]
+        .filter((part): part is string => typeof part === "string" && part.length > 0);
+      if (parts.length > 0) {
+        reason = parts.join(": ");
+      }
+    } catch {
+      // Provider error payload was plain text; redact and return the bounded value below.
+    }
+
+    return {
+      statusCode: error.statusCode,
+      reason: redactSensitiveText(reason)
+    };
+  }
+
+  return {
+    statusCode: 0,
+    reason: error instanceof Error ? redactSensitiveText(error.message) : "unknown_error"
+  };
+};
+
 const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options) => {
   const ragSecurityGuard = new RagSecurityGuard();
   const pipeline = new ZentrisPipeline({ litellmChat: options.litellmChat });
+  const llmStatusChat = options.litellmChat ?? ((messages, llmOptions) => new LiteLLMClient().chat(messages, llmOptions));
 
   app.get("/.well-known/litellm-ui-config", async (request) => {
     const host = request.headers.host;
@@ -149,6 +187,68 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
   app.get("/public/model_hub", async () => PUBLIC_MODELS);
   app.get("/public/agent_hub", async () => []);
   app.get("/public/mcp_hub", async () => []);
+
+  app.get(
+    "/public/llm-status",
+    {
+      config: {
+        rateLimit: {
+          max: 3,
+          timeWindow: "1 minute"
+        }
+      }
+    },
+    async () => {
+      const keyConfigured = config.LITELLM_API_KEY.trim().length >= 16;
+
+      if (!keyConfigured) {
+        return {
+          status: "not_configured",
+          provider: "openai",
+          model: "gpt-4o-mini",
+          baseUrl: config.LITELLM_BASE_URL,
+          keyConfigured: false,
+          error: "LITELLM_API_KEY is missing or too short"
+        };
+      }
+
+      try {
+        const response = await llmStatusChat(
+          [
+            {
+              role: "system",
+              content: "Reply with exactly: OK",
+              timestamp: Date.now()
+            },
+            {
+              role: "user",
+              content: "Health check",
+              timestamp: Date.now()
+            }
+          ],
+          { model: "gpt-4o-mini", temperature: 0, maxTokens: 8 }
+        );
+
+        return {
+          status: "ok",
+          provider: "openai",
+          model: "gpt-4o-mini",
+          baseUrl: config.LITELLM_BASE_URL,
+          keyConfigured: true,
+          sample: response.slice(0, 40)
+        };
+      } catch (error) {
+        return {
+          status: "upstream_error",
+          provider: "openai",
+          model: "gpt-4o-mini",
+          baseUrl: config.LITELLM_BASE_URL,
+          keyConfigured: true,
+          error: summarizeLLMError(error)
+        };
+      }
+    }
+  );
 
   app.get("/public/dashboard-token", async () => {
     const now = Math.floor(Date.now() / 1000);
