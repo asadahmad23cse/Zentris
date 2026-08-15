@@ -100,6 +100,12 @@ const MCP_SUPPORTED_ENDPOINTS = new Set<EndpointType>([
   EndpointType.MCP,
 ]);
 const DEFAULT_PLAYGROUND_MODEL = "gpt-4o";
+const DEMO_PLAYGROUND_MODELS: ModelGroup[] = [
+  { model_group: "gpt-4o-mini", mode: "chat" },
+  { model_group: "gpt-4o", mode: "chat" },
+  { model_group: "claude-3-5-sonnet", mode: "chat" },
+  { model_group: "gemini-1.5-flash", mode: "chat" }
+];
 
 const ChatUI: React.FC<ChatUIProps> = ({
   accessToken,
@@ -168,7 +174,10 @@ const ChatUI: React.FC<ChatUIProps> = ({
     const saved = sessionStorage.getItem("apiKeySource");
     if (saved) {
       try {
-        return JSON.parse(saved) as "session" | "custom";
+        const source = JSON.parse(saved) as "session" | "custom";
+        return source === "custom" && !sessionStorage.getItem("apiKey") && !disabledPersonalKeyCreation
+          ? "session"
+          : source;
       } catch (error) {
         console.error("Error parsing apiKeySource from sessionStorage", error);
       }
@@ -181,7 +190,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
     () => sessionStorage.getItem("customProxyBaseUrl") || "",
   );
   const [inputMessage, setInputMessage] = useState("");
-  const [selectedModel, setSelectedModel] = useState<string | undefined>(simplified ? fixedModel : undefined);
+  const [selectedModel, setSelectedModel] = useState<string | undefined>(simplified ? fixedModel : DEFAULT_PLAYGROUND_MODEL);
   const [showCustomModelInput, setShowCustomModelInput] = useState<boolean>(false);
   const [modelInfo, setModelInfo] = useState<ModelGroup[]>([]);
   const [agentInfo, setAgentInfo] = useState<Agent[]>([]);
@@ -397,23 +406,23 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
         console.log("Fetched models:", uniqueModels);
 
-        setModelInfo(uniqueModels);
+        const availableModels = uniqueModels.length > 0 ? uniqueModels : DEMO_PLAYGROUND_MODELS;
+        setModelInfo(availableModels);
 
         // Check for selection overlap or empty model list. Wildcard model groups are
         // intentionally hidden from playground requests because they are routing
         // patterns, not concrete model IDs.
-        const hasSelection = uniqueModels.some((m) => m.model_group === selectedModel);
-        if (!uniqueModels.length) {
-          setSelectedModel(undefined);
-          sessionStorage.removeItem("selectedModel");
-        } else if (!hasSelection) {
+        const hasSelection = availableModels.some((m) => m.model_group === selectedModel);
+        if (!hasSelection) {
           const fallbackModel =
-            uniqueModels.find((model) => model.model_group === DEFAULT_PLAYGROUND_MODEL)?.model_group ??
-            uniqueModels[0].model_group;
+            availableModels.find((model) => model.model_group === DEFAULT_PLAYGROUND_MODEL)?.model_group ??
+            availableModels[0].model_group;
           setSelectedModel(fallbackModel);
         }
       } catch (error) {
         console.error("Error fetching model info:", error);
+        setModelInfo(DEMO_PLAYGROUND_MODELS);
+        setSelectedModel((current) => current ?? DEFAULT_PLAYGROUND_MODEL);
       }
     };
 
