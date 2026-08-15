@@ -21,7 +21,12 @@ New-Item -ItemType Directory -Force -Path $LocalState | Out-Null
 
 function New-UrlSafeSecret([string]$Prefix = "") {
   $bytes = New-Object byte[] 32
-  [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+  $generator = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+  try {
+    $generator.GetBytes($bytes)
+  } finally {
+    $generator.Dispose()
+  }
   $token = [Convert]::ToBase64String($bytes).TrimEnd("=").Replace("+", "-").Replace("/", "_")
   return "$Prefix$token"
 }
@@ -212,6 +217,9 @@ $ProxyProcess = Start-Process -FilePath "C:\Users\ASAD AHMAD\miniconda3\pythonw.
 $env:REDIS_URL = "redis://localhost:6379"
 $env:LITELLM_BASE_URL = "http://localhost:4000"
 $env:LITELLM_API_KEY = $MasterKey
+$env:NODE_ENV = "development"
+$env:ZENTRIS_STRICT_CONFIG = "false"
+$env:ZENTRIS_DEMO_ENABLED = "true"
 $env:MAX_SESSION_MESSAGES = "20"
 $env:CIRCUIT_BREAKER_ENABLED = "true"
 $env:LOG_LEVEL = "info"

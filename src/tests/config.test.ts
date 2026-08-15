@@ -8,6 +8,7 @@ let validateConfig: typeof import("../config").validateConfig;
 const validConfig = (overrides: Partial<AppConfig> = {}): AppConfig => ({
   NODE_ENV: "production",
   ZENTRIS_STRICT_CONFIG: true,
+  ZENTRIS_DEMO_ENABLED: false,
   REDIS_URL: "rediss://redis.internal:6379",
   LITELLM_BASE_URL: "https://llm.internal",
   LITELLM_API_KEY: "sk-production-key-1234567890",

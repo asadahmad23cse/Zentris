@@ -35,6 +35,16 @@
   <img width="220" alt="Zentris Logo" src="ui/litellm-dashboard/public/assets/logos/zentris_logo.svg" />
 </p>
 
+## Interview demo (no cloud setup required)
+
+Show the Zentris security decision flow locally—prompt injection blocking, PII masking, RAG poisoning checks, tool approvals, and output-secret redaction:
+
+```powershell
+python demo/zentris_demo.py --serve
+```
+
+Open `http://127.0.0.1:8080`, then select **Run security scenarios**. See [the four-minute interview guide](docs/INTERVIEW_DEMO.md) and [resume-ready project entry](docs/RESUME_PROJECT_ENTRY.md).
+
 
 ## Use Zentris for
 
