@@ -27,16 +27,16 @@ function LoginPageContent() {
     return "/ui/model_hub";
   };
 
-  const createPublicViewerToken = () => {
+  const createPublicAdminToken = () => {
     const encode = (value: Record<string, unknown>) =>
       btoa(JSON.stringify(value)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
     const now = Math.floor(Date.now() / 1000);
     const header = encode({ alg: "none", typ: "JWT" });
     const payload = encode({
-      key: "public-viewer",
-      user_id: "public-viewer",
-      user_email: "public@zentris.local",
-      user_role: "proxy_admin_viewer",
+      key: "public-admin",
+      user_id: "public-admin",
+      user_email: "admin@zentris.local",
+      user_role: "proxy_admin",
       login_method: "public_access",
       premium_user: false,
       exp: now + 7 * 24 * 60 * 60,
@@ -64,7 +64,7 @@ function LoginPageContent() {
       return;
     }
 
-    document.cookie = `token=${createPublicViewerToken()}; path=/; SameSite=Lax`;
+    document.cookie = `token=${createPublicAdminToken()}; path=/; SameSite=Lax`;
     router.replace(dashboardHome());
   }, [isConfigLoading, router, uiConfig]);
 

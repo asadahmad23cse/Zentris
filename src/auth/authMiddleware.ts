@@ -12,7 +12,13 @@ declare module "fastify" {
 
 const authMiddleware: FastifyPluginAsync = async (app) => {
   app.addHook("onRequest", async (request, reply) => {
-    if (request.raw.url?.startsWith("/health")) {
+    const url = request.raw.url ?? "";
+    if (
+      url.startsWith("/health") ||
+      url.startsWith("/public/") ||
+      url.startsWith("/v1/public/") ||
+      url.startsWith("/.well-known/")
+    ) {
       return;
     }
 
