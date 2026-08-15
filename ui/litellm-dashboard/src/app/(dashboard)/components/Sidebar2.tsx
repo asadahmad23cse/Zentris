@@ -81,6 +81,8 @@ const getBasePath = () => {
 const routeFor = (slug: string): string => {
   switch (slug) {
     // top level
+    case "demo-tour":
+      return "demo-tour";
     case "api-keys":
       return "virtual-keys";
     case "llm-playground":
@@ -162,6 +164,12 @@ const toHref = (slugOrPath: string) => {
 
 // ----- Menu config (unchanged labels/icons; same appearance) -----
 const menuItems: MenuItemCfg[] = [
+  {
+    key: "demo-tour",
+    page: "demo-tour",
+    label: "Demo Tour",
+    icon: <PlayCircleOutlined style={{ fontSize: 18 }} />
+  },
   { key: "1", page: "api-keys", label: "Virtual Keys", icon: <KeyOutlined style={{ fontSize: 18 }} /> },
   {
     key: "3",

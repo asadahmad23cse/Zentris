@@ -31,6 +31,7 @@ function withBase(path: string): string {
  * Key = legacy page id used in leftnav, Value = route segment under (dashboard)/
  */
 const MIGRATED_PAGES: Record<string, string> = {
+  "demo-tour": "demo-tour",
   "api-reference": "api-reference",
   "api-keys": "virtual-keys",
   "llm-playground": "test-key",
