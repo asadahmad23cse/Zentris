@@ -68,6 +68,7 @@ jobs:
       - name: Validate deployment config
         run: |
           python -c "import yaml; yaml.safe_load(open('proxy_server_config.yaml', encoding='utf-8'))"
+          cp .env.production.example .env
           docker compose -f docker-compose.yml config --quiet
 
       - name: Install dashboard dependencies
