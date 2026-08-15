@@ -17,7 +17,6 @@ interface LiteLLMResponse {
   choices?: LiteLLMChoice[];
 }
 
-const DEFAULT_MODEL = "gpt-4o-mini";
 const DEFAULT_TEMPERATURE = 0.7;
 const REQUEST_TIMEOUT_MS = 30_000;
 const RETRY_BACKOFF_MS = [500, 1000] as const;
@@ -66,7 +65,7 @@ export class LiteLLMClient {
   public async chat(messages: ChatMessage[], options?: LLMOptions): Promise<string> {
     const url = `${config.LITELLM_BASE_URL.replace(/\/$/, "")}/chat/completions`;
     const body = {
-      model: options?.model ?? DEFAULT_MODEL,
+      model: options?.model ?? config.LITELLM_MODEL,
       messages: messages.map((message) => ({
         role: message.role,
         content: message.content

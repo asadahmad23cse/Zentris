@@ -204,8 +204,7 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
       if (!keyConfigured) {
         return {
           status: "not_configured",
-          provider: "openai",
-          model: "gpt-4o-mini",
+          model: config.LITELLM_MODEL,
           baseUrl: config.LITELLM_BASE_URL,
           keyConfigured: false,
           error: "LITELLM_API_KEY is missing or too short"
@@ -226,13 +225,12 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
               timestamp: Date.now()
             }
           ],
-          { model: "gpt-4o-mini", temperature: 0, maxTokens: 8 }
+          { model: config.LITELLM_MODEL, temperature: 0, maxTokens: 8 }
         );
 
         return {
           status: "ok",
-          provider: "openai",
-          model: "gpt-4o-mini",
+          model: config.LITELLM_MODEL,
           baseUrl: config.LITELLM_BASE_URL,
           keyConfigured: true,
           sample: response.slice(0, 40)
@@ -240,8 +238,7 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
       } catch (error) {
         return {
           status: "upstream_error",
-          provider: "openai",
-          model: "gpt-4o-mini",
+          model: config.LITELLM_MODEL,
           baseUrl: config.LITELLM_BASE_URL,
           keyConfigured: true,
           error: summarizeLLMError(error)

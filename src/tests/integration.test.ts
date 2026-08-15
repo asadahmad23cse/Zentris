@@ -338,7 +338,6 @@ describe("Zentris integration", { concurrency: 1 }, () => {
     assert.equal(response.statusCode, 200);
     const body = response.json();
     assert.equal(body.status, "ok");
-    assert.equal(body.provider, "openai");
     assert.equal(body.model, "gpt-4o-mini");
     assert.equal(body.keyConfigured, true);
     assert.equal(body.sample, "OK");

@@ -11,6 +11,7 @@ const validConfig = (overrides: Partial<AppConfig> = {}): AppConfig => ({
   REDIS_URL: "rediss://redis.internal:6379",
   LITELLM_BASE_URL: "https://llm.internal",
   LITELLM_API_KEY: "sk-production-key-1234567890",
+  LITELLM_MODEL: "gpt-4o-mini",
   JWT_SECRET: "jwt-secret-1234567890-1234567890",
   RATE_LIMIT_MAX: 30,
   RATE_LIMIT_WINDOW: "1 minute",
