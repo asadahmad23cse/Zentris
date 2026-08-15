@@ -28,6 +28,6 @@
     "@types/sinon": "^17.0.4",
     "sinon": "^22.0.0",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "5.7.2"
   }
 }
