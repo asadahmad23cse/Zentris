@@ -24,7 +24,7 @@ export interface PublicRouteOptions {
 
 const PUBLIC_IDENTITY: AuthenticatedIdentity = {
   userId: "public-web-user",
-  userRole: "anonymous",
+  userRole: "viewer",
   tenantId: null,
   orgId: null
 };
