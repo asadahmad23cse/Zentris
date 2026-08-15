@@ -3,12 +3,14 @@ import rateLimit from "@fastify/rate-limit";
 import authMiddleware from "./auth/authMiddleware";
 import { config } from "./config";
 import chatRoutes, { type ChatRouteOptions } from "./routes/chat";
+import publicRoutes, { type PublicRouteOptions } from "./routes/public";
 import { checkRedisHealth, redisClient } from "./services/redisClient";
 import { logger } from "./utils/logger";
 
 interface ServerOptions {
   redisHealthCheck?: typeof checkRedisHealth;
   chatRoutes?: ChatRouteOptions;
+  publicRoutes?: PublicRouteOptions;
 }
 
 export const buildServer = async (options: ServerOptions = {}) => {
@@ -27,6 +29,27 @@ export const buildServer = async (options: ServerOptions = {}) => {
     reply.header("Cross-Origin-Resource-Policy", "same-origin");
     reply.header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'");
     return payload;
+  });
+
+  app.addHook("onRequest", async (request, reply) => {
+    const origin = request.headers.origin;
+    const allowedOrigins = new Set([
+      config.PUBLIC_WEB_ORIGIN,
+      "https://litellm-dashboard-rose.vercel.app",
+      "http://localhost:3000",
+      "http://localhost:3001"
+    ]);
+
+    if (origin && allowedOrigins.has(origin)) {
+      reply.header("Access-Control-Allow-Origin", origin);
+      reply.header("Vary", "Origin");
+      reply.header("Access-Control-Allow-Headers", "authorization,content-type");
+      reply.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    }
+
+    if (request.method === "OPTIONS") {
+      return reply.code(204).send();
+    }
   });
 
   await app.register(rateLimit, {
@@ -58,6 +81,7 @@ export const buildServer = async (options: ServerOptions = {}) => {
     });
   });
 
+  await app.register(publicRoutes, options.publicRoutes ?? {});
   await app.register(authMiddleware);
   await app.register(chatRoutes, options.chatRoutes ?? {});
 

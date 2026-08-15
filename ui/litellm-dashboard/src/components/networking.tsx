@@ -78,12 +78,13 @@ import { jsonFields } from "./common_components/check_openapi_schema";
 import NotificationsManager from "./molecules/notifications_manager";
 
 const isLocal = process.env.NODE_ENV === "development";
+const productionProxyBaseUrl = process.env.NEXT_PUBLIC_ZENTRIS_API_URL || "https://zentris-api.onrender.com";
 // In dev, if NEXT_PUBLIC_USE_REWRITES=true the Next.js dev server proxies API calls
 // to the backend — use relative URLs (null) so rewrites can intercept them.
 const defaultProxyBaseUrl =
   isLocal && process.env.NEXT_PUBLIC_USE_REWRITES !== "true"
     ? "http://localhost:4000"
-    : null;
+    : productionProxyBaseUrl;
 const defaultServerRootPath = "/";
 export let serverRootPath = defaultServerRootPath;
 const WORKER_URL_KEY = "Zentris_worker_url";

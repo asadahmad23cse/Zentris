@@ -29,6 +29,7 @@ const validConfig = (overrides: Partial<AppConfig> = {}): AppConfig => ({
   CIRCUIT_BREAKER_ENABLED: true,
   LOG_LEVEL: "info",
   PORT: 3000,
+  PUBLIC_WEB_ORIGIN: "https://litellm-dashboard-rose.vercel.app",
   ...overrides
 });
 

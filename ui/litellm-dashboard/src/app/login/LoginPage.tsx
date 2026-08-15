@@ -22,9 +22,9 @@ function LoginPageContent() {
   const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null);
   const dashboardHome = () => {
     if (typeof window !== "undefined" && window.location.port === "3001") {
-      return "/?login=success";
+      return "/model_hub";
     }
-    return "/ui/?login=success";
+    return "/ui/model_hub";
   };
 
   const createPublicViewerToken = () => {

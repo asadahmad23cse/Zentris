@@ -54,7 +54,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ConfigProvider, theme } from "antd";
 
 function PublicHome() {
-  const loginHref = "/ui/login";
+  const chatHref = "/ui/chat";
   const modelHubHref = "/ui/model_hub";
 
   return (
@@ -111,7 +111,7 @@ function PublicHome() {
             Models
           </a>
           <a
-            href={loginHref}
+            href={chatHref}
             style={{
               color: "#ffffff",
               background: "#111827",
@@ -122,7 +122,7 @@ function PublicHome() {
               borderRadius: 8,
             }}
           >
-            Sign in
+            Try chat
           </a>
         </nav>
       </header>
@@ -184,7 +184,7 @@ function PublicHome() {
             }}
           >
             <a
-              href={loginHref}
+              href={chatHref}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -199,7 +199,7 @@ function PublicHome() {
                 fontWeight: 800,
               }}
             >
-              Open console
+              Try chat
             </a>
             <a
               href={modelHubHref}

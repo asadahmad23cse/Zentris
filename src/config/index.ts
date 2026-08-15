@@ -28,6 +28,7 @@ export interface AppConfig {
   CIRCUIT_BREAKER_ENABLED: boolean;
   LOG_LEVEL: LogLevel;
   PORT: number;
+  PUBLIC_WEB_ORIGIN: string;
 }
 
 export class ConfigValidationError extends Error {
@@ -216,7 +217,8 @@ export const config: AppConfig = {
   MAX_SESSION_MESSAGES: getNumberEnv("MAX_SESSION_MESSAGES", 20),
   CIRCUIT_BREAKER_ENABLED: getBooleanEnv("CIRCUIT_BREAKER_ENABLED", true),
   LOG_LEVEL: getLogLevel(),
-  PORT: getNumberEnv("PORT")
+  PORT: getNumberEnv("PORT"),
+  PUBLIC_WEB_ORIGIN: getStringEnv("PUBLIC_WEB_ORIGIN", "https://litellm-dashboard-rose.vercel.app")
 };
 
 validateConfig(config);
