@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zentris | Security Control Room</title>
+    <style>
+      :root { --ink:#eaf2ff; --muted:#91a6c9; --line:#23365b; --panel:#101b31; --bg:#080e1c; --cyan:#48d7ff; --green:#45e09c; --amber:#ffc65a; --red:#ff6b7a; }
+      * { box-sizing:border-box; } body { margin:0; color:var(--ink); font:15px/1.55 Inter, ui-sans-serif, system-ui, sans-serif; background:radial-gradient(circle at 20% 0%, #183260 0, var(--bg) 40%); }
+      main { max-width:1180px; margin:auto; padding:44px 24px 70px; } .eyebrow { color:var(--cyan); font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+      h1 { font-size:clamp(34px,5vw,64px); line-height:1.02; margin:12px 0 14px; letter-spacing:-.05em; } .lead { max-width:720px; color:var(--muted); font-size:18px; }
+      .hero { display:flex; gap:28px; justify-content:space-between; align-items:end; border-bottom:1px solid var(--line); padding-bottom:30px; } button { border:0; cursor:pointer; border-radius:10px; padding:14px 18px; color:#03111d; font-weight:800; font-size:15px; background:var(--cyan); white-space:nowrap; } button:hover { transform:translateY(-1px); background:#80e5ff; }
+      .metrics, .cards { display:grid; gap:14px; margin-top:28px; } .metrics { grid-template-columns:repeat(4,1fr); }.cards { grid-template-columns:repeat(3,1fr); }
+      .metric, .card { background:linear-gradient(140deg,rgba(23,41,75,.94),rgba(13,23,43,.94)); border:1px solid var(--line); border-radius:14px; padding:18px; } .metric b { display:block; font-size:26px; } .metric span { color:var(--muted); font-size:13px; }
+      .card { min-height:200px; position:relative; overflow:hidden; } .card:before { content:""; width:4px; height:100%; background:var(--cyan); position:absolute; left:0; top:0; } .card h2 { margin:0 0 8px; font-size:17px; } .card p { color:var(--muted); margin:0; } .card code { color:#c7d7f4; white-space:pre-wrap; font:12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .result { margin-top:26px; background:#091426; border:1px solid var(--line); border-radius:14px; overflow:hidden; } .result header { display:flex; justify-content:space-between; padding:16px 18px; border-bottom:1px solid var(--line); } .empty { color:var(--muted); padding:25px 18px; }
+      .row { display:grid; grid-template-columns:1.2fr .7fr 2fr .8fr; gap:14px; align-items:center; padding:15px 18px; border-bottom:1px solid #1a2b4a; }.row:last-child { border:0; }.small { color:var(--muted); font-size:12px; }.action { font-size:12px; font-weight:900; letter-spacing:.06em; }.allow { color:var(--green); }.sanitize { color:var(--amber); }.block { color:var(--red); }.approval { color:var(--amber); }
+      .footnote { margin-top:22px; color:var(--muted); font-size:13px; } @media(max-width:760px){ main{padding:28px 16px 50px}.hero{display:block}.hero button{margin-top:18px;width:100%}.metrics,.cards{grid-template-columns:1fr}.row{grid-template-columns:1fr;gap:4px}.row .small{margin-top:2px} }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero"><div><div class="eyebrow">Zentris • AI Security Gateway</div><h1>Security decisions,<br>before model routing.</h1><p class="lead">A live production walkthrough of how Zentris detects risky AI traffic, enforces a policy decision, and creates an audit-ready trail.</p></div><button id="run">Run security scenarios</button></section>
+      <section class="metrics"><div class="metric"><b id="tested">0 / 6</b><span>scenarios evaluated</span></div><div class="metric"><b id="blocked">0</b><span>high-risk interventions</span></div><div class="metric"><b id="latency">—</b><span>median policy latency</span></div><div class="metric"><b>6</b><span>control points represented</span></div></section>
+      <section class="cards"><article class="card"><h2>1. Inspect</h2><p>Normalise client input and look for prompt-injection, PII and risky intent signals.</p></article><article class="card"><h2>2. Enforce</h2><p>Allow safe traffic; block attacks; mask sensitive data; or require human approval for high-impact actions.</p></article><article class="card"><h2>3. Explain</h2><p>Return a clear decision trace mapped to OWASP LLM risks and MITRE ATLAS techniques.</p></article></section>
+      <section class="result"><header><strong>Live decision trace</strong><span class="small">Production guard evaluation • no API key required</span></header><div id="results" class="empty">Click “Run security scenarios” to evaluate six representative requests.</div></section>
+      <p class="footnote">Interview note: this showcase invokes the deployed Zentris guard pipeline. The production gateway additionally integrates authentication, rate limiting, secure routing, audit logging and LiteLLM provider access.</p>
+    </main>
+    <script>
+      const run = document.querySelector('#run'), out = document.querySelector('#results');
+      const endpoint = window.location.pathname.startsWith('/demo') ? '/api/demo/run' : 'https://zentris-api.onrender.com/api/demo/run';
+      const actionClass = action => action === 'ALLOW' ? 'allow' : action === 'BLOCK' ? 'block' : action === 'REDACT' || action === 'SANITIZE' ? 'sanitize' : 'approval';
+      run.addEventListener('click', async () => { run.disabled = true; run.textContent = 'Evaluating…'; out.className = 'empty'; out.textContent = 'Applying input, retrieval, tool and output controls…';
+        try { const response = await fetch(endpoint, {method:'POST', body:'{}'}); if (!response.ok) throw new Error('Demo API unavailable'); const {results} = await response.json();
+          const blocked = results.filter(x => x.action !== 'ALLOW').length, timings = results.map(x=>x.latency_ms).sort((a,b)=>a-b), median = timings[Math.floor(timings.length/2)];
+          document.querySelector('#tested').textContent = `${results.length} / ${results.length}`; document.querySelector('#blocked').textContent = blocked; document.querySelector('#latency').textContent = `${median} ms`;
+          out.className = ''; out.innerHTML = results.map(x => `<article class="row"><div><strong>${x.scenario}</strong><div class="small">${x.owasp} · ${x.mitre}</div></div><div class="action ${actionClass(x.action)}">${x.action}</div><div><div>${x.summary}</div><div class="small">Signals: ${x.signals.join(', ')}</div>${x.sanitized_preview ? `<code>${x.sanitized_preview}</code>` : ''}</div><div class="small">${x.risk.toUpperCase()} RISK<br>${x.latency_ms} ms</div></article>`).join('');
+        } catch { out.textContent = 'Unable to reach the live demo service. Please reload and try again.'; } finally { run.disabled = false; run.textContent = 'Run security scenarios again'; }
+      });
+    </script>
+  </body>
+</html>

@@ -12,7 +12,11 @@ declare module "fastify" {
 
 const authMiddleware: FastifyPluginAsync = async (app) => {
   app.addHook("onRequest", async (request, reply) => {
-    if (request.raw.url?.startsWith("/health")) {
+    const requestUrl = request.raw.url ?? "";
+    const isPublicDemo =
+      config.ZENTRIS_DEMO_ENABLED && (requestUrl.startsWith("/demo") || requestUrl.startsWith("/api/demo/"));
+
+    if (requestUrl.startsWith("/health") || isPublicDemo) {
       return;
     }
 

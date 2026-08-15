@@ -3,6 +3,7 @@ import rateLimit from "@fastify/rate-limit";
 import authMiddleware from "./auth/authMiddleware";
 import { config } from "./config";
 import chatRoutes, { type ChatRouteOptions } from "./routes/chat";
+import demoRoutes from "./routes/demo";
 import { checkRedisHealth, redisClient } from "./services/redisClient";
 import { logger } from "./utils/logger";
 
@@ -25,7 +26,14 @@ export const buildServer = async (options: ServerOptions = {}) => {
     reply.header("Referrer-Policy", "no-referrer");
     reply.header("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
     reply.header("Cross-Origin-Resource-Policy", "same-origin");
-    reply.header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'");
+    if (_request.raw.url?.startsWith("/demo")) {
+      reply.header(
+        "Content-Security-Policy",
+        "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'"
+      );
+    } else {
+      reply.header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'");
+    }
     return payload;
   });
 
@@ -57,6 +65,10 @@ export const buildServer = async (options: ServerOptions = {}) => {
       }
     });
   });
+
+  if (config.ZENTRIS_DEMO_ENABLED) {
+    await app.register(demoRoutes);
+  }
 
   await app.register(authMiddleware);
   await app.register(chatRoutes, options.chatRoutes ?? {});

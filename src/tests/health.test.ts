@@ -15,8 +15,8 @@ describe("health endpoints", () => {
     process.env.LOG_LEVEL = process.env.LOG_LEVEL ?? "info";
     process.env.PORT = process.env.PORT ?? "3100";
 
-    ({ buildServer } = await import("../server"));
     ({ redisClient } = await import("../services/redisClient"));
+    ({ buildServer } = await import("../server"));
   });
 
   beforeEach(async () => {

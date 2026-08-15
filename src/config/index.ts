@@ -7,6 +7,7 @@ export type LogLevel = "debug" | "info" | "warn" | "error";
 export interface AppConfig {
   NODE_ENV: string;
   ZENTRIS_STRICT_CONFIG: boolean;
+  ZENTRIS_DEMO_ENABLED: boolean;
   REDIS_URL: string;
   LITELLM_BASE_URL: string;
   LITELLM_API_KEY: string;
@@ -190,6 +191,7 @@ export const validateConfig = (candidate: AppConfig): void => {
 export const config: AppConfig = {
   NODE_ENV: getStringEnv("NODE_ENV", "development"),
   ZENTRIS_STRICT_CONFIG: getBooleanEnv("ZENTRIS_STRICT_CONFIG", false),
+  ZENTRIS_DEMO_ENABLED: getBooleanEnv("ZENTRIS_DEMO_ENABLED", false),
   REDIS_URL: getRequiredEnv("REDIS_URL"),
   LITELLM_BASE_URL: getRequiredEnv("LITELLM_BASE_URL"),
   LITELLM_API_KEY: getRequiredEnv("LITELLM_API_KEY"),
