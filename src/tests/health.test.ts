@@ -1,12 +1,10 @@
 import assert from "node:assert/strict";
-import { afterEach, before, beforeEach, describe, test } from "node:test";
-import sinon, { type SinonSandbox } from "sinon";
+import { after, afterEach, before, beforeEach, describe, test } from "node:test";
 
 let buildServer: typeof import("../server").buildServer;
 let redisClient: typeof import("../services/redisClient").redisClient;
 
 describe("health endpoints", () => {
-  let sandbox: SinonSandbox;
   let app: Awaited<ReturnType<typeof buildServer>>;
 
   before(async () => {
@@ -22,14 +20,18 @@ describe("health endpoints", () => {
   });
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox();
     app = await buildServer();
     await app.ready();
   });
 
   afterEach(async () => {
     await app.close();
-    sandbox.restore();
+  });
+
+  after(() => {
+    if (redisClient.status !== "end") {
+      redisClient.disconnect();
+    }
   });
 
   test("liveness endpoint does not require authentication", async () => {
@@ -56,7 +58,11 @@ describe("health endpoints", () => {
   });
 
   test("readiness endpoint reports ready when Redis responds", async () => {
-    sandbox.stub(redisClient, "ping").resolves("PONG");
+    await app.close();
+    app = await buildServer({
+      redisHealthCheck: async () => ({ ok: true, status: "ready", latencyMs: 1 })
+    });
+    await app.ready();
 
     const response = await app.inject({
       method: "GET",
@@ -70,7 +76,11 @@ describe("health endpoints", () => {
   });
 
   test("readiness endpoint returns 503 when Redis is unavailable", async () => {
-    sandbox.stub(redisClient, "ping").rejects(new Error("redis_down"));
+    await app.close();
+    app = await buildServer({
+      redisHealthCheck: async () => ({ ok: false, status: "end", latencyMs: 1, reason: "redis_down" })
+    });
+    await app.ready();
 
     const response = await app.inject({
       method: "GET",

@@ -6,7 +6,7 @@ import { InputNormalizer } from "../guards/inputNormalizer";
 import { IntentClassifier } from "../guards/intentClassifier";
 import { PiiScrubber } from "../guards/piiScrubber";
 import { wrapUntrustedData } from "../guards/ragWrapper";
-import { LiteLLMClient } from "../llm/litellmClient";
+import { LiteLLMClient, type LLMOptions } from "../llm/litellmClient";
 import { AuthorizationService } from "../services/authorizationService";
 import { AuditLogger } from "../services/auditLogger";
 import { CircuitBreaker } from "../services/circuitBreaker";
@@ -75,6 +75,12 @@ export interface PipelineRunResult {
   confirmationToken?: string;
 }
 
+export type LLMChat = (messages: ChatMessage[], options?: LLMOptions) => Promise<string>;
+
+interface PipelineOptions {
+  litellmChat?: LLMChat;
+}
+
 export class ZentrisPipeline {
   private readonly inputNormalizer = new InputNormalizer();
   private readonly piiScrubber = new PiiScrubber();
@@ -84,8 +90,13 @@ export class ZentrisPipeline {
   private readonly authorizationService = new AuthorizationService();
   private readonly executionGuard = new ExecutionGuard();
   private readonly litellmClient = new LiteLLMClient();
+  private readonly litellmChat: LLMChat;
   private readonly circuitBreaker = new CircuitBreaker();
   private readonly auditLogger = new AuditLogger();
+
+  public constructor(options: PipelineOptions = {}) {
+    this.litellmChat = options.litellmChat ?? ((messages, options) => this.litellmClient.chat(messages, options));
+  }
 
   public async runGuards(req: ZentrisRequest): Promise<PipelineGuardOutcome> {
     const normalizedInput = this.inputNormalizer.normalize(req.rawInput);
@@ -180,7 +191,7 @@ export class ZentrisPipeline {
       }
 
       const llmResponse = await this.circuitBreaker.execute(
-        () => this.litellmClient.chat(guardOutcome.llmMessages),
+        () => this.litellmChat(guardOutcome.llmMessages),
         fallbackResponse
       );
 

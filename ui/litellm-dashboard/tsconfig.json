@@ -38,6 +38,9 @@
   "exclude": [
     "node_modules",
     "e2e_tests",
-    "scripts"
+    "scripts",
+    "tests",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ]
 }

@@ -2,11 +2,17 @@ import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import rateLimit from "@fastify/rate-limit";
 import authMiddleware from "./auth/authMiddleware";
 import { config } from "./config";
-import chatRoutes from "./routes/chat";
+import chatRoutes, { type ChatRouteOptions } from "./routes/chat";
 import { checkRedisHealth, redisClient } from "./services/redisClient";
 import { logger } from "./utils/logger";
 
-export const buildServer = async () => {
+interface ServerOptions {
+  redisHealthCheck?: typeof checkRedisHealth;
+  chatRoutes?: ChatRouteOptions;
+}
+
+export const buildServer = async (options: ServerOptions = {}) => {
+  const redisHealthCheck = options.redisHealthCheck ?? checkRedisHealth;
   const app = Fastify({
     loggerInstance: logger,
     requestTimeout: 60_000,
@@ -39,7 +45,7 @@ export const buildServer = async () => {
   }));
 
   app.get("/health/readiness", async (_request, reply) => {
-    const redis = await checkRedisHealth();
+    const redis = await redisHealthCheck();
     const ready = redis.ok;
 
     return reply.code(ready ? 200 : 503).send({
@@ -53,7 +59,7 @@ export const buildServer = async () => {
   });
 
   await app.register(authMiddleware);
-  await app.register(chatRoutes);
+  await app.register(chatRoutes, options.chatRoutes ?? {});
 
   app.setErrorHandler((error: Error, request: FastifyRequest, reply: FastifyReply) => {
     request.log.error({ err: error }, "unhandled_request_error");
