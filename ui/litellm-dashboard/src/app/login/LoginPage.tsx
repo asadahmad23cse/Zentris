@@ -60,7 +60,7 @@ function LoginPageContent() {
     }
 
     installPublicDashboardToken()
-      .then(() => router.replace(dashboardHome()))
+      .then(() => router.replace(consumeReturnUrl() || dashboardHome()))
       .catch(() => setIsLoading(false));
   }, [isConfigLoading, router, uiConfig]);
 

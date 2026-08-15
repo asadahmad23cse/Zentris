@@ -56,7 +56,7 @@ import { ConfigProvider, theme } from "antd";
 function PublicHome() {
   const chatHref = "/ui/chat";
   const modelHubHref = "/ui/model_hub";
-  const dashboardHref = "/ui/?page=llm-playground";
+  const dashboardHref = "/ui/login?redirect_to=%2Fui%2F%3Fpage%3Dllm-playground";
 
   return (
     <main
