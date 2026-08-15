@@ -8,6 +8,7 @@ interface JwtPayload {
   orgId?: unknown;
   exp?: unknown;
   nbf?: unknown;
+  [key: string]: unknown;
 }
 
 const BASE64_URL_PATTERN = /^[A-Za-z0-9_-]+$/;
@@ -17,6 +18,19 @@ const base64UrlToUtf8 = (value: string): string =>
 
 const sign = (header: string, payload: string, secret: string): Buffer =>
   createHmac("sha256", secret).update(`${header}.${payload}`).digest();
+
+const base64UrlEncode = (value: Record<string, unknown>): string =>
+  Buffer.from(JSON.stringify(value)).toString("base64url");
+
+export const createAccessToken = (
+  payload: JwtPayload & { sub: string; role: UserRole },
+  secret: string
+): string => {
+  const headerSegment = base64UrlEncode({ alg: "HS256", typ: "JWT" });
+  const payloadSegment = base64UrlEncode(payload);
+  const signatureSegment = sign(headerSegment, payloadSegment, secret).toString("base64url");
+  return `${headerSegment}.${payloadSegment}.${signatureSegment}`;
+};
 
 const parseJson = <T>(encoded: string): T | null => {
   try {

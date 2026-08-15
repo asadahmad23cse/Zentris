@@ -27,21 +27,16 @@ function LoginPageContent() {
     return "/ui/model_hub";
   };
 
-  const createPublicAdminToken = () => {
-    const encode = (value: Record<string, unknown>) =>
-      btoa(JSON.stringify(value)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-    const now = Math.floor(Date.now() / 1000);
-    const header = encode({ alg: "none", typ: "JWT" });
-    const payload = encode({
-      key: "public-admin",
-      user_id: "public-admin",
-      user_email: "admin@zentris.local",
-      user_role: "proxy_admin",
-      login_method: "public_access",
-      premium_user: false,
-      exp: now + 7 * 24 * 60 * 60,
-    });
-    return `${header}.${payload}.public`;
+  const installPublicDashboardToken = async () => {
+    const response = await fetch(`${getProxyBaseUrl()}/public/dashboard-token`, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("Unable to create public dashboard session");
+    }
+    const data = await response.json();
+    if (!data?.token) {
+      throw new Error("Public dashboard session did not return a token");
+    }
+    document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
   };
 
   // Pre-select worker from URL param (e.g. /ui/login?worker=team-b)
@@ -64,8 +59,9 @@ function LoginPageContent() {
       return;
     }
 
-    document.cookie = `token=${createPublicAdminToken()}; path=/; SameSite=Lax`;
-    router.replace(dashboardHome());
+    installPublicDashboardToken()
+      .then(() => router.replace(dashboardHome()))
+      .catch(() => setIsLoading(false));
   }, [isConfigLoading, router, uiConfig]);
 
   const handleSubmit = () => {

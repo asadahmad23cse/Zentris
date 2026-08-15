@@ -4,6 +4,7 @@ import { RagSecurityGuard } from "../guards/ragSecurityGuard";
 import { wrapUntrustedData } from "../guards/ragWrapper";
 import { type LLMChat, ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
+import { createAccessToken } from "../auth/jwt";
 import { type AuthenticatedIdentity, type ChatMessage, type ToolInvocation } from "../types";
 
 interface PublicChatBody {
@@ -152,6 +153,29 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
   app.get("/public/model_hub", async () => PUBLIC_MODELS);
   app.get("/public/agent_hub", async () => []);
   app.get("/public/mcp_hub", async () => []);
+
+  app.get("/public/dashboard-token", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const token = createAccessToken(
+      {
+        sub: "public-admin",
+        role: "admin",
+        key: "public-admin",
+        user_id: "public-admin",
+        user_email: "admin@zentris.local",
+        user_role: "proxy_admin",
+        login_method: "public_access",
+        premium_user: false,
+        exp: now + 7 * 24 * 60 * 60
+      },
+      config.JWT_SECRET
+    );
+
+    return {
+      token,
+      expires_in: 7 * 24 * 60 * 60
+    };
+  });
 
   app.post<{ Body: PublicChatBody }>(
     "/v1/public/chat",

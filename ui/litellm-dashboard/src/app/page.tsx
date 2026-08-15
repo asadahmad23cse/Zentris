@@ -584,7 +584,7 @@ function CreateKeyPageContent() {
 
     if (decoded) {
       // set accessToken
-      setAccessToken(decoded.key);
+      setAccessToken(decoded.login_method === "public_access" ? token : decoded.key);
 
       setDisabledPersonalKeyCreation(decoded.disabled_non_admin_personal_key_creation);
 
