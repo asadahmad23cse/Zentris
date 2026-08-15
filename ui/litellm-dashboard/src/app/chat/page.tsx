@@ -75,6 +75,7 @@ export default function PublicChatPage() {
           Zentris
         </a>
         <nav className="flex items-center gap-4 text-sm font-semibold">
+          <a href="/ui/?page=llm-playground" className="text-slate-600 hover:text-slate-950">Main dashboard</a>
           <a href="/ui/model_hub" className="text-slate-600 hover:text-slate-950">Models</a>
           <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-emerald-700">Live</span>
         </nav>

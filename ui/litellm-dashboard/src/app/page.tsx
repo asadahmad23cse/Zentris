@@ -56,6 +56,7 @@ import { ConfigProvider, theme } from "antd";
 function PublicHome() {
   const chatHref = "/ui/chat";
   const modelHubHref = "/ui/model_hub";
+  const dashboardHref = "/ui/?page=llm-playground";
 
   return (
     <main
@@ -98,6 +99,18 @@ function PublicHome() {
           <span>Zentris</span>
         </a>
         <nav style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <a
+            href={dashboardHref}
+            style={{
+              color: "#475569",
+              textDecoration: "none",
+              fontSize: 14,
+              fontWeight: 600,
+              padding: "9px 12px",
+            }}
+          >
+            Main dashboard
+          </a>
           <a
             href={modelHubHref}
             style={{
@@ -184,7 +197,7 @@ function PublicHome() {
             }}
           >
             <a
-              href={chatHref}
+              href={dashboardHref}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -194,6 +207,25 @@ function PublicHome() {
                 borderRadius: 8,
                 background: "#111827",
                 color: "#ffffff",
+                textDecoration: "none",
+                fontSize: 15,
+                fontWeight: 800,
+              }}
+            >
+              Main dashboard
+            </a>
+            <a
+              href={chatHref}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 48,
+                padding: "0 20px",
+                borderRadius: 8,
+                background: "#ffffff",
+                color: "#111827",
+                border: "1px solid #cbd5e1",
                 textDecoration: "none",
                 fontSize: 15,
                 fontWeight: 800,
