@@ -45,13 +45,258 @@ import SpendLogsTable from "@/components/view_logs";
 import ViewUserDashboard from "@/components/view_users";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { isJwtExpired } from "@/utils/jwtUtils";
-import { buildLoginUrlWithReturn, consumeReturnUrl, isValidReturnUrl, normalizeUrlForCompare, storeReturnUrl } from "@/utils/returnUrlUtils";
+import { consumeReturnUrl, isValidReturnUrl, normalizeUrlForCompare } from "@/utils/returnUrlUtils";
 import { formatUserRole, isAdminRole } from "@/utils/roles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ConfigProvider, theme } from "antd";
+
+function PublicHome() {
+  const loginHref = "/ui/login";
+  const modelHubHref = "/ui/model_hub";
+
+  return (
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#f8fafc",
+        color: "#111827",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <header
+        style={{
+          height: 68,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 clamp(20px, 6vw, 72px)",
+          borderBottom: "1px solid #e5e7eb",
+          background: "#ffffff",
+        }}
+      >
+        <a
+          href="/ui/"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            color: "#111827",
+            textDecoration: "none",
+            fontWeight: 800,
+            fontSize: 18,
+          }}
+        >
+          <img
+            src="/assets/logos/zentris_logo.svg"
+            alt="Zentris"
+            style={{ height: 34, width: 34, objectFit: "contain" }}
+          />
+          <span>Zentris</span>
+        </a>
+        <nav style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <a
+            href={modelHubHref}
+            style={{
+              color: "#475569",
+              textDecoration: "none",
+              fontSize: 14,
+              fontWeight: 600,
+              padding: "9px 12px",
+            }}
+          >
+            Models
+          </a>
+          <a
+            href={loginHref}
+            style={{
+              color: "#ffffff",
+              background: "#111827",
+              textDecoration: "none",
+              fontSize: 14,
+              fontWeight: 700,
+              padding: "10px 14px",
+              borderRadius: 8,
+            }}
+          >
+            Sign in
+          </a>
+        </nav>
+      </header>
+
+      <section
+        style={{
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.05fr) minmax(300px, 0.95fr)",
+          alignItems: "center",
+          gap: "clamp(28px, 5vw, 64px)",
+          padding: "clamp(42px, 7vw, 88px) clamp(20px, 6vw, 72px)",
+        }}
+      >
+        <div style={{ maxWidth: 720 }}>
+          <p
+            style={{
+              margin: "0 0 14px",
+              color: "#0f766e",
+              fontSize: 14,
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: 0,
+            }}
+          >
+            AI gateway and security runtime
+          </p>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 56,
+              lineHeight: 1.02,
+              letterSpacing: 0,
+              fontWeight: 850,
+              maxWidth: 680,
+            }}
+          >
+            Zentris
+          </h1>
+          <p
+            style={{
+              margin: "22px 0 0",
+              color: "#475569",
+              fontSize: 19,
+              lineHeight: 1.65,
+              maxWidth: 680,
+            }}
+          >
+            One secure console for OpenAI, Claude, Gemini, model routing, usage, guardrails, and
+            production monitoring.
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 12,
+              marginTop: 32,
+            }}
+          >
+            <a
+              href={loginHref}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 48,
+                padding: "0 20px",
+                borderRadius: 8,
+                background: "#111827",
+                color: "#ffffff",
+                textDecoration: "none",
+                fontSize: 15,
+                fontWeight: 800,
+              }}
+            >
+              Open console
+            </a>
+            <a
+              href={modelHubHref}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 48,
+                padding: "0 20px",
+                borderRadius: 8,
+                background: "#ffffff",
+                color: "#111827",
+                border: "1px solid #cbd5e1",
+                textDecoration: "none",
+                fontSize: 15,
+                fontWeight: 800,
+              }}
+            >
+              Browse models
+            </a>
+          </div>
+        </div>
+
+        <div
+          style={{
+            background: "#ffffff",
+            border: "1px solid #e5e7eb",
+            borderRadius: 8,
+            boxShadow: "0 24px 80px rgba(15, 23, 42, 0.10)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              padding: "14px 16px",
+              borderBottom: "1px solid #e5e7eb",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: "#f8fafc",
+            }}
+          >
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#111827" }}>Production status</span>
+            <span
+              style={{
+                fontSize: 12,
+                color: "#047857",
+                background: "#d1fae5",
+                padding: "4px 8px",
+                borderRadius: 999,
+                fontWeight: 800,
+              }}
+            >
+              Ready
+            </span>
+          </div>
+          <div style={{ padding: 20, display: "grid", gap: 14 }}>
+            {[
+              ["Providers", "OpenAI, Claude, Gemini"],
+              ["Security", "Prompt injection, DLP, tool confirmation"],
+              ["Reliability", "Health checks, CI gate, smoke tests"],
+              ["Operations", "Postgres, Redis, Prometheus, Grafana"],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 16,
+                  padding: "13px 0",
+                  borderBottom: "1px solid #f1f5f9",
+                }}
+              >
+                <span style={{ color: "#64748b", fontSize: 14, fontWeight: 700 }}>{label}</span>
+                <span style={{ color: "#111827", fontSize: 14, fontWeight: 800, textAlign: "right" }}>
+                  {value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <style jsx>{`
+        @media (max-width: 860px) {
+          section {
+            grid-template-columns: 1fr !important;
+          }
+          nav a:first-child {
+            display: none !important;
+          }
+        }
+      `}</style>
+    </main>
+  );
+}
 
 function getCookie(name: string) {
   // Safer cookie read + decoding; handles '=' inside values
@@ -210,13 +455,6 @@ function CreateKeyPageContent() {
     setCreateClicked(() => !createClicked);
   };
   const redirectToLogin = authLoading === false && token === null && invitation_id === null;
-  const getLoginUrl = () => {
-    if (typeof window !== "undefined" && window.location.port === "3001") {
-      return `${window.location.origin}/login`;
-    }
-    return (proxyBaseUrl || "") + "/ui/login";
-  };
-
   useEffect(() => {
     let cancelled = false;
 
@@ -248,18 +486,6 @@ function CreateKeyPageContent() {
       cancelled = true;
     };
   }, []);
-
-  useEffect(() => {
-    if (redirectToLogin) {
-      // Store the current URL so we can redirect back after login
-      storeReturnUrl();
-      // Build login URL with return URL parameter
-      const baseLoginUrl = getLoginUrl();
-      const dest = buildLoginUrlWithReturn(baseLoginUrl);
-      // Replace instead of assigning to avoid back-button loops
-      window.location.replace(dest);
-    }
-  }, [redirectToLogin]);
 
   // Redirect legacy query-param pages to their new path-based routes
   const isLegacyRedirect = page in LEGACY_REDIRECTS;
@@ -456,8 +682,12 @@ function CreateKeyPageContent() {
     setShowClaudeCodePrompt(true);
   };
 
-  if (authLoading || redirectToLogin || isLegacyRedirect) {
+  if (authLoading || isLegacyRedirect) {
     return <LoadingScreen />;
+  }
+
+  if (redirectToLogin) {
+    return <PublicHome />;
   }
 
   return (

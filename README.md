@@ -38,6 +38,22 @@
 
 ## Use Zentris for
 
+## Production Readiness
+
+Before a production deploy, run the full gate:
+
+```powershell
+.\scripts\production-check.ps1
+```
+
+After deployment, verify the live target:
+
+```powershell
+.\scripts\smoke-test.ps1 -BaseUrl https://your-zentris-domain.example -JwtToken $env:ZENTRIS_SMOKE_JWT
+```
+
+See [docs/production-readiness.md](docs/production-readiness.md) for required secrets, health checks, monitoring, and rollback steps.
+
 ## Zentris AI Security Runtime
 
 Zentris now includes a project-owned AI security runtime under `zentris_security/` for free local and enterprise-style AI gateway deployments. It adds direct and indirect prompt injection detection, RAG poisoning checks, agent tool-call enforcement, MCP exposure checks, unsafe output scoring, policy decisions, JSONL audit replay, OWASP LLM Top 10 mapping, MITRE ATLAS mapping, and a red-team simulator.

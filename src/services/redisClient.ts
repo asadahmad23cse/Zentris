@@ -30,6 +30,38 @@ redisClient.on("error", (error: Error) => {
   logger.error({ err: error }, "redis_client_error");
 });
 
+export interface RedisHealth {
+  ok: boolean;
+  status: string;
+  latencyMs?: number;
+  reason?: string;
+}
+
+export const checkRedisHealth = async (timeoutMs = 1_000): Promise<RedisHealth> => {
+  const startedAt = Date.now();
+
+  try {
+    const ping = redisClient.ping();
+    const timeout = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("redis_health_timeout")), timeoutMs);
+    });
+
+    const result = await Promise.race([ping, timeout]);
+    return {
+      ok: result === "PONG",
+      status: redisClient.status,
+      latencyMs: Date.now() - startedAt
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      status: redisClient.status,
+      latencyMs: Date.now() - startedAt,
+      reason: error instanceof Error ? error.message : "redis_health_failed"
+    };
+  }
+};
+
 export const getSession = async (sessionId: string): Promise<ChatMessage[]> => {
   try {
     const messages = await redisClient.lrange(messageListKey(sessionId), 0, -1);

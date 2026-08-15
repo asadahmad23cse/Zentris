@@ -4,7 +4,7 @@ import { RagSecurityGuard, type RagChunkInput } from "../guards/ragSecurityGuard
 import { StreamingGuard } from "../guards/streamingGuard";
 import { wrapUntrustedData } from "../guards/ragWrapper";
 import { StreamingClient } from "../llm/streamingClient";
-import { ZentrisPipeline } from "../middleware/pipeline";
+import { type LLMChat, ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
 import { StreamAbuseGuard } from "../services/streamAbuseGuard";
 import { type AuthenticatedIdentity, type ChatMessage, type ToolInvocation, type ZentrisRequest } from "../types";
@@ -22,6 +22,13 @@ interface ChatRouteBody {
   ragContext?: string;
   ragChunks?: RagChunkInput[];
   toolInvocation?: ToolInvocation;
+}
+
+export type StreamChat = StreamingClient["streamChat"];
+
+export interface ChatRouteOptions {
+  litellmChat?: LLMChat;
+  streamChat?: StreamChat;
 }
 
 const SESSION_ID_REGEX = /^[A-Za-z0-9-]{1,64}$/;
@@ -149,10 +156,11 @@ const sendJsonError = (
     .header("X-Risk-Level", riskLevel)
     .send(payload);
 
-const chatRoutes: FastifyPluginAsync = async (app) => {
+const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) => {
   const ragSecurityGuard = new RagSecurityGuard();
-  const pipeline = new ZentrisPipeline();
+  const pipeline = new ZentrisPipeline({ litellmChat: options.litellmChat });
   const streamingClient = new StreamingClient();
+  const streamChat: StreamChat = options.streamChat ?? ((...args) => streamingClient.streamChat(...args));
   const streamAbuseGuard = new StreamAbuseGuard();
   const streamingGuard = new StreamingGuard(
     config.STREAMING_ROLLING_BUFFER_CHARS,
@@ -361,7 +369,7 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
 
       request.raw.socket.on("close", disconnectHandler);
 
-      await streamingClient.streamChat(
+      await streamChat(
         streamId,
         guardOutcome.llmMessages,
         {},

@@ -12,7 +12,7 @@ declare module "fastify" {
 
 const authMiddleware: FastifyPluginAsync = async (app) => {
   app.addHook("onRequest", async (request, reply) => {
-    if (request.raw.url === "/health") {
+    if (request.raw.url?.startsWith("/health")) {
       return;
     }
 
