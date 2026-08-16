@@ -1,12 +1,25 @@
 services:
   - type: web
-    name: openai-proxy
-    runtime: image
-    image:
-      url: ghcr.io/berriai/litellm:main-stable
-    envVars:
-      - key: PORT
-        value: 4000
-    numInstances: 1
-    healthCheckPath: /health/liveliness
+    name: zentris-api
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: node dist/server.js
+    healthCheckPath: /health
     autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ZENTRIS_DEMO_ENABLED
+        value: "true"
+      - key: PORT
+        value: "10000"
+      - key: REDIS_URL
+        sync: false
+      - key: LITELLM_BASE_URL
+        sync: false
+      - key: LITELLM_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CONFIRMATION_TOKEN_SECRET
+        sync: false
