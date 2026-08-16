@@ -3,6 +3,7 @@
 import SidebarProvider from "@/app/(dashboard)/components/SidebarProvider";
 import OldModelDashboard from "@/app/(dashboard)/models-and-endpoints/ModelsAndEndpointsView";
 import PlaygroundPage from "@/app/(dashboard)/playground/page";
+import LoginPage from "@/app/login/LoginPage";
 import AdminPanel from "@/components/AdminPanel";
 import AgentsPanel from "@/components/agents";
 import BudgetPanel from "@/components/budgets/budget_panel";
@@ -747,7 +748,7 @@ function CreateKeyPageContent() {
     if (hasDashboardPageRequest) {
       return <LoadingScreen />;
     }
-    return <PublicHome />;
+    return <LoginPage />;
   }
 
   return (
