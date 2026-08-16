@@ -64,7 +64,10 @@ const demoRoutes: FastifyPluginAsync = async (app) => {
 
     const piiStarted = Date.now();
     const pii = await pipeline.runGuards(
-      baseRequest("Email the account update to priya.shah@example.com and call +91 98765 43210.")
+      baseRequest(
+        "Email the update to priya.shah@example.com, call +91 98765 43210 or +1 415-555-0198, " +
+        "charge card 4111 1111 1111 1111 (exp 09/26), and use api_key=sk-test-XYZ1234567890abcdef."
+      )
     );
 
     const ragStarted = Date.now();
