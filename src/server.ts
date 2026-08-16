@@ -71,16 +71,16 @@ export const buildServer = async (options: ServerOptions = {}) => {
     timeWindow: config.RATE_LIMIT_WINDOW
   });
 
-  app.get("/health", async () => ({ status: "ok", service: "zentris", timestamp: Date.now() }));
+  app.get("/health", { config: { rateLimit: false } }, async () => ({ status: "ok", service: "zentris", timestamp: Date.now() }));
 
-  app.get("/health/liveness", async () => ({
+  app.get("/health/liveness", { config: { rateLimit: false } }, async () => ({
     status: "ok",
     service: "zentris",
     timestamp: Date.now(),
     uptimeSeconds: Math.round(process.uptime())
   }));
 
-  app.get("/health/readiness", async (_request, reply) => {
+  app.get("/health/readiness", { config: { rateLimit: false } }, async (_request, reply) => {
     const redis = await redisHealthCheck();
     const ready = redis.ok;
 
