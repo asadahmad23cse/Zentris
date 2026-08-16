@@ -3,7 +3,6 @@ import rateLimit from "@fastify/rate-limit";
 import authMiddleware from "./auth/authMiddleware";
 import { config } from "./config";
 import chatRoutes, { type ChatRouteOptions } from "./routes/chat";
-import publicRoutes, { type PublicRouteOptions } from "./routes/public";
 import demoRoutes from "./routes/demo";
 import { checkRedisHealth, redisClient } from "./services/redisClient";
 import { logger } from "./utils/logger";
@@ -98,7 +97,7 @@ export const buildServer = async (options: ServerOptions = {}) => {
   if (config.ZENTRIS_DEMO_ENABLED) {
     await app.register(demoRoutes);
   }
-  await app.register(publicRoutes, options.publicRoutes ?? {});
+
   await app.register(authMiddleware);
   await app.register(chatRoutes, options.chatRoutes ?? {});
 
