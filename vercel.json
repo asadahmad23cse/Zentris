@@ -3,14 +3,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "demo/index.html",
-      "use": "@vercel/static"
+      "src": "ui/litellm-dashboard/package.json",
+      "use": "@vercel/next"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/demo/index.html"
+      "dest": "ui/litellm-dashboard/$1"
     }
   ]
 }
