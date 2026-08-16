@@ -10,7 +10,6 @@ import { logger } from "./utils/logger";
 interface ServerOptions {
   redisHealthCheck?: typeof checkRedisHealth;
   chatRoutes?: ChatRouteOptions;
-  publicRoutes?: PublicRouteOptions;
 }
 
 export const buildServer = async (options: ServerOptions = {}) => {

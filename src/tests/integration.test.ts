@@ -302,11 +302,8 @@ describe("Zentris integration", { concurrency: 1 }, () => {
     streamChatStub = sandbox.stub().rejects(new Error("stream_stub_not_configured"));
     app = await buildServer({
       chatRoutes: {
-        litellmChat: (...args) => llmChatStub(...args),
-        streamChat: (...args) => streamChatStub(...args)
-      },
-      publicRoutes: {
-        litellmChat: (...args) => llmChatStub(...args)
+        litellmChat: (...args: any[]) => llmChatStub(...args),
+        streamChat: (...args: any[]) => streamChatStub(...args)
       }
     });
     await app.ready();
