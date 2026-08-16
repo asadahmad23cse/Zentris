@@ -3,7 +3,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "ui/litellm-dashboard/next.config.mjs",
+      "src": "ui/litellm-dashboard/package.json",
       "use": "@vercel/next"
     }
   ],
