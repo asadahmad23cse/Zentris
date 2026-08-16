@@ -64,7 +64,7 @@ const DLP_PATTERNS: ReadonlyArray<DlpPattern> = [
   // Phone: Indian (+91 prefix or standalone 10-digit starting 6-9), and international E.164
   {
     type: "PHONE",
-    regex: /(?:\+91[\s-]?[6-9]\d{9}|\b[6-9]\d{9}\b|\+?1[\s.-]\d{3}[\s.-]\d{3}[\s.-]\d{4}|\+?\d{1,3}[\s.-]\d{3}[\s.-]\d{3,4}[\s.-]\d{4}|\(\d{2,4}\)[\s.-]?\d{6,8})/g
+    regex: /(?:\+91[\s-]?(?:\d[\s-]?){9,10}\d|\b[6-9]\d{9}\b|\+?1[\s.-]\d{3}[\s.-]\d{3}[\s.-]\d{4}|\+\d{1,3}[\s.-]\d{2,4}[\s.-]\d{4}[\s.-]\d{4})/g
   },
   // Credit/debit card — Luhn-validated to prevent false positives on phone numbers
   {
