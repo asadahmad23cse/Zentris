@@ -1,5 +1,5 @@
 import fp from "fastify-plugin";
-import { type FastifyPluginAsync } from "fastify";
+import { type FastifyPluginAsync, type FastifyRequest, type FastifyReply } from "fastify";
 import { ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
 import { type ChatMessage, type ZentrisRequest } from "../types";
@@ -13,6 +13,7 @@ interface ChatCompletionsBody {
   model?: string;
   messages: OpenAIMessage[];
   stream?: boolean;
+  stream_options?: { include_usage?: boolean };
   temperature?: number;
   max_tokens?: number;
 }
@@ -20,11 +21,8 @@ interface ChatCompletionsBody {
 const gatewayRoutes: FastifyPluginAsync = async (app) => {
   const pipeline = new ZentrisPipeline();
 
-  const handler = async (
-    request: { body: ChatCompletionsBody; id: string; identity: { userId: string; userRole: string; tenantId: string | null; orgId: string | null } },
-    reply: { code: (c: number) => { header: (k: string, v: string) => { send: (b: unknown) => unknown } }; header: (k: string, v: string) => void }
-  ) => {
-    const body = request.body;
+  const handler = async (request: FastifyRequest, reply: FastifyReply) => {
+    const body = request.body as ChatCompletionsBody;
     const messages = body.messages ?? [];
     const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
 
@@ -33,6 +31,13 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
         error: { message: "No user message found", type: "invalid_request_error" }
       });
     }
+
+    const identity = (request as any).identity ?? {
+      userId: "anonymous",
+      userRole: "anonymous",
+      tenantId: null,
+      orgId: null
+    };
 
     const history: ChatMessage[] = messages.slice(0, -1).map((m) => ({
       role: m.role,
@@ -43,10 +48,10 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     const zentrisRequest: ZentrisRequest = {
       sessionId: request.id,
       identity: {
-        userId: request.identity.userId,
-        userRole: request.identity.userRole as "admin" | "operator" | "viewer" | "anonymous",
-        tenantId: request.identity.tenantId,
-        orgId: request.identity.orgId
+        userId: identity.userId,
+        userRole: identity.userRole as "admin" | "operator" | "viewer" | "anonymous",
+        tenantId: identity.tenantId,
+        orgId: identity.orgId
       },
       rawInput: lastUserMessage.content,
       messages: history.slice(-config.MAX_SESSION_MESSAGES)
@@ -86,16 +91,60 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
 
     const responseText = result.response ?? "";
     const completionId = `chatcmpl-${request.id}`;
+    const created = Math.floor(Date.now() / 1000);
+    const model = body.model ?? config.LITELLM_MODEL;
 
     reply.header("X-Request-ID", request.id);
     reply.header("X-Risk-Level", result.riskLevel);
     reply.header("X-Zentris-Action", result.action);
 
+    if (body.stream) {
+      reply.raw.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "X-Request-ID": request.id
+      });
+
+      const roleChunk = {
+        id: completionId,
+        object: "chat.completion.chunk",
+        created,
+        model,
+        choices: [{ index: 0, delta: { role: "assistant", content: "" }, finish_reason: null }]
+      };
+      reply.raw.write(`data: ${JSON.stringify(roleChunk)}\n\n`);
+
+      const contentChunk = {
+        id: completionId,
+        object: "chat.completion.chunk",
+        created,
+        model,
+        choices: [{ index: 0, delta: { content: responseText }, finish_reason: null }]
+      };
+      reply.raw.write(`data: ${JSON.stringify(contentChunk)}\n\n`);
+
+      const stopChunk: any = {
+        id: completionId,
+        object: "chat.completion.chunk",
+        created,
+        model,
+        choices: [{ index: 0, delta: {}, finish_reason: "stop" }]
+      };
+      if (body.stream_options?.include_usage) {
+        stopChunk.usage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+      }
+      reply.raw.write(`data: ${JSON.stringify(stopChunk)}\n\n`);
+      reply.raw.write("data: [DONE]\n\n");
+      reply.raw.end();
+      return;
+    }
+
     return {
       id: completionId,
       object: "chat.completion",
-      created: Math.floor(Date.now() / 1000),
-      model: body.model ?? config.LITELLM_MODEL,
+      created,
+      model,
       choices: [
         {
           index: 0,
@@ -118,13 +167,8 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     };
   };
 
-  app.post("/v1/chat/completions", async (request, reply) =>
-    handler(request as any, reply as any)
-  );
-
-  app.post("/chat/completions", async (request, reply) =>
-    handler(request as any, reply as any)
-  );
+  app.post("/v1/chat/completions", handler);
+  app.post("/chat/completions", handler);
 
   app.get("/v1/models", async () => ({
     object: "list",
