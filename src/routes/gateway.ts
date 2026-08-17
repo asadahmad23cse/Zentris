@@ -252,6 +252,51 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     spend: 0,
     max_budget: null
   }));
+
+  app.post("/key/generate", async () => ({
+    key: "sk-zentris-public",
+    key_name: "Public Demo Key",
+    expires: null,
+    user_id: "public-admin",
+    models: ["gpt-4o-mini", "gpt-4o"],
+    spend: 0,
+    max_budget: null
+  }));
+
+  app.get("/guardrails/list", async () => ({ guardrails: [] }));
+
+  app.get("/team/list", async () => []);
+  app.post("/team/list", async () => []);
+
+  app.get("/global/spend", async () => ({ spend: 0, max_budget: null }));
+  app.get("/global/spend/all_tag_names", async () => []);
+  app.get("/global/all_end_users", async () => []);
+
+  app.get("/v1/model/info", async () => ({
+    data: [
+      {
+        model_name: "gpt-4o-mini",
+        litellm_params: { model: "gpt-4o-mini" },
+        model_info: { id: "gpt-4o-mini", mode: "chat" }
+      },
+      {
+        model_name: "gpt-4o",
+        litellm_params: { model: "gpt-4o" },
+        model_info: { id: "gpt-4o", mode: "chat" }
+      }
+    ]
+  }));
+
+  app.get("/get/config/callbacks", async () => ({
+    status: "success",
+    callbacks: [],
+    alerting: []
+  }));
+
+  app.get("/sso/get/ui_settings", async () => ({ status: "success" }));
+  app.get("/get/allowed_ips", async () => ({ allowed_ips: [] }));
+  app.get("/budget/list", async () => []);
+  app.get("/organization/list", async () => []);
 };
 
 export default fp(gatewayRoutes, { name: "gateway-routes" });
