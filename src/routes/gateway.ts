@@ -99,10 +99,21 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     reply.header("X-Zentris-Action", result.action);
 
     if (body.stream) {
-      reply.code(200);
-      reply.header("Content-Type", "text/event-stream");
-      reply.header("Cache-Control", "no-cache");
-      reply.header("Connection", "keep-alive");
+      const origin = request.headers.origin;
+      reply.raw.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "X-Request-ID": request.id,
+        "X-Risk-Level": result.riskLevel,
+        "X-Zentris-Action": result.action,
+        ...(origin ? {
+          "Access-Control-Allow-Origin": origin,
+          "Vary": "Origin",
+          "Access-Control-Allow-Headers": "authorization,content-type,x-zentris-tags,x-stainless-lang,x-stainless-package-version,x-stainless-os,x-stainless-arch,x-stainless-runtime,x-stainless-runtime-version,x-stainless-retry-count,x-stainless-timeout",
+          "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+        } : {})
+      });
 
       const roleChunk = {
         id: completionId,
