@@ -22,7 +22,7 @@ import { Team } from "@/components/key_team_helpers/key_list";
 import { MCPServers } from "@/components/mcp_tools";
 import ModelHubTable from "@/components/AIHub/ModelHubTable";
 import Navbar from "@/components/navbar";
-import { getUiConfig, Organization, proxyBaseUrl, setGlobalZentrisHeaderName, getInProductNudgesCall } from "@/components/networking";
+import { getUiConfig, Organization, proxyBaseUrl, setGlobalZentrisHeaderName, getInProductNudgesCall, getProxyBaseUrl } from "@/components/networking";
 import NewUsagePage from "@/components/UsagePage/components/UsagePageView";
 import OldTeams from "@/components/OldTeams";
 import { fetchUserModels, CreateKeyPrefillData } from "@/components/organisms/create_key_button";
@@ -520,10 +520,18 @@ function CreateKeyPageContent() {
       let valid = raw && !isJwtExpired(raw) && !isLegacyInvalidAccessToken(raw) ? raw : null;
 
       if (!valid) {
-        // Automatically provide a demo session token so Enterprise Control Plane opens directly
-        const DEMO_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZW1vLXVzZXIiLCJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiZGVtby11c2VyIiwiZXhwIjoyNTM0MDIzMDAwMDB9.demo-signature-1234567890";
-        document.cookie = `token=${DEMO_TOKEN}; path=/; SameSite=Lax`;
-        valid = DEMO_TOKEN;
+        try {
+          const res = await fetch(`${getProxyBaseUrl()}/public/dashboard-token`, { cache: "no-store" });
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.token) {
+              document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
+              valid = data.token;
+            }
+          }
+        } catch {
+          // backend unreachable — dashboard will show limited UI
+        }
       }
 
       if (!cancelled) {

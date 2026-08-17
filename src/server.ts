@@ -4,6 +4,8 @@ import authMiddleware from "./auth/authMiddleware";
 import { config } from "./config";
 import chatRoutes, { type ChatRouteOptions } from "./routes/chat";
 import demoRoutes from "./routes/demo";
+import gatewayRoutes from "./routes/gateway";
+import publicRoutes from "./routes/public";
 import { checkRedisHealth, redisClient } from "./services/redisClient";
 import { logger } from "./utils/logger";
 
@@ -55,7 +57,7 @@ export const buildServer = async (options: ServerOptions = {}) => {
     if (origin && allowedOrigins.has(origin)) {
       reply.header("Access-Control-Allow-Origin", origin);
       reply.header("Vary", "Origin");
-      reply.header("Access-Control-Allow-Headers", "authorization,content-type");
+      reply.header("Access-Control-Allow-Headers", "authorization,content-type,x-zentris-tags");
       reply.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     }
 
@@ -97,7 +99,9 @@ export const buildServer = async (options: ServerOptions = {}) => {
     await app.register(demoRoutes);
   }
 
+  await app.register(publicRoutes);
   await app.register(authMiddleware);
+  await app.register(gatewayRoutes);
   await app.register(chatRoutes, options.chatRoutes ?? {});
 
   app.setErrorHandler((error: Error, request: FastifyRequest, reply: FastifyReply) => {

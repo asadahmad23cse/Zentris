@@ -16,7 +16,12 @@ const authMiddleware: FastifyPluginAsync = async (app) => {
     const isPublicDemo =
       config.ZENTRIS_DEMO_ENABLED && (requestUrl.startsWith("/demo") || requestUrl.startsWith("/api/demo/"));
 
-    if (requestUrl.startsWith("/health") || isPublicDemo) {
+    const isPublicRoute =
+      requestUrl.startsWith("/public/") ||
+      requestUrl.startsWith("/.well-known/") ||
+      requestUrl.startsWith("/v1/public/");
+
+    if (requestUrl.startsWith("/health") || isPublicDemo || isPublicRoute) {
       return;
     }
 
