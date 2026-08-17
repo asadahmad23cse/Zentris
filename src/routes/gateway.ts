@@ -99,12 +99,10 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     reply.header("X-Zentris-Action", result.action);
 
     if (body.stream) {
-      reply.raw.writeHead(200, {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-        "X-Request-ID": request.id
-      });
+      reply.code(200);
+      reply.header("Content-Type", "text/event-stream");
+      reply.header("Cache-Control", "no-cache");
+      reply.header("Connection", "keep-alive");
 
       const roleChunk = {
         id: completionId,
