@@ -253,16 +253,6 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     max_budget: null
   }));
 
-  app.post("/key/generate", async () => ({
-    key: "sk-zentris-public",
-    key_name: "Public Demo Key",
-    expires: null,
-    user_id: "public-admin",
-    models: ["gpt-4o-mini", "gpt-4o"],
-    spend: 0,
-    max_budget: null
-  }));
-
   app.get("/guardrails/list", async () => ({ guardrails: [] }));
 
   app.get("/team/list", async () => []);
@@ -297,6 +287,64 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/get/allowed_ips", async () => ({ allowed_ips: [] }));
   app.get("/budget/list", async () => []);
   app.get("/organization/list", async () => []);
+
+  const modelInfoData = [
+    {
+      model_name: "gpt-4o-mini",
+      litellm_params: { model: "gpt-4o-mini" },
+      model_info: {
+        id: "gpt-4o-mini",
+        mode: "chat",
+        input_cost_per_token: 0.00000015,
+        output_cost_per_token: 0.0000006,
+        max_input_tokens: 128000,
+        max_output_tokens: 16384,
+        supports_function_calling: true,
+        supports_vision: true
+      }
+    },
+    {
+      model_name: "gpt-4o",
+      litellm_params: { model: "gpt-4o" },
+      model_info: {
+        id: "gpt-4o",
+        mode: "chat",
+        input_cost_per_token: 0.0000025,
+        output_cost_per_token: 0.00001,
+        max_input_tokens: 128000,
+        max_output_tokens: 16384,
+        supports_function_calling: true,
+        supports_vision: true
+      }
+    }
+  ];
+
+  app.get("/v2/model/info", async () => ({ data: modelInfoData }));
+
+  app.post("/key/generate", { config: { rawBody: false } }, async () => ({
+    key: "sk-zentris-demo",
+    key_name: "Demo Key",
+    expires: null,
+    user_id: "public-admin",
+    models: ["gpt-4o-mini", "gpt-4o"],
+    spend: 0,
+    max_budget: null
+  }));
+
+  app.get("/mcp_server/list", async () => []);
+  app.get("/policy/list", async () => []);
+  app.get("/in-product-nudges", async () => ({ nudges: [] }));
+
+  app.get("/config/list", async () => ({
+    PROXY_BASE_URL: "",
+    Zentris_UI_API_DOC_BASE_URL: null
+  }));
+  app.get("/global/spend/provider", async () => []);
+  app.get("/global/activity", async () => ({ data: [] }));
+  app.get("/vector_store/list", async () => []);
+
+  app.get("/openai/deployments", async () => ({ data: [] }));
+  app.get("/access_group/list", async () => []);
 };
 
 export default fp(gatewayRoutes, { name: "gateway-routes" });

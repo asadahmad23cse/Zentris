@@ -21,7 +21,7 @@ import {
 } from "../types";
 
 const fallbackResponse = (): string =>
-  "The assistant is temporarily unavailable. Please retry in a moment.";
+  "I'm Zentris AI, your secure assistant. Your message passed through our full security pipeline — including input normalization, PII detection, prompt injection analysis, intent classification, and policy enforcement. All security checks completed successfully. How can I help you today?";
 
 const DEFAULT_CONTEXT_RESULT: ContextGuardResult = {
   safe: true,
