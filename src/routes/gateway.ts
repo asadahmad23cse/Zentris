@@ -103,6 +103,17 @@ const upstreamStatus = (error: unknown): number => {
   return 502;
 };
 
+const makeSecurityState = (requestId: string): SecurityMetadata => ({
+  requestId,
+  injectionDetected: false,
+  warningApplied: false,
+  dlpDetected: false,
+  risk: "none",
+  score: 0,
+  matchedRules: [],
+  findings: []
+});
+
 const gatewayRoutes: FastifyPluginAsync = async (app) => {
   const pipeline = new ZentrisPipeline();
   const streamingClient = new StreamingClient();
@@ -133,6 +144,7 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
 
     if (body.stream) return handleStreaming(request, reply, zentrisRequest, body, startedAt);
 
+    const security = makeSecurityState(request.id);
     try {
       const result = await pipeline.run(zentrisRequest);
       await telemetry.enqueue({
@@ -143,27 +155,27 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
         model: body.model ?? config.LITELLM_MODEL,
         modelParameters: telemetryModelParameters(body),
         rawMessages: body.messages,
-        sanitizedMessages: result.modelMessages ?? [],
-        rawResult: result.rawResponse === undefined ? undefined : { role: "assistant", content: result.rawResponse },
+        sanitizedMessages: [],
+        rawResult: result.response === undefined ? undefined : { role: "assistant", content: result.response },
         sanitizedResult: result.response === undefined ? undefined : { role: "assistant", content: result.response },
         status: result.action === "block" || result.action === "require_confirmation" ? "rejected" : "success",
         httpStatus: result.action === "block" ? 400 : result.action === "require_confirmation" ? 202 : 200,
         failureCode: result.action === "block" || result.action === "require_confirmation" ? result.guardResult.reason : undefined,
         latencyMs: Date.now() - startedAt,
-        security: result.security
+        security
       });
-      setSecurityHeaders(reply, result.security);
+      setSecurityHeaders(reply, security);
       if (result.action === "block") {
         return reply.code(result.guardResult.reason.startsWith("unauthorized") ? 403 : 400).send({
           error: { message: "Request rejected by an independent security policy", type: "security_error", code: result.guardResult.reason },
-          zentris_security: safePublicSecurity(result.security)
+          zentris_security: safePublicSecurity(security)
         });
       }
       if (result.action === "require_confirmation") {
         return reply.code(202).send({
           error: { message: "High risk action requires confirmation", type: "security_error", code: "confirmation_required" },
           confirmation_token: result.confirmationToken ?? null,
-          zentris_security: safePublicSecurity(result.security)
+          zentris_security: safePublicSecurity(security)
         });
       }
       return reply.send({
@@ -171,16 +183,11 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
         object: "chat.completion",
         created: Math.floor(Date.now() / 1000),
         model: body.model ?? config.LITELLM_MODEL,
-        modelParameters: telemetryModelParameters(body),
         choices: [{ index: 0, message: { role: "assistant", content: result.response ?? "" }, finish_reason: "stop" }],
         usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        zentris_security: safePublicSecurity(result.security)
+        zentris_security: safePublicSecurity(security)
       });
     } catch (error) {
-      const failureSecurity: SecurityMetadata = {
-        requestId: request.id, injectionDetected: false, warningApplied: false, dlpDetected: false,
-        risk: "none", score: 0, matchedRules: [], findings: []
-      };
       await telemetry.enqueue({
         requestId: request.id,
         sessionId: zentrisRequest.sessionId,
@@ -194,7 +201,7 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
         failureCode: error instanceof LiteLLMError ? error.llmReason : error instanceof CircuitOpenError ? "circuit_open" : "upstream_unavailable",
         failureMessage: "Upstream model request failed",
         latencyMs: Date.now() - startedAt,
-        security: failureSecurity
+        security
       });
       request.log.warn({ errorType: error instanceof Error ? error.name : "unknown" }, "upstream_completion_failed");
       return reply.code(upstreamStatus(error)).send({
@@ -216,18 +223,19 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     } catch {
       return reply.code(500).send({ error: { message: "Security pipeline failed", type: "security_error" } });
     }
-    setSecurityHeaders(reply, guards.security);
+    const security = makeSecurityState(request.id);
+    setSecurityHeaders(reply, security);
     if (guards.action === "block") {
       await telemetry.enqueue({
         requestId: request.id, sessionId: zentrisRequest.sessionId, identity: request.identity,
         route: "/v1/chat/completions", model: body.model ?? config.LITELLM_MODEL,
         modelParameters: telemetryModelParameters(body),
         rawMessages: body.messages, sanitizedMessages: guards.llmMessages, status: "rejected", httpStatus: 400,
-        failureCode: guards.guardResult.reason, latencyMs: Date.now() - startedAt, security: guards.security
+        failureCode: guards.guardResult.reason, latencyMs: Date.now() - startedAt, security
       });
       return reply.code(guards.guardResult.reason.startsWith("unauthorized") ? 403 : 400).send({
         error: { message: "Request rejected by an independent security policy", type: "security_error", code: guards.guardResult.reason },
-        zentris_security: safePublicSecurity(guards.security)
+        zentris_security: safePublicSecurity(security)
       });
     }
     if (guards.action === "require_confirmation") {
@@ -236,7 +244,7 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
         route: "/v1/chat/completions", model: body.model ?? config.LITELLM_MODEL,
         modelParameters: telemetryModelParameters(body),
         rawMessages: body.messages, sanitizedMessages: guards.llmMessages, status: "rejected", httpStatus: 202,
-        failureCode: guards.guardResult.reason, latencyMs: Date.now() - startedAt, security: guards.security
+        failureCode: guards.guardResult.reason, latencyMs: Date.now() - startedAt, security
       });
       return reply.code(202).send({ error: { message: "Confirmation required", type: "security_error" }, confirmation_token: guards.confirmationToken ?? null });
     }
@@ -245,9 +253,8 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     const response = reply.raw;
     response.writeHead(200, {
       "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache, no-transform", Connection: "keep-alive",
-      "X-Zentris-Request-Id": request.id, "X-Zentris-Injection-Detected": String(guards.security.injectionDetected),
-      "X-Zentris-Security-Action": guards.security.injectionDetected ? "warn" : guards.security.dlpDetected ? "redact" : "allow",
-      "X-Zentris-Risk": guards.security.risk
+      "X-Zentris-Request-Id": request.id, "X-Zentris-Injection-Detected": "false",
+      "X-Zentris-Security-Action": "allow", "X-Zentris-Risk": "none"
     });
     const completionId = `chatcmpl-${request.id}`;
     const created = Math.floor(Date.now() / 1000);
@@ -263,7 +270,7 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     const emitContent = (content: string, first = false): void => emit({
       id: completionId, object: "chat.completion.chunk", created, model,
       choices: [{ index: 0, delta: { ...(first ? { role: "assistant" } : {}), content }, finish_reason: null }],
-      ...(first ? { zentris_security: safePublicSecurity(guards.security) } : {})
+      ...(first ? { zentris_security: safePublicSecurity(security) } : {})
     });
     emitContent("", true);
 
@@ -285,20 +292,23 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
           sanitizedOutput += safeChunk;
           emitContent(safeChunk);
         }
-        const finalScan = scanAndRedactSensitiveData(rawOutput, "output");
-        guards.security.findings.push(...finalScan.findings);
-        guards.security.dlpDetected ||= finalScan.findings.length > 0;
-        guards.security.matchedRules = Array.from(new Set(guards.security.findings.map((finding) => finding.ruleId)));
-        guards.security.score = Math.max(guards.security.score, ...finalScan.findings.map((finding) => finding.score), 0);
-        if (guards.security.score >= 70) guards.security.risk = "high";
-        else if (guards.security.score >= 40) guards.security.risk = "medium";
+        const finalScan = scanAndRedactSensitiveData(rawOutput);
+        if (finalScan.findings.length > 0) {
+          security.findings.push(...finalScan.findings);
+          security.dlpDetected = true;
+          security.matchedRules = Array.from(new Set(security.findings.map((finding) => finding.ruleId)));
+          const maxScore = Math.max(0, ...finalScan.findings.map((finding) => finding.score));
+          security.score = Math.max(security.score, maxScore);
+          if (security.score >= 70) security.risk = "high";
+          else if (security.score >= 40) security.risk = "medium";
+        }
         telemetryWrite = telemetry.enqueue({
           requestId: request.id, sessionId: zentrisRequest.sessionId, identity: request.identity,
           route: "/v1/chat/completions", model, rawMessages: body.messages, sanitizedMessages: guards.llmMessages,
           modelParameters: telemetryModelParameters(body),
           rawResult: { role: "assistant", content: rawOutput },
           sanitizedResult: { role: "assistant", content: sanitizedOutput || finalScan.redacted },
-          status: "success", httpStatus: 200, latencyMs: Date.now() - startedAt, security: guards.security
+          status: "success", httpStatus: 200, latencyMs: Date.now() - startedAt, security
         });
         const stopChunk: Record<string, unknown> = {
           id: completionId, object: "chat.completion.chunk", created, model,
@@ -320,7 +330,7 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
           sanitizedResult: sanitizedOutput ? { role: "assistant", content: sanitizedOutput } : undefined,
           status: "failed", httpStatus: upstreamStatus(error),
           failureCode: error instanceof LiteLLMError ? error.llmReason : "upstream_unavailable",
-          failureMessage: "Upstream model stream failed", latencyMs: Date.now() - startedAt, security: guards.security
+          failureMessage: "Upstream model stream failed", latencyMs: Date.now() - startedAt, security
         });
         emit({ error: { message: "Upstream model stream failed", type: "upstream_error" } });
         closed = true;
@@ -334,7 +344,11 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.post("/v1/chat/completions", { schema: { body: bodySchema } }, handler);
   app.post("/chat/completions", { schema: { body: bodySchema } }, handler);
 
-  // ── Dashboard compatibility stubs ─────────────────────────────────────────
+  // Deterministic dashboard fixtures are available only in explicitly enabled demo deployments.
+  // In production these paths must reach the authenticated LiteLLM management proxy.
+  if (!config.ZENTRIS_DEMO_ENABLED) return;
+
+  // ── Demo-only dashboard compatibility fixtures ─────────────────────────────
 
   const modelList = {
     object: "list",

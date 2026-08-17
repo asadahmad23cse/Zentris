@@ -42,13 +42,9 @@ export class CircuitBreaker {
     this.enabled = config.CIRCUIT_BREAKER_ENABLED;
   }
 
-  public async execute<T>(fn: () => Promise<T>, fallback: () => T): Promise<T> {
+  public async execute<T>(fn: () => Promise<T>): Promise<T> {
     if (!this.enabled) {
-      try {
-        return await fn();
-      } catch {
-        return fallback();
-      }
+      return fn();
     }
 
     if (this.state === "open") {
@@ -59,7 +55,7 @@ export class CircuitBreaker {
       if (canTryHalfOpen) {
         this.transitionTo("half-open", "timeout_elapsed");
       } else {
-        return fallback();
+        throw new CircuitOpenError("Upstream circuit is open");
       }
     }
 
@@ -69,7 +65,7 @@ export class CircuitBreaker {
       return result;
     } catch (error) {
       this.onFailure(error);
-      return fallback();
+      throw error;
     }
   }
 
@@ -143,5 +139,14 @@ export class CircuitBreaker {
     );
 
     this.state = nextState;
+  }
+}
+
+export class CircuitOpenError extends Error {
+  public readonly statusCode = 503;
+
+  public constructor(message: string) {
+    super(message);
+    this.name = "CircuitOpenError";
   }
 }

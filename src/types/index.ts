@@ -8,6 +8,46 @@ export interface ChatMessage {
   timestamp: number;
 }
 
+export type SecurityRisk = "none" | "low" | "medium" | "high";
+export type SecurityFindingKind = "prompt_injection" | "secret" | "pii";
+export type SecurityFindingStage = "input" | "history" | "rag" | "output";
+export type SecurityFindingAction = "allow" | "warn" | "redact";
+
+export interface SecurityFinding {
+  kind: SecurityFindingKind;
+  ruleId: string;
+  category: string;
+  stage: SecurityFindingStage;
+  risk: Exclude<SecurityRisk, "none">;
+  score: number;
+  action: SecurityFindingAction;
+  start?: number;
+  end?: number;
+}
+
+export interface SecurityMetadata {
+  requestId: string;
+  injectionDetected: boolean;
+  warningApplied: boolean;
+  dlpDetected: boolean;
+  risk: SecurityRisk;
+  score: number;
+  matchedRules: string[];
+  findings: SecurityFinding[];
+}
+
+export interface GenerationOptions {
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+  topP?: number;
+  stop?: string | string[];
+  tools?: unknown[];
+  toolChoice?: unknown;
+  responseFormat?: unknown;
+  apiKey?: string;
+}
+
 export interface AuthenticatedIdentity {
   userId: string;
   userRole: UserRole;
@@ -28,6 +68,8 @@ export interface ZentrisRequest {
   rawInput: string;
   messages: ChatMessage[];
   toolInvocation?: ToolInvocation;
+  generation?: GenerationOptions;
+  requestId?: string;
 }
 
 export interface GuardResult {
@@ -35,6 +77,13 @@ export interface GuardResult {
   risk: "low" | "medium" | "high";
   reason: string;
   action: "allow" | "block" | "sanitize" | "require_confirmation";
+}
+
+export interface InjectionDetectionResult extends GuardResult {
+  detected: boolean;
+  score: number;
+  matchedRules: string[];
+  findings: SecurityFinding[];
 }
 
 export interface IntentClassificationResult {
