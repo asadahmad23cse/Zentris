@@ -345,6 +345,34 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
 
   app.get("/openai/deployments", async () => ({ data: [] }));
   app.get("/access_group/list", async () => []);
+
+  const demoKey = {
+    token: "sk-zentris-demo-xxxxxxxx",
+    key_alias: "Zentris Demo Key",
+    key_name: "sk-...xxxx",
+    spend: 0,
+    max_budget: null,
+    expires: null,
+    models: ["gpt-4o-mini", "gpt-4o"],
+    user_id: "public-admin",
+    team_id: null,
+    permissions: {},
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  app.get("/key/list", async () => ({ keys: [demoKey], total: 1 }));
+  app.get("/v2/key/info", async () => demoKey);
+  app.post("/key/delete", async () => ({ deleted: true }));
+  app.post("/key/update", async () => demoKey);
+
+  app.get("/user/list", async () => [
+    { user_id: "public-admin", user_role: "proxy_admin", spend: 0, max_budget: null }
+  ]);
+
+  app.get("/global/spend/tags", async () => []);
+  app.get("/global/spend/keys", async () => []);
+  app.get("/global/predict/spend/logs", async () => ({ data: [] }));
 };
 
 export default fp(gatewayRoutes, { name: "gateway-routes" });
