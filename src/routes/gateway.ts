@@ -373,6 +373,77 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/global/spend/tags", async () => []);
   app.get("/global/spend/keys", async () => []);
   app.get("/global/predict/spend/logs", async () => ({ data: [] }));
+
+  // Logs page
+  app.get("/spend/logs/ui", async () => ({ data: [], total: 0, page: 0, page_size: 50 }));
+  app.get("/spend/logs/ui/:logId", async () => ({ data: null }));
+  app.get("/spend/logs/session/ui", async () => ({ data: [] }));
+
+  // Policies page
+  app.get("/policies/list", async () => ({ policies: [], total: 0 }));
+  app.get("/policies/attachments/list", async () => ({ attachments: [] }));
+  app.get("/policies/:policyId", async () => null);
+  app.get("/policy/info/:policyName", async () => null);
+  app.post("/policies/test", async () => ({ results: [] }));
+
+  // Usage page
+  app.get("/global/spend/teams", async () => []);
+  app.get("/global/spend/end_users", async () => []);
+  app.get("/global/spend/models", async () => []);
+  app.get("/global/activity/cache_hits", async () => ({ data: [] }));
+  app.get("/global/activity/model", async () => ({ data: [] }));
+
+  // Teams page
+  app.get("/v2/team/list", async () => ({ teams: [], total: 0 }));
+  app.get("/team/available", async () => []);
+  app.get("/team/info", async () => ({ team_id: null, team_alias: null, members_with_roles: [] }));
+
+  // Users page
+  app.get("/v2/user/info", async () => ({
+    user_id: "public-admin",
+    user_role: "proxy_admin",
+    spend: 0,
+    max_budget: null,
+    teams: [],
+    keys: []
+  }));
+  app.get("/user/filter/ui", async () => ({ users: [], total: 0 }));
+  app.get("/user/available_roles", async () => (["proxy_admin", "proxy_user", "app_user", "app_owner", "team_admin"]));
+  app.get("/user/daily/activity/aggregated", async () => ({ data: [] }));
+
+  // Customer/end-users
+  app.get("/customer/list", async () => []);
+
+  // Keys page extras
+  app.get("/key/aliases", async () => []);
+  app.get("/key/service-account/generate", async () => ({}));
+
+  // Model group
+  app.get("/model_group/info", async () => ({ data: [] }));
+
+  // Settings endpoints
+  app.get("/callbacks/configs", async () => ({ callbacks: [] }));
+  app.get("/router/settings", async () => ({ routing_strategy: "simple-shuffle", model_group_alias: {} }));
+  app.get("/cache/settings", async () => ({ cache: "none" }));
+  app.get("/alerting/settings", async () => ({ alerting: [] }));
+
+  // OpenAPI schema
+  app.get("/openai.json", async () => ({
+    openapi: "3.0.0",
+    info: { title: "Zentris AI Gateway", version: "1.0.0" },
+    paths: {}
+  }));
+  app.get("/openapi/deployments", async () => ({ data: [] }));
+
+  // Organization extras
+  app.get("/organization/info", async () => null);
+
+  // Health check
+  app.get("/health/test_connection", async () => ({ status: "ok" }));
+
+  // Provider/agent fields
+  app.get("/public/providers/fields", async () => []);
+  app.get("/public/agents/fields", async () => []);
 };
 
 export default fp(gatewayRoutes, { name: "gateway-routes" });

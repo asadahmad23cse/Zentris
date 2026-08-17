@@ -9,6 +9,14 @@
   ],
   "routes": [
     {
+      "src": "/ui$",
+      "dest": "ui/litellm-dashboard/"
+    },
+    {
+      "src": "/ui/(.*)",
+      "dest": "ui/litellm-dashboard/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "ui/litellm-dashboard/$1"
     }
