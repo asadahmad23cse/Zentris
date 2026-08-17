@@ -47,7 +47,7 @@ const useAuthorized = () => {
     isLoading,
     isAuthorized,
     token: isAuthorized ? token : null,
-    accessToken: decoded?.key ?? null,
+    accessToken: decoded?.login_method === "public_access" ? token : (decoded?.key ?? null),
     userId: decoded?.user_id ?? null,
     userEmail: decoded?.user_email ?? null,
     userRole: formatUserRole(decoded?.user_role),
