@@ -57,7 +57,7 @@ export const buildServer = async (options: ServerOptions = {}) => {
     if (origin && allowedOrigins.has(origin)) {
       reply.header("Access-Control-Allow-Origin", origin);
       reply.header("Vary", "Origin");
-      reply.header("Access-Control-Allow-Headers", "authorization,content-type,x-zentris-tags");
+      reply.header("Access-Control-Allow-Headers", "authorization,content-type,x-zentris-tags,x-stainless-lang,x-stainless-package-version,x-stainless-os,x-stainless-arch,x-stainless-runtime,x-stainless-runtime-version,x-stainless-retry-count,x-stainless-timeout");
       reply.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     }
 
