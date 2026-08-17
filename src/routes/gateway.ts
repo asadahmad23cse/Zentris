@@ -293,14 +293,9 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
           emitContent(safeChunk);
         }
         const finalScan = scanAndRedactSensitiveData(rawOutput);
-        if (finalScan.findings.length > 0) {
-          security.findings.push(...finalScan.findings);
+        if (finalScan.detectedTypes.length > 0) {
           security.dlpDetected = true;
-          security.matchedRules = Array.from(new Set(security.findings.map((finding) => finding.ruleId)));
-          const maxScore = Math.max(0, ...finalScan.findings.map((finding) => finding.score));
-          security.score = Math.max(security.score, maxScore);
-          if (security.score >= 70) security.risk = "high";
-          else if (security.score >= 40) security.risk = "medium";
+          security.matchedRules = Array.from(new Set([...security.matchedRules, ...finalScan.detectedTypes]));
         }
         telemetryWrite = telemetry.enqueue({
           requestId: request.id, sessionId: zentrisRequest.sessionId, identity: request.identity,
@@ -472,7 +467,7 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/alerting/settings",       async () => ({ alerting: [] }));
   app.get("/router/settings",         async () => ({ routing_strategy: "simple-shuffle", model_group_alias: {} }));
   app.get("/cache/settings",          async () => ({ cache: "none" }));
-  app.get("/config/list",             async () => ({ PROXY_BASE_URL: "https://zentris-api.onrender.com", Zentris_UI_API_DOC_BASE_URL: null }));
+  app.get("/config/list",             async () => ({ PROXY_BASE_URL: null, Zentris_UI_API_DOC_BASE_URL: null }));
   app.get("/config/pass_through_endpoint", async () => ({ endpoints: [] }));
   app.get("/config/field/info",       async () => ({}));
   app.get("/credentials",             async () => ({ credentials: [] }));

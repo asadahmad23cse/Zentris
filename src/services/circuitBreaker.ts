@@ -42,7 +42,7 @@ export class CircuitBreaker {
     this.enabled = config.CIRCUIT_BREAKER_ENABLED;
   }
 
-  public async execute<T>(fn: () => Promise<T>): Promise<T> {
+  public async execute<T>(fn: () => Promise<T>, fallback?: () => T): Promise<T> {
     if (!this.enabled) {
       return fn();
     }
@@ -55,6 +55,7 @@ export class CircuitBreaker {
       if (canTryHalfOpen) {
         this.transitionTo("half-open", "timeout_elapsed");
       } else {
+        if (fallback) return Promise.resolve(fallback());
         throw new CircuitOpenError("Upstream circuit is open");
       }
     }
