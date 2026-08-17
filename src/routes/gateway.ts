@@ -333,6 +333,150 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
 
   app.post("/v1/chat/completions", { schema: { body: bodySchema } }, handler);
   app.post("/chat/completions", { schema: { body: bodySchema } }, handler);
+
+  // ── Dashboard compatibility stubs ─────────────────────────────────────────
+
+  const modelList = {
+    object: "list",
+    data: [
+      { id: "gpt-4o-mini", object: "model", owned_by: "openai" },
+      { id: "gpt-4o",      object: "model", owned_by: "openai" },
+      { id: "claude-3-5-sonnet", object: "model", owned_by: "anthropic" },
+      { id: "gemini-1.5-flash",  object: "model", owned_by: "google"    }
+    ]
+  };
+  const modelInfoData = [
+    { model_name: "gpt-4o-mini", litellm_params: { model: "gpt-4o-mini" }, model_info: { id: "gpt-4o-mini", mode: "chat", input_cost_per_token: 0.00000015, output_cost_per_token: 0.0000006, max_input_tokens: 128000, max_output_tokens: 16384, supports_function_calling: true, supports_vision: true } },
+    { model_name: "gpt-4o",      litellm_params: { model: "gpt-4o"      }, model_info: { id: "gpt-4o",      mode: "chat", input_cost_per_token: 0.0000025,  output_cost_per_token: 0.00001,   max_input_tokens: 128000, max_output_tokens: 16384, supports_function_calling: true, supports_vision: true } }
+  ];
+  const demoKey = {
+    token: "sk-zentris-demo-xxxxxxxx", key_alias: "Zentris Demo Key", key_name: "sk-...xxxx",
+    spend: 0, max_budget: null, expires: null, models: ["gpt-4o-mini", "gpt-4o"],
+    user_id: "public-admin", team_id: null, permissions: {},
+    created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+  };
+
+  // Models
+  app.get("/v1/models",    async () => modelList);
+  app.get("/models",       async () => modelList);
+  app.get("/model/info",   async () => ({ data: modelInfoData }));
+  app.get("/v1/model/info",async () => ({ data: modelInfoData }));
+  app.get("/v2/model/info",async () => ({ data: modelInfoData }));
+  app.get("/model_group/info", async () => ({ data: [] }));
+
+  // Keys
+  app.get("/key/info",     async () => ({ info: { token: "sk-zentris-public", key_name: "Public Demo Key", spend: 0, max_budget: null, expires: null, models: ["gpt-4o-mini", "gpt-4o"], user_id: "public-admin" } }));
+  app.get("/key/list",     async () => ({ keys: [demoKey], total: 1 }));
+  app.get("/v2/key/info",  async () => demoKey);
+  app.get("/key/aliases",  async () => []);
+  app.post("/key/generate",async () => ({ key: "sk-zentris-demo", key_name: "Demo Key", expires: null, user_id: "public-admin", models: ["gpt-4o-mini", "gpt-4o"], spend: 0, max_budget: null }));
+  app.post("/key/delete",  async () => ({ deleted: true }));
+  app.post("/key/update",  async () => demoKey);
+
+  // Users
+  app.get("/user/info",    async () => ({ user_id: "public-admin", user_role: "proxy_admin", spend: 0, max_budget: null }));
+  app.get("/user/list",    async () => [{ user_id: "public-admin", user_role: "proxy_admin", spend: 0, max_budget: null }]);
+  app.get("/v2/user/info", async () => ({ user_id: "public-admin", user_role: "proxy_admin", spend: 0, max_budget: null, teams: [], keys: [] }));
+  app.get("/user/filter/ui", async () => ({ users: [], total: 0 }));
+  app.get("/user/available_roles", async () => ["proxy_admin", "proxy_user", "app_user", "app_owner", "team_admin"]);
+  app.get("/user/daily/activity", async () => ({ data: [] }));
+  app.get("/user/daily/activity/aggregated", async () => ({ data: [] }));
+
+  // Teams
+  app.get("/team/list",      async () => []);
+  app.post("/team/list",     async () => []);
+  app.get("/v2/team/list",   async () => ({ teams: [], total: 0 }));
+  app.get("/team/available", async () => []);
+  app.get("/team/info",      async () => ({ team_id: null, team_alias: null, members_with_roles: [] }));
+  app.get("/team/daily/activity", async () => ({ data: [] }));
+
+  // Organizations & budgets
+  app.get("/organization/list",   async () => []);
+  app.get("/organization/info",   async () => null);
+  app.get("/organization/daily/activity", async () => ({ data: [] }));
+  app.get("/budget/list",         async () => []);
+  app.get("/access_group/list",   async () => []);
+  app.get("/customer/list",       async () => []);
+  app.get("/customer/daily/activity", async () => ({ data: [] }));
+
+  // Spend / usage
+  app.get("/global/spend",         async () => ({ spend: 0, max_budget: null }));
+  app.get("/global/spend/logs",    async () => []);
+  app.get("/global/spend/report",  async () => ({ data: [] }));
+  app.get("/global/spend/all_tag_names", async () => []);
+  app.get("/global/all_end_users", async () => []);
+  app.get("/global/spend/keys",    async () => []);
+  app.get("/global/spend/tags",    async () => []);
+  app.get("/global/spend/provider",async () => []);
+  app.get("/global/spend/teams",   async () => []);
+  app.get("/global/spend/end_users", async () => []);
+  app.get("/global/spend/models",  async () => []);
+  app.get("/global/predict/spend/logs", async () => ({ data: [] }));
+  app.get("/global/activity",      async () => ({ data: [] }));
+  app.get("/global/activity/cache_hits", async () => ({ data: [] }));
+  app.get("/global/activity/model", async () => ({ data: [] }));
+
+  // Logs / audit
+  app.get("/spend/logs/ui",        async () => ({ data: [], total: 0, page: 0, page_size: 50 }));
+  app.get("/spend/logs/ui/:logId", async () => ({ data: null }));
+  app.get("/spend/logs/session/ui",async () => ({ data: [] }));
+  app.get("/audit",                async () => ({ data: [] }));
+
+  // Tags
+  app.get("/tag/list",    async () => []);
+  app.get("/tag/dau",     async () => ({ data: [] }));
+  app.get("/tag/wau",     async () => ({ data: [] }));
+  app.get("/tag/mau",     async () => ({ data: [] }));
+  app.get("/tag/daily/activity", async () => ({ data: [] }));
+  app.get("/agent/daily/activity", async () => ({ data: [] }));
+
+  // Guardrails
+  app.get("/guardrails/list",   async () => ({ guardrails: [] }));
+  app.get("/v2/guardrails/list",async () => ({ guardrails: [] }));
+  app.post("/guardrails",       async () => ({ guardrail_id: "demo", guardrail_name: "demo" }));
+  app.delete("/guardrails/:guardrailId", async () => ({ deleted: true }));
+  app.patch("/guardrails/:guardrailId",  async () => ({}));
+  app.post("/guardrails/apply_guardrail", async () => ({ safe: true }));
+  app.get("/guardrails/ui/add_guardrail_settings", async () => ({}));
+  app.get("/guardrails/submissions", async () => ({ data: [] }));
+
+  // Policies
+  app.get("/policy/list",             async () => []);
+  app.get("/policies/list",           async () => ({ policies: [], total: 0 }));
+  app.get("/policies/attachments/list", async () => ({ attachments: [] }));
+  app.get("/policies/:policyId",      async () => null);
+  app.get("/policy/info/:policyName", async () => null);
+  app.post("/policies/test",          async () => ({ results: [] }));
+
+  // Settings / config
+  app.get("/sso/get/ui_settings",     async () => ({ status: "success" }));
+  app.get("/get/ui_settings",         async () => ({ status: "success" }));
+  app.get("/get/internal_user_settings", async () => ({}));
+  app.get("/get/allowed_ips",         async () => ({ allowed_ips: [] }));
+  app.get("/get/config/callbacks",    async () => ({ status: "success", callbacks: [], alerting: [] }));
+  app.get("/callbacks/configs",       async () => ({ callbacks: [] }));
+  app.get("/alerting/settings",       async () => ({ alerting: [] }));
+  app.get("/router/settings",         async () => ({ routing_strategy: "simple-shuffle", model_group_alias: {} }));
+  app.get("/cache/settings",          async () => ({ cache: "none" }));
+  app.get("/config/list",             async () => ({ PROXY_BASE_URL: "https://zentris-api.onrender.com", Zentris_UI_API_DOC_BASE_URL: null }));
+  app.get("/config/pass_through_endpoint", async () => ({ endpoints: [] }));
+  app.get("/config/field/info",       async () => ({}));
+  app.get("/credentials",             async () => ({ credentials: [] }));
+
+  // Misc / other
+  app.get("/in-product-nudges",       async () => ({ nudges: [] }));
+  app.get("/in_product_nudges",       async () => ({ nudges: [] }));
+  app.get("/vector_store/list",       async () => []);
+  app.get("/openai/deployments",      async () => ({ data: [] }));
+  app.get("/openai.json",             async () => ({ openapi: "3.0.0", info: { title: "Zentris AI Gateway", version: "1.0.0" }, paths: {} }));
+  app.get("/openapi/deployments",     async () => ({ data: [] }));
+  app.get("/mcp_server/list",         async () => []);
+  app.get("/v1/mcp/server",          async () => ({ data: [] }));
+  app.get("/v1/agents",              async () => ({ data: [] }));
+  app.get("/health/test_connection",  async () => ({ status: "ok" }));
+  app.get("/health/latest",          async () => ({ status: "ok" }));
+  app.get("/public/providers/fields", async () => []);
+  app.get("/public/agents/fields",   async () => []);
 };
 
 export default fp(gatewayRoutes, { name: "gateway-routes" });
