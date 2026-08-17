@@ -5,22 +5,69 @@ import { clearTokenCookies, getCookie } from "@/utils/cookieUtils";
 import { checkTokenValidity, decodeToken } from "@/utils/jwtUtils";
 import { buildLoginUrlWithReturn, storeReturnUrl } from "@/utils/returnUrlUtils";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUserRole } from "@/utils/roles";
 import { useUIConfig } from "./uiConfig/useUIConfig";
+
+const isLegacyInvalidAccessToken = (token: string): boolean => {
+  const [headerSegment, , signatureSegment] = token.split(".");
+  if (!headerSegment || !signatureSegment) return true;
+  try {
+    const padded = headerSegment.padEnd(headerSegment.length + ((4 - (headerSegment.length % 4)) % 4), "=");
+    const header = JSON.parse(atob(padded.replace(/-/g, "+").replace(/_/g, "/")));
+    return header?.alg !== "HS256" || signatureSegment === "public";
+  } catch {
+    return true;
+  }
+};
+
+const fetchPublicToken = async (): Promise<string | null> => {
+  try {
+    const res = await fetch(`${getProxyBaseUrl()}/public/dashboard-token`, { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data?.token) {
+      document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
+      return data.token;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
 
 const useAuthorized = () => {
   const router = useRouter();
   const { data: uiConfig, isLoading: isUIConfigLoading } = useUIConfig();
 
-  const token = typeof document !== "undefined" ? getCookie("token") : null;
+  const rawCookie = typeof document !== "undefined" ? getCookie("token") : null;
+  const isRawValid =
+    rawCookie != null &&
+    !isLegacyInvalidAccessToken(rawCookie) &&
+    checkTokenValidity(rawCookie);
+
+  const [token, setToken] = useState<string | null>(isRawValid ? rawCookie : null);
+  const [fetchingToken, setFetchingToken] = useState(!isRawValid);
+
+  useEffect(() => {
+    if (isRawValid) {
+      setToken(rawCookie);
+      setFetchingToken(false);
+      return;
+    }
+    setFetchingToken(true);
+    fetchPublicToken().then((t) => {
+      setToken(t);
+      setFetchingToken(false);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const decoded = useMemo(() => decodeToken(token), [token]);
   const isTokenValid = useMemo(() => checkTokenValidity(token), [token]);
-  const isLoading = isUIConfigLoading;
+  const isLoading = isUIConfigLoading || fetchingToken;
   const isAuthorized = isTokenValid && !uiConfig?.admin_ui_disabled;
 
-  // Helper function to redirect to login while preserving the current URL
   const redirectToLogin = useCallback(() => {
     storeReturnUrl();
     const baseLoginUrl =
@@ -31,14 +78,10 @@ const useAuthorized = () => {
     router.replace(loginUrlWithReturn);
   }, [router]);
 
-  // Single useEffect for all redirect logic
   useEffect(() => {
     if (isLoading) return;
-
     if (!isAuthorized) {
-      if (token) {
-        clearTokenCookies();
-      }
+      if (token) clearTokenCookies();
       redirectToLogin();
     }
   }, [isLoading, isAuthorized, token, redirectToLogin]);
@@ -58,6 +101,3 @@ const useAuthorized = () => {
 };
 
 export default useAuthorized;
-
-
-
