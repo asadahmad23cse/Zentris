@@ -14,6 +14,7 @@ const validConfig = (overrides: Partial<AppConfig> = {}): AppConfig => ({
   LITELLM_API_KEY: "sk-production-key-1234567890",
   LITELLM_MODEL: "gpt-4o-mini",
   JWT_SECRET: "jwt-secret-1234567890-1234567890",
+  UI_PASSWORD: "",
   RATE_LIMIT_MAX: 30,
   RATE_LIMIT_WINDOW: "1 minute",
   REQUEST_BODY_LIMIT_BYTES: 1_048_576,
