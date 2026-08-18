@@ -417,22 +417,25 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
 
   // ── Demo-only dashboard compatibility fixtures ─────────────────────────────
 
+  // Upstream is Groq (LITELLM_BASE_URL=https://api.groq.com/openai/v1). These IDs
+  // are forwarded verbatim to Groq, so they must be real Groq model names.
   const modelList = {
     object: "list",
     data: [
-      { id: "gpt-4o-mini", object: "model", owned_by: "openai" },
-      { id: "gpt-4o",      object: "model", owned_by: "openai" },
-      { id: "claude-3-5-sonnet", object: "model", owned_by: "anthropic" },
-      { id: "gemini-1.5-flash",  object: "model", owned_by: "google"    }
+      { id: "openai/gpt-oss-120b", object: "model", owned_by: "groq" },
+      { id: "openai/gpt-oss-20b",  object: "model", owned_by: "groq" },
+      { id: "qwen/qwen3.6-27b",    object: "model", owned_by: "groq" },
+      { id: "groq/compound",       object: "model", owned_by: "groq" }
     ]
   };
   const modelInfoData = [
-    { model_name: "gpt-4o-mini", litellm_params: { model: "gpt-4o-mini" }, model_info: { id: "gpt-4o-mini", mode: "chat", input_cost_per_token: 0.00000015, output_cost_per_token: 0.0000006, max_input_tokens: 128000, max_output_tokens: 16384, supports_function_calling: true, supports_vision: true } },
-    { model_name: "gpt-4o",      litellm_params: { model: "gpt-4o"      }, model_info: { id: "gpt-4o",      mode: "chat", input_cost_per_token: 0.0000025,  output_cost_per_token: 0.00001,   max_input_tokens: 128000, max_output_tokens: 16384, supports_function_calling: true, supports_vision: true } }
+    { model_name: "openai/gpt-oss-120b", litellm_params: { model: "openai/gpt-oss-120b" }, model_info: { id: "openai/gpt-oss-120b", mode: "chat", input_cost_per_token: 0.00000015, output_cost_per_token: 0.0000006, max_input_tokens: 131072, max_output_tokens: 65536, supports_function_calling: true, supports_vision: false } },
+    { model_name: "openai/gpt-oss-20b",  litellm_params: { model: "openai/gpt-oss-20b"  }, model_info: { id: "openai/gpt-oss-20b",  mode: "chat", input_cost_per_token: 0.00000005, output_cost_per_token: 0.0000002, max_input_tokens: 131072, max_output_tokens: 65536, supports_function_calling: true, supports_vision: false } },
+    { model_name: "qwen/qwen3.6-27b",    litellm_params: { model: "qwen/qwen3.6-27b"    }, model_info: { id: "qwen/qwen3.6-27b",    mode: "chat", input_cost_per_token: 0.0000006,  output_cost_per_token: 0.000003,  max_input_tokens: 131072, max_output_tokens: 16384, supports_function_calling: true, supports_vision: true } }
   ];
   const demoKey = {
     token: "sk-zentris-demo-xxxxxxxx", key_alias: "Zentris Demo Key", key_name: "sk-...xxxx",
-    spend: 0, max_budget: null, expires: null, models: ["gpt-4o-mini", "gpt-4o"],
+    spend: 0, max_budget: null, expires: null, models: ["openai/gpt-oss-120b", "openai/gpt-oss-20b"],
     user_id: "public-admin", team_id: null, permissions: {},
     created_at: new Date().toISOString(), updated_at: new Date().toISOString()
   };
@@ -446,11 +449,11 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/model_group/info", async () => ({ data: [] }));
 
   // Keys
-  app.get("/key/info",     async () => ({ info: { token: "sk-zentris-public", key_name: "Public Demo Key", spend: 0, max_budget: null, expires: null, models: ["gpt-4o-mini", "gpt-4o"], user_id: "public-admin" } }));
+  app.get("/key/info",     async () => ({ info: { token: "sk-zentris-public", key_name: "Public Demo Key", spend: 0, max_budget: null, expires: null, models: ["openai/gpt-oss-120b", "openai/gpt-oss-20b"], user_id: "public-admin" } }));
   app.get("/key/list",     async () => ({ keys: [demoKey], total: 1 }));
   app.get("/v2/key/info",  async () => demoKey);
   app.get("/key/aliases",  async () => []);
-  app.post("/key/generate",async () => ({ key: "sk-zentris-demo", key_name: "Demo Key", expires: null, user_id: "public-admin", models: ["gpt-4o-mini", "gpt-4o"], spend: 0, max_budget: null }));
+  app.post("/key/generate",async () => ({ key: "sk-zentris-demo", key_name: "Demo Key", expires: null, user_id: "public-admin", models: ["openai/gpt-oss-120b", "openai/gpt-oss-20b"], spend: 0, max_budget: null }));
   app.post("/key/delete",  async () => ({ deleted: true }));
   app.post("/key/update",  async () => demoKey);
 

@@ -31,57 +31,59 @@ const PUBLIC_IDENTITY: AuthenticatedIdentity = {
   orgId: null
 };
 
+// Upstream is Groq (LITELLM_BASE_URL=https://api.groq.com/openai/v1). Model IDs
+// must be real Groq model names so they can be forwarded verbatim.
 const PUBLIC_MODELS = [
   {
-    model_group: "gpt-4o-mini",
-    providers: ["openai"],
+    model_group: "openai/gpt-oss-120b",
+    providers: ["groq"],
     mode: "chat",
-    max_input_tokens: 128000,
-    max_output_tokens: 16384,
+    max_input_tokens: 131072,
+    max_output_tokens: 65536,
     input_cost_per_token: 0.00000015,
     output_cost_per_token: 0.0000006,
     supports_function_calling: true,
     supports_parallel_function_calling: true,
-    supports_vision: true,
+    supports_vision: false,
     health_status: "available"
   },
   {
-    model_group: "gpt-4o",
-    providers: ["openai"],
+    model_group: "openai/gpt-oss-20b",
+    providers: ["groq"],
     mode: "chat",
-    max_input_tokens: 128000,
-    max_output_tokens: 16384,
-    input_cost_per_token: 0.0000025,
-    output_cost_per_token: 0.00001,
+    max_input_tokens: 131072,
+    max_output_tokens: 65536,
+    input_cost_per_token: 0.00000005,
+    output_cost_per_token: 0.0000002,
     supports_function_calling: true,
     supports_parallel_function_calling: true,
-    supports_vision: true,
+    supports_vision: false,
     health_status: "available"
   },
   {
-    model_group: "claude-3-5-sonnet",
-    providers: ["anthropic"],
+    model_group: "qwen/qwen3.6-27b",
+    providers: ["groq"],
     mode: "chat",
-    max_input_tokens: 200000,
-    max_output_tokens: 8192,
-    input_cost_per_token: 0.000003,
-    output_cost_per_token: 0.000015,
+    max_input_tokens: 131072,
+    max_output_tokens: 16384,
+    input_cost_per_token: 0.0000006,
+    output_cost_per_token: 0.000003,
     supports_function_calling: true,
     supports_parallel_function_calling: false,
     supports_vision: true,
     health_status: "available"
   },
   {
-    model_group: "gemini-1.5-flash",
-    providers: ["gemini"],
+    model_group: "groq/compound",
+    providers: ["groq"],
     mode: "chat",
-    max_input_tokens: 1000000,
+    max_input_tokens: 131072,
     max_output_tokens: 8192,
-    input_cost_per_token: 0.000000075,
-    output_cost_per_token: 0.0000003,
+    input_cost_per_token: 0.0000002,
+    output_cost_per_token: 0.0000006,
     supports_function_calling: true,
     supports_parallel_function_calling: true,
-    supports_vision: true,
+    supports_vision: false,
     health_status: "available"
   }
 ] as const;
