@@ -538,7 +538,7 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/alerting/settings",       async () => ({ alerting: [] }));
   app.get("/router/settings",         async () => ({ routing_strategy: "simple-shuffle", model_group_alias: {} }));
   app.get("/cache/settings",          async () => ({ cache: "none" }));
-  app.get("/config/list",             async () => ({ PROXY_BASE_URL: null, Zentris_UI_API_DOC_BASE_URL: null }));
+  app.get("/config/list",             async () => ({ PROXY_BASE_URL: process.env["PROXY_BASE_URL"] || null, Zentris_UI_API_DOC_BASE_URL: null }));
   app.get("/config/pass_through_endpoint", async () => ({ endpoints: [] }));
   app.get("/config/field/info",       async () => ({}));
   app.get("/credentials",             async () => ({ credentials: [] }));
