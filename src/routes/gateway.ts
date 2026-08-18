@@ -56,6 +56,16 @@ const bearerToken = (request: FastifyRequest): string | undefined => {
   return value?.startsWith("Bearer ") ? value.slice(7).trim() || undefined : undefined;
 };
 
+// Only real upstream provider keys (sk-.../gsk_...) may be forwarded to the LLM.
+// The dashboard's "Current UI Session" sends a Zentris JWT (login_method=
+// public_access), which is not a provider credential — forwarding it makes the
+// upstream reject with 401. A non-provider token falls back to LITELLM_API_KEY.
+const PROVIDER_KEY_PREFIX = /^(sk-|sk_|gsk_)/;
+const upstreamApiKey = (request: FastifyRequest): string | undefined => {
+  const token = bearerToken(request);
+  return token && PROVIDER_KEY_PREFIX.test(token) ? token : undefined;
+};
+
 const generationOptions = (body: ChatCompletionsBody, request: FastifyRequest): GenerationOptions => ({
   model: body.model ?? config.LITELLM_MODEL,
   streamOptions: body.stream_options === undefined
@@ -68,7 +78,7 @@ const generationOptions = (body: ChatCompletionsBody, request: FastifyRequest): 
   tools: body.tools,
   toolChoice: body.tool_choice,
   responseFormat: body.response_format,
-  apiKey: bearerToken(request)
+  apiKey: upstreamApiKey(request)
 });
 
 const telemetryModelParameters = (body: ChatCompletionsBody): Record<string, unknown> => ({

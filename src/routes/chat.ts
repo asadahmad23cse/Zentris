@@ -40,6 +40,19 @@ export interface ChatRouteOptions {
 
 const SESSION_ID_REGEX = /^[A-Za-z0-9-]{1,64}$/;
 
+// Real upstream provider keys look like `sk-...` / `gsk_...`. The dashboard's
+// "Current UI Session" sends a Zentris JWT (login_method=public_access), which
+// is NOT a provider credential — forwarding it to the upstream makes the LLM
+// reject the request with 401. Only pass through genuine provider keys; anything
+// else falls back to config.LITELLM_API_KEY in the LLM clients.
+const PROVIDER_KEY_PREFIX = /^(sk-|sk_|gsk_)/;
+
+const resolveUpstreamApiKey = (authHeader: string | undefined): string | undefined => {
+  if (!authHeader?.startsWith("Bearer ")) return undefined;
+  const token = authHeader.slice(7).trim();
+  return PROVIDER_KEY_PREFIX.test(token) ? token : undefined;
+};
+
 const upstreamStatus = (error: unknown): number => {
   if (error instanceof CircuitOpenError) return 503;
   if (error instanceof LiteLLMError && error.llmReason === "request_timeout") return 504;
@@ -243,7 +256,7 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
             model: body.model,
             temperature: body.temperature,
             maxTokens: body.maxTokens,
-            apiKey: request.headers.authorization?.startsWith("Bearer ") ? request.headers.authorization.slice(7).trim() : undefined
+            apiKey: resolveUpstreamApiKey(request.headers.authorization)
           }
         });
       } catch (error) {
@@ -370,7 +383,7 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
             model: body.model,
             temperature: body.temperature,
             maxTokens: body.maxTokens,
-            apiKey: request.headers.authorization?.startsWith("Bearer ") ? request.headers.authorization.slice(7).trim() : undefined
+            apiKey: resolveUpstreamApiKey(request.headers.authorization)
           }
         }
       );
