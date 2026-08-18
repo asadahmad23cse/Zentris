@@ -594,7 +594,21 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/alerting/settings",       async () => ({ alerting: [] }));
   app.get("/router/settings",         async () => ({ routing_strategy: "simple-shuffle", model_group_alias: {} }));
   app.get("/cache/settings",          async () => ({ cache: "none" }));
-  app.get("/config/list",             async () => ({ PROXY_BASE_URL: process.env["PROXY_BASE_URL"] || null, Zentris_UI_API_DOC_BASE_URL: null }));
+  // /config/list has two shapes: with ?config_type=... the UI expects an ARRAY
+  // of ConfigListItem and calls .find() over it (Model/SpendLogs settings modals);
+  // without it, the dashboard reads PROXY_BASE_URL. Returning the object for the
+  // config_type call caused "proxyConfigData.find is not a function".
+  app.get("/config/list", async (request) => {
+    const configType = (request.query as { config_type?: string } | undefined)?.config_type;
+    if (configType) {
+      return [
+        { field_name: "store_model_in_db", field_type: "Boolean", field_description: "Store model settings in the database.", field_value: false, stored_in_db: null, field_default_value: false },
+        { field_name: "store_prompts_in_spend_logs", field_type: "Boolean", field_description: "Store prompts in spend logs.", field_value: false, stored_in_db: null, field_default_value: false },
+        { field_name: "maximum_spend_logs_retention_period", field_type: "String", field_description: "Maximum retention period for spend logs.", field_value: null, stored_in_db: null, field_default_value: null }
+      ];
+    }
+    return { PROXY_BASE_URL: process.env["PROXY_BASE_URL"] || null, Zentris_UI_API_DOC_BASE_URL: null };
+  });
   app.get("/config/pass_through_endpoint", async () => ({ endpoints: [] }));
   app.get("/config/field/info",       async () => ({}));
   app.get("/credentials",             async () => ({ credentials: [] }));
