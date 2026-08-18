@@ -476,8 +476,10 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     "groq/compound":       { max_tokens: 8192,  max_input_tokens: 131072, max_output_tokens: 8192,  input_cost_per_token: 0.0000002, output_cost_per_token: 0.0000006, Zentris_provider: "groq", litellm_provider: "groq", mode: "chat", supports_function_calling: true }
   };
   app.get("/public/Zentris_model_cost_map", async () => modelCostMap);
-  app.get("/model/cost_map/source", async () => ({ source: "backend_default", url: null }));
-  app.get("/schedule/model_cost_map_reload/status", async () => ({ status: "idle", last_reload: null, in_progress: false }));
+  // Price Data Management tab reads source.model_count.toLocaleString() (must be a
+  // number) plus source/url; and reload status reads scheduled/last_run/next_run.
+  app.get("/model/cost_map/source", async () => ({ source: "local", model_count: Object.keys(modelCostMap).length, url: null, is_env_forced: false, fallback_reason: null }));
+  app.get("/schedule/model_cost_map_reload/status", async () => ({ scheduled: false, last_run: null, next_run: null, interval_hours: null }));
   app.get("/user/available_users", async () => ({ available_users: [], total: 0 }));
   app.get("/health/license", async () => ({ valid: false, license: null }));
 
