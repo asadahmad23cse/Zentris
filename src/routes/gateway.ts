@@ -564,9 +564,11 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     const username = body?.username ?? "";
     const password = body?.password ?? "";
 
-    const validAdmin = username === "admin" && password === config.LITELLM_API_KEY;
-    const validEmail = username === "admin@zentris.ai" && password === config.LITELLM_API_KEY;
-    if (!validAdmin && !validEmail) {
+    const validPassword =
+      (config.UI_PASSWORD.length > 0 && password === config.UI_PASSWORD) ||
+      (config.LITELLM_API_KEY.length >= 16 && password === config.LITELLM_API_KEY);
+    const validUsername = username === "admin" || username === "admin@zentris.ai";
+    if (!validUsername || !validPassword) {
       return reply.code(401).send({ error: "invalid_credentials" });
     }
 

@@ -13,6 +13,7 @@ export interface AppConfig {
   LITELLM_API_KEY: string;
   LITELLM_MODEL: string;
   JWT_SECRET: string;
+  UI_PASSWORD: string;
   RATE_LIMIT_MAX: number;
   RATE_LIMIT_WINDOW: string;
   REQUEST_BODY_LIMIT_BYTES: number;
@@ -207,6 +208,7 @@ export const config: AppConfig = {
   LITELLM_API_KEY: getRequiredEnv("LITELLM_API_KEY"),
   LITELLM_MODEL: getStringEnv("LITELLM_MODEL", "gpt-4o-mini"),
   JWT_SECRET: getRequiredEnv("JWT_SECRET"),
+  UI_PASSWORD: getStringEnv("UI_PASSWORD", ""),
   RATE_LIMIT_MAX: getNumberEnv("RATE_LIMIT_MAX", 30),
   RATE_LIMIT_WINDOW: getStringEnv("RATE_LIMIT_WINDOW", "1 minute"),
   REQUEST_BODY_LIMIT_BYTES: getNumberEnv("REQUEST_BODY_LIMIT_BYTES", 1_048_576),
