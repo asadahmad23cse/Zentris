@@ -443,6 +443,14 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     { model_name: "openai/gpt-oss-20b",  litellm_params: { model: "openai/gpt-oss-20b"  }, model_info: { id: "openai/gpt-oss-20b",  mode: "chat", input_cost_per_token: 0.00000005, output_cost_per_token: 0.0000002, max_input_tokens: 131072, max_output_tokens: 65536, supports_function_calling: true, supports_vision: false } },
     { model_name: "qwen/qwen3.6-27b",    litellm_params: { model: "qwen/qwen3.6-27b"    }, model_info: { id: "qwen/qwen3.6-27b",    mode: "chat", input_cost_per_token: 0.0000006,  output_cost_per_token: 0.000003,  max_input_tokens: 131072, max_output_tokens: 16384, supports_function_calling: true, supports_vision: true } }
   ];
+  // Drives the Playground model dropdown (fetchAvailableModels -> /model_group/info).
+  // model_group must equal the ID forwarded to Groq so completions succeed.
+  const modelGroupInfo = [
+    { model_group: "openai/gpt-oss-120b", providers: ["groq"], mode: "chat", max_input_tokens: 131072, max_output_tokens: 65536, input_cost_per_token: 0.00000015, output_cost_per_token: 0.0000006, supports_function_calling: true, supports_vision: false },
+    { model_group: "openai/gpt-oss-20b",  providers: ["groq"], mode: "chat", max_input_tokens: 131072, max_output_tokens: 65536, input_cost_per_token: 0.00000005, output_cost_per_token: 0.0000002, supports_function_calling: true, supports_vision: false },
+    { model_group: "qwen/qwen3.6-27b",    providers: ["groq"], mode: "chat", max_input_tokens: 131072, max_output_tokens: 16384, input_cost_per_token: 0.0000006, output_cost_per_token: 0.000003, supports_function_calling: true, supports_vision: true },
+    { model_group: "groq/compound",       providers: ["groq"], mode: "chat", max_input_tokens: 131072, max_output_tokens: 8192, input_cost_per_token: 0.0000002, output_cost_per_token: 0.0000006, supports_function_calling: true, supports_vision: false }
+  ];
   const demoKey = {
     token: "sk-zentris-demo-xxxxxxxx", key_alias: "Zentris Demo Key", key_name: "sk-...xxxx",
     spend: 0, max_budget: null, expires: null, models: ["openai/gpt-oss-120b", "openai/gpt-oss-20b"],
@@ -456,7 +464,7 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/model/info",   async () => ({ data: modelInfoData }));
   app.get("/v1/model/info",async () => ({ data: modelInfoData }));
   app.get("/v2/model/info",async () => ({ data: modelInfoData }));
-  app.get("/model_group/info", async () => ({ data: [] }));
+  app.get("/model_group/info", async () => ({ data: modelGroupInfo }));
 
   // Keys
   app.get("/key/info",     async () => ({ info: { token: "sk-zentris-public", key_name: "Public Demo Key", spend: 0, max_budget: null, expires: null, models: ["openai/gpt-oss-120b", "openai/gpt-oss-20b"], user_id: "public-admin" } }));
