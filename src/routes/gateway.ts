@@ -1,6 +1,7 @@
 import fp from "fastify-plugin";
 import { type FastifyPluginAsync, type FastifyReply, type FastifyRequest } from "fastify";
 import { config } from "../config";
+import { createAccessToken } from "../auth/jwt";
 import { StreamingGuard } from "../guards/streamingGuard";
 import { scanAndRedactSensitiveData } from "../guards/dlpGuard";
 import { LiteLLMError } from "../llm/litellmClient";
@@ -557,6 +558,40 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/health/latest",          async () => ({ status: "ok" }));
   app.get("/public/providers/fields", async () => []);
   app.get("/public/agents/fields",   async () => []);
+
+  const loginHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+    const body = request.body as { username?: string; password?: string } | undefined;
+    const username = body?.username ?? "";
+    const password = body?.password ?? "";
+
+    const validAdmin = username === "admin" && password === config.LITELLM_API_KEY;
+    const validEmail = username === "admin@zentris.ai" && password === config.LITELLM_API_KEY;
+    if (!validAdmin && !validEmail) {
+      return reply.code(401).send({ error: "invalid_credentials" });
+    }
+
+    const exp = Math.floor(Date.now() / 1000) + 86400;
+    const token = createAccessToken(
+      {
+        sub: "admin",
+        role: "admin",
+        exp,
+        user_id: "admin",
+        user_email: "admin@zentris.ai",
+        user_role: "proxy_admin",
+        login_method: "public_access",
+        premium_user: true,
+        disabled_non_admin_personal_key_creation: false,
+        key: "admin"
+      },
+      config.JWT_SECRET
+    );
+
+    return { token, redirect_url: "/ui/" };
+  };
+
+  app.post("/v2/login", loginHandler);
+  app.post("/v3/login", loginHandler);
 };
 
 export default fp(gatewayRoutes, { name: "gateway-routes" });

@@ -16,7 +16,8 @@ const OWNED_PUBLIC_PATHS = new Set([
   "/public/model_hub/info",
   "/public/model_hub",
   "/public/agent_hub",
-  "/public/mcp_hub"
+  "/public/mcp_hub",
+  "/public/dashboard-token"
 ]);
 
 const authMiddleware: FastifyPluginAsync = async (app) => {

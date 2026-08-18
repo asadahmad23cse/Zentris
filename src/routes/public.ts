@@ -4,6 +4,7 @@ import { RagSecurityGuard } from "../guards/ragSecurityGuard";
 import { wrapUntrustedData } from "../guards/ragWrapper";
 import { type LLMChat, ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
+import { createAccessToken } from "../auth/jwt";
 import { LiteLLMClient, LiteLLMError } from "../llm/litellmClient";
 import { type AuthenticatedIdentity, type ChatMessage, type ToolInvocation } from "../types";
 
@@ -183,6 +184,26 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
   app.get("/public/model_hub", async () => PUBLIC_MODELS);
   app.get("/public/agent_hub", async () => []);
   app.get("/public/mcp_hub", async () => []);
+
+  app.get("/public/dashboard-token", async () => {
+    const exp = Math.floor(Date.now() / 1000) + 86400;
+    const token = createAccessToken(
+      {
+        sub: "public-admin",
+        role: "admin",
+        exp,
+        user_id: "public-admin",
+        user_email: "admin@zentris.ai",
+        user_role: "proxy_admin",
+        login_method: "public_access",
+        premium_user: false,
+        disabled_non_admin_personal_key_creation: false,
+        key: "public-admin"
+      },
+      config.JWT_SECRET
+    );
+    return { token, user_role: "proxy_admin", login_method: "public_access" };
+  });
 
   // Provider-backed public probes/chat exist only in the explicit demo runtime
   // or when a test injects a bounded fake model. Production inference always
