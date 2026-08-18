@@ -51,6 +51,15 @@ const proxyRoutes: FastifyPluginAsync = async (app) => {
     if (MODEL_API_PREFIXES.some((prefix) => path === prefix.replace(/\/$/, "") || path.startsWith(prefix))) {
       return reply.code(404).send({ error: "Model inference is available only through the Zentris chat gateway" });
     }
+    // When LITELLM_BASE_URL points at a raw model provider (e.g. Groq) rather than
+    // a real LiteLLM management proxy, unmatched dashboard/management endpoints
+    // must NOT be forwarded upstream — that leaks dashboard calls to the provider
+    // and returns malformed responses that crash admin pages. Return a clean 404.
+    const upstreamHost = new URL(upstreamBase()).host;
+    const RAW_PROVIDER_HOSTS = ["groq.com", "openai.com", "anthropic.com", "googleapis.com", "mistral.ai", "cohere.com", "perplexity.ai"];
+    if (RAW_PROVIDER_HOSTS.some((h) => upstreamHost === h || upstreamHost.endsWith(`.${h}`))) {
+      return reply.code(404).send({ error: "not_found" });
+    }
     const url = `${upstreamBase()}${rawUrl}`;
     const headers: Record<string, string> = {};
     for (const [name, value] of Object.entries(request.headers)) {

@@ -466,6 +466,21 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/v2/model/info",async () => ({ data: modelInfoData }));
   app.get("/model_group/info", async () => ({ data: modelGroupInfo }));
 
+  // Model cost map — the dashboard reads provider/mode/costs from here. Fetched
+  // WITHOUT a bearer token, so /public/Zentris_model_cost_map is also listed in
+  // OWNED_PUBLIC_PATHS. Must be a plain object keyed by model id (not an array).
+  const modelCostMap: Record<string, Record<string, unknown>> = {
+    "openai/gpt-oss-120b": { max_tokens: 65536, max_input_tokens: 131072, max_output_tokens: 65536, input_cost_per_token: 0.00000015, output_cost_per_token: 0.0000006, Zentris_provider: "groq", litellm_provider: "groq", mode: "chat", supports_function_calling: true },
+    "openai/gpt-oss-20b":  { max_tokens: 65536, max_input_tokens: 131072, max_output_tokens: 65536, input_cost_per_token: 0.00000005, output_cost_per_token: 0.0000002, Zentris_provider: "groq", litellm_provider: "groq", mode: "chat", supports_function_calling: true },
+    "qwen/qwen3.6-27b":    { max_tokens: 16384, max_input_tokens: 131072, max_output_tokens: 16384, input_cost_per_token: 0.0000006, output_cost_per_token: 0.000003, Zentris_provider: "groq", litellm_provider: "groq", mode: "chat", supports_function_calling: true },
+    "groq/compound":       { max_tokens: 8192,  max_input_tokens: 131072, max_output_tokens: 8192,  input_cost_per_token: 0.0000002, output_cost_per_token: 0.0000006, Zentris_provider: "groq", litellm_provider: "groq", mode: "chat", supports_function_calling: true }
+  };
+  app.get("/public/Zentris_model_cost_map", async () => modelCostMap);
+  app.get("/model/cost_map/source", async () => ({ source: "backend_default", url: null }));
+  app.get("/schedule/model_cost_map_reload/status", async () => ({ status: "idle", last_reload: null, in_progress: false }));
+  app.get("/user/available_users", async () => ({ available_users: [], total: 0 }));
+  app.get("/health/license", async () => ({ valid: false, license: null }));
+
   // Keys
   app.get("/key/info",     async () => ({ info: { token: "sk-zentris-public", key_name: "Public Demo Key", spend: 0, max_budget: null, expires: null, models: ["openai/gpt-oss-120b", "openai/gpt-oss-20b"], user_id: "public-admin" } }));
   app.get("/key/list",     async () => ({ keys: [demoKey], total: 1 }));
@@ -573,8 +588,11 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/openai.json",             async () => ({ openapi: "3.0.0", info: { title: "Zentris AI Gateway", version: "1.0.0" }, paths: {} }));
   app.get("/openapi/deployments",     async () => ({ data: [] }));
   app.get("/mcp_server/list",         async () => []);
-  app.get("/v1/mcp/server",          async () => ({ data: [] }));
-  app.get("/v1/agents",              async () => ({ data: [] }));
+  // fetchMCPServers/fetchAvailableAgents consume the raw body as an array
+  // (mcpServers.map(...), agents.sort(...)), so these MUST return a bare array.
+  app.get("/v1/mcp/server",          async () => []);
+  app.get("/v1/mcp/server/health",   async () => []);
+  app.get("/v1/agents",              async () => []);
   app.get("/health/test_connection",  async () => ({ status: "ok" }));
   app.get("/health/latest",          async () => ({ status: "ok" }));
   app.get("/public/providers/fields", async () => []);
