@@ -6,6 +6,7 @@
   "framework": "nextjs",
   "rewrites": [
     { "source": "/ui", "destination": "/" },
-    { "source": "/ui/:path*", "destination": "/:path*" }
+    { "source": "/ui/:path*", "destination": "/:path*" },
+    { "source": "/:path*", "destination": "https://zentris-api.onrender.com/:path*" }
   ]
 }
