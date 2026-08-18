@@ -5,7 +5,7 @@ export class PiiScrubber {
   public scrub(text: string): { scrubbed: string; detectedTypes: string[] } {
     const result = scanAndRedactSensitiveData(text);
     for (const detectedType of result.detectedTypes) {
-      logger.info({ detectedType }, "pii_detected");
+      logger.debug({ detectedType }, "pii_detected");
     }
     return {
       scrubbed: result.redacted,

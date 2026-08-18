@@ -3,10 +3,10 @@ services:
     image: nginx:1.27-alpine
     container_name: zentris_nginx
     depends_on:
-      litellm:
+      gateway:
         condition: service_healthy
       dashboard:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "80:80"
       - "443:443"
@@ -17,46 +17,99 @@ services:
       NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx/conf.d
     restart: unless-stopped
 
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.gateway
+    container_name: zentris_gateway
+    environment:
+      NODE_ENV: production
+      ZENTRIS_STRICT_CONFIG: "true"
+      ZENTRIS_DEMO_ENABLED: "${ZENTRIS_DEMO_ENABLED:-false}"
+      PORT: "3000"
+      REDIS_URL: "redis://redis:6379/0"
+      LITELLM_BASE_URL: "http://litellm:4000/v1"
+      LITELLM_API_KEY: "${LITELLM_MASTER_KEY:?set LITELLM_MASTER_KEY}"
+      LITELLM_MODEL: "${LITELLM_MODEL:-gpt-4o-mini}"
+      JWT_SECRET: "${JWT_SECRET:?set JWT_SECRET}"
+      CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET:?set CONFIRMATION_TOKEN_SECRET}"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      WEB_CONCURRENCY: "${WEB_CONCURRENCY:-4}"
+      RATE_LIMIT_MAX: "${RATE_LIMIT_MAX:-120}"
+      RATE_LIMIT_WINDOW: "${RATE_LIMIT_WINDOW:-1 minute}"
+      REQUEST_BODY_LIMIT_BYTES: "${REQUEST_BODY_LIMIT_BYTES:-1048576}"
+      STREAMING_CONCURRENT_LIMIT: "${STREAMING_CONCURRENT_LIMIT:-2}"
+      STREAMING_SLOT_TTL_SECONDS: "${STREAMING_SLOT_TTL_SECONDS:-120}"
+      STREAMING_ROLLING_BUFFER_CHARS: "${STREAMING_ROLLING_BUFFER_CHARS:-256}"
+      STREAMING_SUSPICIOUS_EVENT_LIMIT: "${STREAMING_SUSPICIOUS_EVENT_LIMIT:-3}"
+      STREAMING_SESSION_SUSPICIOUS_EVENT_LIMIT: "${STREAMING_SESSION_SUSPICIOUS_EVENT_LIMIT:-10}"
+      STREAMING_SESSION_SUSPICIOUS_WINDOW_SECONDS: "${STREAMING_SESSION_SUSPICIOUS_WINDOW_SECONDS:-900}"
+      PUBLIC_WEB_ORIGIN: "${PUBLIC_WEB_ORIGIN:-http://localhost}"
+    depends_on:
+      litellm:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health/readiness').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
   litellm:
     build:
       context: .
       args:
         target: runtime
-    image: docker.litellm.ai/berriai/litellm:main-stable
-    #########################################
-    ## Uncomment these lines to start proxy with a config.yaml file ##
-    # volumes:
-    #  - ./config.yaml:/app/config.yaml
-    # command:
-    #  - "--config=/app/config.yaml"
-    ##############################################
-    ports:
-      - "4000:4000" # Map the container port to the host, change the host port if necessary
+    image: zentris-litellm:local
+    container_name: zentris_litellm
+    command: ["--config=/app/proxy_server_config.production.yaml", "--port", "4000"]
+    expose:
+      - "4000"
     environment:
       DATABASE_URL: "postgresql://llmproxy:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/litellm"
       LITELLM_MASTER_KEY: "${LITELLM_MASTER_KEY:?set LITELLM_MASTER_KEY}"
-      STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
-      REDIS_URL: "redis://redis:6379/0" # required by security middleware + replay protection
-      JWT_SECRET: "${JWT_SECRET:?set JWT_SECRET}"
-      CONFIRMATION_TOKEN_SECRET: "${CONFIRMATION_TOKEN_SECRET:?set CONFIRMATION_TOKEN_SECRET}"
-      CONFIRMATION_TOKEN_TTL_SECONDS: "${CONFIRMATION_TOKEN_TTL_SECONDS:-300}"
-      STREAMING_ROLLING_BUFFER_CHARS: "${STREAMING_ROLLING_BUFFER_CHARS:-256}"
-      STREAMING_SUSPICIOUS_EVENT_LIMIT: "${STREAMING_SUSPICIOUS_EVENT_LIMIT:-3}"
+      STORE_MODEL_IN_DB: "True"
+      ENFORCE_PRISMA_MIGRATION_CHECK: "true"
+      REDIS_URL: "redis://redis:6379/0"
+      UI_USERNAME: "${UI_USERNAME:-admin}"
+      UI_PASSWORD: "${UI_PASSWORD:?set UI_PASSWORD}"
     env_file:
-      - .env # Load local .env file
+      - .env
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    healthcheck:  # Defines the health check configuration for the container
-      test:
-        - CMD-SHELL
-        - python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')"  # Command to execute for health check
-      interval: 30s  # Perform health check every 30 seconds
-      timeout: 10s   # Health check command times out after 10 seconds
-      retries: 3     # Retry up to 3 times if health check fails
-      start_period: 40s  # Wait 40 seconds after container start before beginning health checks
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')\""]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
+
+  telemetry-worker:
+    image: zentris-litellm:local
+    container_name: zentris_telemetry_worker
+    entrypoint: ["python"]
+    command: ["-m", "zentris_security.telemetry_worker"]
+    environment:
+      DATABASE_URL: "postgresql://llmproxy:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/litellm"
+      REDIS_URL: "redis://redis:6379/0"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+    depends_on:
+      litellm:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
   dashboard:
     build:
@@ -64,48 +117,41 @@ services:
       dockerfile: docker/Dockerfile.dashboard
     container_name: zentris_dashboard
     depends_on:
-      litellm:
+      gateway:
         condition: service_healthy
     environment:
-      NEXT_PUBLIC_BASE_URL: "http://localhost"
+      NODE_ENV: production
       NEXT_PUBLIC_USE_REWRITES: "false"
-      NODE_ENV: "production"
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     healthcheck:
-      test:
-        - CMD-SHELL
-        - node -e "fetch('http://localhost:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-      interval: 30s
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 10
+      start_period: 30s
     restart: unless-stopped
 
   db:
     image: postgres:16
-    restart: always
     container_name: litellm_db
     environment:
       POSTGRES_DB: litellm
       POSTGRES_USER: llmproxy
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}"
-    ports:
-      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Persists Postgres data across container restarts
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d litellm -U llmproxy"]
-      interval: 1s
+      interval: 2s
       timeout: 5s
-      retries: 10
+      retries: 20
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     container_name: zentris_redis
-    command: ["redis-server", "--appendonly", "yes"]
-    ports:
-      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
     volumes:
       - redis_data:/data
     healthcheck:
@@ -113,20 +159,18 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+    restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v3.1.0
     volumes:
       - prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./monitoring/prometheus:/etc/prometheus/rules:ro
     ports:
       - "9090:9090"
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=15d"
-    restart: always
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--storage.tsdb.retention.time=15d"]
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:11.5.2
@@ -138,7 +182,7 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
       GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD}"
-      GF_USERS_DEFAULT_THEME: "light"
+      GF_USERS_DEFAULT_THEME: light
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
@@ -147,10 +191,7 @@ services:
 
 volumes:
   prometheus_data:
-    driver: local
   postgres_data:
-    name: litellm_postgres_data # Named volume for Postgres data persistence
+    name: litellm_postgres_data
   redis_data:
-    driver: local
   grafana_data:
-    driver: local

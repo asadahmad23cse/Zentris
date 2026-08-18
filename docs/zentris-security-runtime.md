@@ -25,14 +25,15 @@ Run the red-team simulator:
 python -m zentris_security.cli simulate zentris_security/data/red_team_attacks.json
 ```
 
-## Free Local Stack
+## Canonical Local Stack
 
-The current working stack uses only free local components:
+Docker Compose mirrors the production trust boundary with:
 
-- LiteLLM proxy and UI on `http://localhost:4000/ui/`
-- Local Postgres on port `55432`
-- Ollama on `http://127.0.0.1:11434`
-- `qwen2.5:1.5b` exposed as `zentris-local-qwen`
+- Nginx as the only host-facing entry point.
+- The TypeScript security gateway as the only public model API.
+- LiteLLM, PostgreSQL, Redis, and the telemetry worker on the private Compose network.
+- The Next.js dashboard served through Nginx and configured by environment variables.
+- A mock provider only in the explicit E2E profile; production provider configuration remains separate.
 
 ## What Is Implemented
 
@@ -43,14 +44,10 @@ The current working stack uses only free local components:
 - MCP exposure checks.
 - Output secret and system-prompt leakage scoring.
 - Latency-aware multi-stage inspection.
-- JSONL audit logging and replay.
+- Metadata-only operational logging plus admin-protected, expiring database history and streamed JSONL training exports.
 - OWASP LLM Top 10 and MITRE ATLAS mappings.
 - Red-team simulator and regression tests.
 
-## What Still Needs Production Hardening
+## Production Architecture
 
-- Inline proxy enforcement hooks inside LiteLLM request middleware.
-- Streaming token-by-token inspection inside live completions.
-- Persistent SOC dashboard fed from audit events.
-- Multi-model consensus validation using more than one local/remote model.
-- Larger benchmark corpus with false-positive/false-negative tracking.
+The production request, trust-boundary, persistence, failure, and operations design is maintained in [`ARCHITECTURE.md`](../ARCHITECTURE.md). Prompt injection is deterministic sanitize-and-warn behavior; authentication, tool authorization, abuse controls, malformed requests, and upstream failures remain independently enforceable.

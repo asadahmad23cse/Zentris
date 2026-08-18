@@ -1,87 +1,139 @@
+import { isIP } from "node:net";
+import dlpCatalog from "../security/dlp-rules.json";
+import { type SecurityFinding, type SecurityFindingStage } from "../types";
+
 interface DlpPattern {
+  id: string;
   type: string;
+  category: "credential" | "personal" | "financial" | "network" | "health";
   regex: RegExp;
   validate?: (match: string) => boolean;
 }
 
-interface MatchRange {
+interface CatalogDlpRule {
+  id: string;
   type: string;
+  category: DlpPattern["category"];
+  pattern: string;
+  flags: string;
+  validator?: "luhn" | "aadhaar" | "iban" | "ip" | "date" | "encoded_secret";
+}
+
+interface MatchRange {
+  rule: DlpPattern;
   start: number;
   end: number;
   length: number;
 }
 
+export interface DlpFinding extends SecurityFinding {
+  type: string;
+  start: number;
+  end: number;
+}
+
 export interface DlpResult {
   redacted: string;
   detectedTypes: string[];
-  findings: Array<{ type: string; start: number; end: number }>;
+  findings: DlpFinding[];
 }
 
-/** Luhn algorithm — validates credit/debit card numbers to prevent false positives */
 const luhnCheck = (raw: string): boolean => {
-  const digits = raw.replace(/[\s-]/g, "");
+  const digits = raw.replace(/[^0-9]/g, "");
   if (!/^\d{13,19}$/.test(digits)) return false;
   let sum = 0;
   let alternate = false;
-  for (let i = digits.length - 1; i >= 0; i--) {
-    let n = parseInt(digits[i], 10);
-    if (alternate) { n *= 2; if (n > 9) n -= 9; }
-    sum += n;
+  for (let index = digits.length - 1; index >= 0; index -= 1) {
+    let digit = Number.parseInt(digits[index], 10);
+    if (alternate) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
+    }
+    sum += digit;
     alternate = !alternate;
   }
   return sum % 10 === 0;
 };
 
-const DLP_PATTERNS: ReadonlyArray<DlpPattern> = [
-  // ── Credential patterns (highest priority) ──────────────────────────────
-  { type: "ANTHROPIC_KEY",  regex: /\bsk-ant-[A-Za-z0-9_-]{90,}\b/g },
-  { type: "OPENAI_KEY",     regex: /\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b/g },
-  { type: "GEMINI_KEY",     regex: /\bAIza[A-Za-z0-9_-]{35,}\b/g },
-  { type: "GITHUB_TOKEN",   regex: /\bghp_[A-Za-z0-9]{36,}\b/g },
-  { type: "AWS_ACCESS_KEY", regex: /\bAKIA[A-Z0-9]{16}\b/g },
-  { type: "JWT_TOKEN",      regex: /\b[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g },
-  {
-    type: "PRIVATE_KEY",
-    regex: /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z0-9 ]*PRIVATE KEY-----/g
-  },
-  {
-    type: "DATABASE_URL",
-    regex: /\b(?:postgres(?:ql)?|mysql|mariadb|mongodb(?:\+srv)?|redis|mssql|oracle):\/\/[^\s'"`]+/gi
-  },
-  { type: "BASIC_AUTH",   regex: /\bBasic\s+[A-Za-z0-9+/=]{20,}\b/g },
-  { type: "BEARER_TOKEN", regex: /\bBearer\s+[A-Za-z0-9._-]{20,}\b/g },
-  {
-    type: "API_KEY",
-    regex: /\b(?:api[_-]?key|api[_-]?secret|access[_-]?token|auth[_-]?token|secret[_-]?key)\s*[:=]\s*["']?[A-Za-z0-9+/_=.-]{16,}["']?/gi
-  },
-  {
-    type: "GENERIC_ASSIGNMENT_SECRET",
-    regex: /\b(?:secret|token|password)\b\s*[:=]\s*["']?[A-Za-z0-9+/_=-]{16,}["']?/gi
-  },
-  // ── PII patterns ─────────────────────────────────────────────────────────
-  { type: "EMAIL", regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g },
-  { type: "SSN",   regex: /\b\d{3}-\d{2}-\d{4}\b/g },
-  // Phone: Indian (+91 prefix or standalone 10-digit starting 6-9), and international E.164
-  {
-    type: "PHONE",
-    regex: /(?:\+91[\s-]?(?:\d[\s-]?){9,10}\d|\b[6-9]\d{9}\b|\+?1[\s.-]\d{3}[\s.-]\d{3}[\s.-]\d{4}|\+\d{1,3}[\s.-]\d{2,4}[\s.-]\d{4}[\s.-]\d{4})/g
-  },
-  // Credit/debit card — Luhn-validated to prevent false positives on phone numbers
-  {
-    type: "CREDIT_CARD",
-    regex: /\b(?:\d[ -]?){13,19}\b/g,
-    validate: luhnCheck
+const VERHOEFF_D = [
+  [0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],
+  [5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]
+] as const;
+const VERHOEFF_P = [
+  [0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],
+  [9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]
+] as const;
+
+const aadhaarCheck = (raw: string): boolean => {
+  const digits = raw.replace(/\D/g, "");
+  if (!/^[2-9]\d{11}$/.test(digits)) return false;
+  let checksum = 0;
+  const reversed = [...digits].reverse();
+  for (let index = 0; index < reversed.length; index += 1) {
+    checksum = VERHOEFF_D[checksum][VERHOEFF_P[index % 8][Number.parseInt(reversed[index], 10)]];
   }
-];
+  return checksum === 0;
+};
+
+const ibanCheck = (raw: string): boolean => {
+  const iban = raw.replace(/\s/g, "").toUpperCase();
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(iban)) return false;
+  const rearranged = `${iban.slice(4)}${iban.slice(0, 4)}`;
+  let remainder = 0;
+  for (const character of rearranged) {
+    const expanded = /[A-Z]/.test(character) ? String(character.charCodeAt(0) - 55) : character;
+    for (const digit of expanded) remainder = (remainder * 10 + Number.parseInt(digit, 10)) % 97;
+  }
+  return remainder === 1;
+};
+
+const ipCheck = (raw: string): boolean => isIP(raw.replace(/^\[|\]$/g, "")) !== 0;
+const dateCheck = (raw: string): boolean => {
+  const value = raw.match(/\b(?:dob|date\s+of\s+birth|birthdate)\s*[:=]?\s*([^,;\n]+)/i)?.[1]?.trim() ?? "";
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) && timestamp <= Date.now();
+};
+
+const encodedSecretCheck = (raw: string): boolean => {
+  try {
+    const decoded = /^[A-Fa-f0-9]+$/.test(raw) && raw.length % 2 === 0
+      ? Buffer.from(raw, "hex").toString("utf8")
+      : Buffer.from(raw, "base64").toString("utf8");
+    if (!decoded || decoded.includes("\uFFFD")) return false;
+    return DLP_PATTERNS.some((rule) => {
+      if (rule.category !== "credential" || rule.id.startsWith("encoded_")) return false;
+      rule.regex.lastIndex = 0;
+      const match = rule.regex.exec(decoded);
+      return Boolean(match && (!rule.validate || rule.validate(match[0])));
+    });
+  } catch {
+    return false;
+  }
+};
+
+const p = (id: string, type: string, category: DlpPattern["category"], regex: RegExp, validate?: DlpPattern["validate"]): DlpPattern =>
+  ({ id, type, category, regex, ...(validate ? { validate } : {}) });
+
+const validatorMap: Record<NonNullable<CatalogDlpRule["validator"]>, DlpPattern["validate"]> = {
+  luhn: luhnCheck,
+  aadhaar: aadhaarCheck,
+  iban: ibanCheck,
+  ip: ipCheck,
+  date: dateCheck,
+  encoded_secret: encodedSecretCheck
+};
+
+const catalog = dlpCatalog as { version: number; rules: CatalogDlpRule[] };
+if (catalog.version !== 1) throw new Error(`Unsupported DLP catalog version: ${catalog.version}`);
+
+const DLP_PATTERNS: ReadonlyArray<DlpPattern> = catalog.rules.map((rule) =>
+  p(rule.id, rule.type, rule.category, new RegExp(rule.pattern, rule.flags), rule.validator ? validatorMap[rule.validator] : undefined)
+);
 
 const ENTROPY_CANDIDATE_REGEX = /\b[A-Za-z0-9+/_=-]{24,}\b/g;
-
 const shannonEntropy = (value: string): number => {
   const frequencies = new Map<string, number>();
-  for (const char of value) {
-    frequencies.set(char, (frequencies.get(char) ?? 0) + 1);
-  }
-
+  for (const character of value) frequencies.set(character, (frequencies.get(character) ?? 0) + 1);
   let entropy = 0;
   for (const count of frequencies.values()) {
     const probability = count / value.length;
@@ -90,180 +142,80 @@ const shannonEntropy = (value: string): number => {
   return entropy;
 };
 
-const isEntropySecretCandidate = (token: string): boolean => {
-  if (token.length < 24) {
-    return false;
-  }
-  if (!/[A-Za-z]/.test(token) || !/\d/.test(token)) {
-    return false;
-  }
-  if (/^[A-Fa-f0-9]+$/.test(token)) {
-    return false;
-  }
-  if (token.startsWith("http") || token.includes("://")) {
-    return false;
-  }
-  const entropy = shannonEntropy(token);
-  return entropy >= 3.6;
-};
+const entropyRule = p("high_entropy_secret", "HIGH_ENTROPY_SECRET", "credential", ENTROPY_CANDIDATE_REGEX);
+const isEntropySecretCandidate = (token: string): boolean =>
+  token.length >= 24 && /[A-Za-z]/.test(token) && /\d/.test(token) && !/^[A-Fa-f0-9]+$/.test(token) && !token.includes("://") && shannonEntropy(token) >= 3.8;
 
-const collectPatternMatches = (text: string): MatchRange[] => {
+const collectMatches = (text: string): MatchRange[] => {
   const matches: MatchRange[] = [];
-
-  for (const pattern of DLP_PATTERNS) {
-    pattern.regex.lastIndex = 0;
-    let result = pattern.regex.exec(text);
-
-    while (result) {
-      const value = result[0];
-      const start = result.index;
-      const end = start + value.length;
-
-      // Skip if pattern has a validator and it returns false (e.g. Luhn check for credit cards)
-      if (pattern.validate && !pattern.validate(value)) {
-        if (pattern.regex.lastIndex === result.index) {
-          pattern.regex.lastIndex += 1;
-        }
-        result = pattern.regex.exec(text);
-        continue;
+  for (const rule of DLP_PATTERNS) {
+    rule.regex.lastIndex = 0;
+    let result: RegExpExecArray | null;
+    while ((result = rule.regex.exec(text)) !== null) {
+      if (!rule.validate || rule.validate(result[0])) {
+        matches.push({ rule, start: result.index, end: result.index + result[0].length, length: result[0].length });
       }
-
-      matches.push({
-        type: pattern.type,
-        start,
-        end,
-        length: value.length
-      });
-
-      if (pattern.regex.lastIndex === result.index) {
-        pattern.regex.lastIndex += 1;
-      }
-      result = pattern.regex.exec(text);
+      if (rule.regex.lastIndex === result.index) rule.regex.lastIndex += 1;
     }
   }
-
-  return matches;
-};
-
-const collectEntropyMatches = (text: string): MatchRange[] => {
-  const matches: MatchRange[] = [];
   ENTROPY_CANDIDATE_REGEX.lastIndex = 0;
-  let result = ENTROPY_CANDIDATE_REGEX.exec(text);
-
-  while (result) {
-    const value = result[0];
-    const start = result.index;
-    const end = start + value.length;
-
-    if (isEntropySecretCandidate(value)) {
-      matches.push({
-        type: "HIGH_ENTROPY_SECRET",
-        start,
-        end,
-        length: value.length
-      });
+  let entropyMatch: RegExpExecArray | null;
+  while ((entropyMatch = ENTROPY_CANDIDATE_REGEX.exec(text)) !== null) {
+    if (isEntropySecretCandidate(entropyMatch[0])) {
+      matches.push({ rule: entropyRule, start: entropyMatch.index, end: entropyMatch.index + entropyMatch[0].length, length: entropyMatch[0].length });
     }
-
-    if (ENTROPY_CANDIDATE_REGEX.lastIndex === result.index) {
-      ENTROPY_CANDIDATE_REGEX.lastIndex += 1;
-    }
-    result = ENTROPY_CANDIDATE_REGEX.exec(text);
   }
-
   return matches;
 };
 
 const selectLongestNonOverlapping = (matches: MatchRange[]): MatchRange[] => {
-  const byLongestFirst = [...matches].sort((a, b) => {
-    if (b.length !== a.length) {
-      return b.length - a.length;
-    }
-    return a.start - b.start;
-  });
-
   const selected: MatchRange[] = [];
-  for (const candidate of byLongestFirst) {
-    const hasOverlap = selected.some(
-      (existing) => candidate.start < existing.end && candidate.end > existing.start
-    );
-    if (!hasOverlap) {
-      selected.push(candidate);
-    }
+  for (const candidate of [...matches].sort((a, b) =>
+    b.length - a.length || Number(Boolean(b.rule.validate)) - Number(Boolean(a.rule.validate)) || a.start - b.start
+  )) {
+    if (!selected.some((existing) => candidate.start < existing.end && candidate.end > existing.start)) selected.push(candidate);
   }
-
   return selected.sort((a, b) => a.start - b.start);
 };
 
-export const scanAndRedactSensitiveData = (text: string): DlpResult => {
-  if (!text || text.length === 0) {
-    return { redacted: text, detectedTypes: [], findings: [] };
-  }
-
-  const matches = selectLongestNonOverlapping([
-    ...collectPatternMatches(text),
-    ...collectEntropyMatches(text)
-  ]);
-
-  if (matches.length === 0) {
-    return { redacted: text, detectedTypes: [], findings: [] };
-  }
-
+export const scanAndRedactSensitiveData = (text: string, stage: SecurityFindingStage = "input"): DlpResult => {
+  if (!text) return { redacted: text, detectedTypes: [], findings: [] };
+  const matches = selectLongestNonOverlapping(collectMatches(text));
   let cursor = 0;
   let redacted = "";
-  const detectedTypes: string[] = [];
-  const findings: Array<{ type: string; start: number; end: number }> = [];
-
+  const findings: DlpFinding[] = [];
   for (const match of matches) {
-    redacted += text.slice(cursor, match.start);
-    redacted += `[REDACTED:${match.type}]`;
+    redacted += `${text.slice(cursor, match.start)}[REDACTED:${match.rule.type}]`;
     cursor = match.end;
-    detectedTypes.push(match.type);
-    findings.push({ type: match.type, start: match.start, end: match.end });
+    findings.push({
+      kind: match.rule.category === "credential" ? "secret" : "pii",
+      ruleId: match.rule.id,
+      category: match.rule.category,
+      stage,
+      risk: match.rule.category === "credential" ? "high" : "medium",
+      score: match.rule.category === "credential" ? 90 : 60,
+      action: "redact",
+      type: match.rule.type,
+      start: match.start,
+      end: match.end
+    });
   }
-
   redacted += text.slice(cursor);
-
-  return {
-    redacted,
-    detectedTypes: Array.from(new Set(detectedTypes)),
-    findings
-  };
+  return { redacted, detectedTypes: Array.from(new Set(findings.map((finding) => finding.type))), findings };
 };
 
 const sanitizeUnknown = (value: unknown, visited: WeakSet<object>): unknown => {
-  if (typeof value === "string") {
-    return scanAndRedactSensitiveData(value).redacted;
-  }
-
-  if (value === null || value === undefined) {
-    return value;
-  }
-
-  if (Array.isArray(value)) {
-    return value.map((entry) => sanitizeUnknown(entry, visited));
-  }
-
-  if (value instanceof Error) {
-    const safeMessage = scanAndRedactSensitiveData(value.message).redacted;
-    return {
-      name: value.name,
-      message: safeMessage
-    };
-  }
-
+  if (typeof value === "string") return scanAndRedactSensitiveData(value).redacted;
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) return value.map((entry) => sanitizeUnknown(entry, visited));
+  if (value instanceof Error) return { name: value.name, message: scanAndRedactSensitiveData(value.message).redacted };
   if (typeof value === "object") {
-    if (visited.has(value)) {
-      return "[Circular]";
-    }
+    if (visited.has(value)) return "[Circular]";
     visited.add(value);
-
     const output: Record<string, unknown> = {};
-    for (const [key, entry] of Object.entries(value)) {
-      output[key] = sanitizeUnknown(entry, visited);
-    }
+    for (const [key, entry] of Object.entries(value)) output[key] = sanitizeUnknown(entry, visited);
     return output;
   }
-
   return value;
 };
 

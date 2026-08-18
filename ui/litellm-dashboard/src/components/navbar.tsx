@@ -43,13 +43,12 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const baseUrl = getProxyBaseUrl();
   const [logoutUrl, setLogoutUrl] = useState("");
-  useTheme();
+  const { logoUrl } = useTheme();
   const { data: healthData } = useHealthReadiness();
   const version = healthData?.Zentris_version;
   const disableBouncingIcon = useDisableBouncingIcon();
 
-  // Simple logo URL: use custom logo if available, otherwise default
-  const imageUrl = "/assets/logos/zentris_logo.svg";
+  const imageUrl = logoUrl || "/assets/logos/zentris_logo.svg";
 
   useEffect(() => {
     const initializeProxySettings = async () => {
@@ -143,6 +142,14 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
           {/* Right side nav items */}
           <div className="flex items-center gap-3 ml-auto">
+            <a
+              href="https://github.com/asadahmad23cse/Zentris#readme"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex text-sm font-medium text-slate-600 hover:text-slate-950"
+            >
+              Docs
+            </a>
             <div
               className="hidden lg:flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700"
               role="status"

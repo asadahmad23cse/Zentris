@@ -1,25 +1,105 @@
 services:
+  - type: keyvalue
+    name: zentris-redis
+    plan: starter
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+    persistenceMode: journal-snapshot
+
+  - type: pserv
+    name: zentris-litellm
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerCommand: --config=/app/proxy_server_config.production.yaml --port 10000
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: zentris-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: zentris-redis
+          property: connectionString
+      - key: LITELLM_MASTER_KEY
+        generateValue: true
+      - key: UI_USERNAME
+        value: admin
+      - key: UI_PASSWORD
+        sync: false
+      - key: STORE_MODEL_IN_DB
+        value: "True"
+      - key: OPENAI_API_KEY
+        sync: false
+
   - type: web
     name: zentris-api
-    runtime: node
-    buildCommand: npm install && npm run build
-    startCommand: node dist/server.js
-    healthCheckPath: /health
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./docker/Dockerfile.gateway
+    healthCheckPath: /health/readiness
     autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
-      - key: ZENTRIS_DEMO_ENABLED
+      - key: ZENTRIS_STRICT_CONFIG
         value: "true"
+      - key: ZENTRIS_DEMO_ENABLED
+        value: "false"
       - key: PORT
         value: "10000"
       - key: REDIS_URL
-        sync: false
-      - key: LITELLM_BASE_URL
-        sync: false
+        fromService:
+          type: keyvalue
+          name: zentris-redis
+          property: connectionString
+      - key: LITELLM_HOSTPORT
+        fromService:
+          type: pserv
+          name: zentris-litellm
+          property: hostport
       - key: LITELLM_API_KEY
-        sync: false
+        fromService:
+          type: pserv
+          name: zentris-litellm
+          envVarKey: LITELLM_MASTER_KEY
+      - key: LITELLM_MODEL
+        value: gpt-4o-mini
       - key: JWT_SECRET
-        sync: false
+        generateValue: true
       - key: CONFIRMATION_TOKEN_SECRET
+        generateValue: true
+      - key: LOG_LEVEL
+        value: info
+      - key: WEB_CONCURRENCY
+        value: "2"
+      - key: PUBLIC_WEB_ORIGIN
         sync: false
+
+  - type: worker
+    name: zentris-telemetry-worker
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m zentris_security.telemetry_worker
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: zentris-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: zentris-redis
+          property: connectionString
+      - key: LOG_LEVEL
+        value: INFO
+
+databases:
+  - name: zentris-postgres
+    plan: basic-256mb
+    databaseName: litellm
+    user: llmproxy
+    postgresMajorVersion: "16"
+    ipAllowList: []

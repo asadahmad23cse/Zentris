@@ -5,11 +5,26 @@ import { useUIConfig } from "@/app/(dashboard)/hooks/uiConfig/useUIConfig";
 import LoadingScreen from "@/components/common_components/LoadingScreen";
 import { getProxyBaseUrl, switchToWorkerUrl } from "@/components/networking";
 import { consumeReturnUrl } from "@/utils/returnUrlUtils";
+import { getCookie } from "@/utils/cookieUtils";
+import { isJwtExpired } from "@/utils/jwtUtils";
 import { InfoCircleOutlined, CloudServerOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Form, Input, Popover, Select, Space, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useWorker } from "@/hooks/useWorker";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const hasTrustedJwtShape = (token: string): boolean => {
+  const [headerSegment, , signatureSegment] = token.split(".");
+  if (!headerSegment || !signatureSegment || signatureSegment === "public") return false;
+  try {
+    const padded = headerSegment.padEnd(headerSegment.length + ((4 - (headerSegment.length % 4)) % 4), "=");
+    const header = JSON.parse(atob(padded.replace(/-/g, "+").replace(/_/g, "/")));
+    return header?.alg === "HS256";
+  } catch {
+    return false;
+  }
+};
 
 function LoginPageContent() {
   const [username, setUsername] = useState("");
@@ -25,18 +40,6 @@ function LoginPageContent() {
       return "/model_hub";
     }
     return "/ui/model_hub";
-  };
-
-  const installPublicDashboardToken = async () => {
-    const response = await fetch(`${getProxyBaseUrl()}/public/dashboard-token`, { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error("Unable to create public dashboard session");
-    }
-    const data = await response.json();
-    if (!data?.token) {
-      throw new Error("Public dashboard session did not return a token");
-    }
-    document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
   };
 
   // Pre-select worker from URL param (e.g. /ui/login?worker=team-b)
@@ -59,9 +62,18 @@ function LoginPageContent() {
       return;
     }
 
-    installPublicDashboardToken()
-      .then(() => router.replace(consumeReturnUrl() || dashboardHome()))
-      .catch(() => setIsLoading(false));
+    const existingToken = getCookie("token");
+    if (existingToken && hasTrustedJwtShape(existingToken) && !isJwtExpired(existingToken)) {
+      router.replace("/ui");
+      return;
+    }
+
+    if (uiConfig?.auto_redirect_to_sso && uiConfig.sso_configured) {
+      router.push(`${getProxyBaseUrl()}/sso/key/generate`);
+      return;
+    }
+
+    setIsLoading(false);
   }, [isConfigLoading, router, uiConfig]);
 
   const handleSubmit = () => {
@@ -290,7 +302,14 @@ function LoginPageContent() {
 }
 
 export default function LoginPage() {
-  return <LoginPageContent />;
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  }));
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LoginPageContent />
+    </QueryClientProvider>
+  );
 }
 
 

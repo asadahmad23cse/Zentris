@@ -8,7 +8,7 @@ type ChatMessage = {
   timestamp: number;
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_ZENTRIS_API_URL || "https://zentris-api.onrender.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_ZENTRIS_API_URL || "";
 
 export default function PublicChatPage() {
   const [input, setInput] = useState("");

@@ -4,7 +4,6 @@ import { RagSecurityGuard } from "../guards/ragSecurityGuard";
 import { wrapUntrustedData } from "../guards/ragWrapper";
 import { type LLMChat, ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
-import { createAccessToken } from "../auth/jwt";
 import { LiteLLMClient, LiteLLMError } from "../llm/litellmClient";
 import { type AuthenticatedIdentity, type ChatMessage, type ToolInvocation } from "../types";
 
@@ -163,13 +162,10 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
   const pipeline = new ZentrisPipeline({ litellmChat: options.litellmChat });
   const llmStatusChat = options.litellmChat ?? ((messages, llmOptions) => new LiteLLMClient().chat(messages, llmOptions));
 
-  app.get("/.well-known/litellm-ui-config", async (request) => {
-    const host = request.headers.host;
-    const protocol = host?.includes("localhost") ? "http" : "https";
-
+  app.get("/.well-known/litellm-ui-config", async () => {
     return {
       server_root_path: "/",
-      proxy_base_url: host ? `${protocol}://${host}` : null,
+      proxy_base_url: null,
       auto_redirect_to_sso: false,
       admin_ui_disabled: false,
       sso_configured: false,
@@ -188,6 +184,11 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
   app.get("/public/agent_hub", async () => []);
   app.get("/public/mcp_hub", async () => []);
 
+  // Provider-backed public probes/chat exist only in the explicit demo runtime
+  // or when a test injects a bounded fake model. Production inference always
+  // requires a LiteLLM virtual key through /v1/chat or /v1/chat/completions.
+  if (!config.ZENTRIS_DEMO_ENABLED && !options.litellmChat) return;
+
   app.get(
     "/public/llm-status",
     {
@@ -205,7 +206,6 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
         return {
           status: "not_configured",
           model: config.LITELLM_MODEL,
-          baseUrl: config.LITELLM_BASE_URL,
           keyConfigured: false,
           error: "LITELLM_API_KEY is missing or too short"
         };
@@ -228,47 +228,23 @@ const publicRoutes: FastifyPluginAsync<PublicRouteOptions> = async (app, options
           { model: config.LITELLM_MODEL, temperature: 0, maxTokens: 8 }
         );
 
+        const sample = typeof response === "string" ? response : response.content;
         return {
           status: "ok",
           model: config.LITELLM_MODEL,
-          baseUrl: config.LITELLM_BASE_URL,
           keyConfigured: true,
-          sample: response.slice(0, 40)
+          sample: sample.slice(0, 40)
         };
       } catch (error) {
         return {
           status: "upstream_error",
           model: config.LITELLM_MODEL,
-          baseUrl: config.LITELLM_BASE_URL,
           keyConfigured: true,
           error: summarizeLLMError(error)
         };
       }
     }
   );
-
-  app.get("/public/dashboard-token", async () => {
-    const now = Math.floor(Date.now() / 1000);
-    const token = createAccessToken(
-      {
-        sub: "public-admin",
-        role: "admin",
-        key: "public-admin",
-        user_id: "public-admin",
-        user_email: "admin@zentris.local",
-        user_role: "proxy_admin",
-        login_method: "public_access",
-        premium_user: false,
-        exp: now + 7 * 24 * 60 * 60
-      },
-      config.JWT_SECRET
-    );
-
-    return {
-      token,
-      expires_in: 7 * 24 * 60 * 60
-    };
-  });
 
   app.post<{ Body: PublicChatBody }>(
     "/v1/public/chat",

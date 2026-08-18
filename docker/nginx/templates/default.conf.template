@@ -1,16 +1,21 @@
-upstream litellm_upstream {
+upstream gateway_upstream {
+    zone gateway_upstream 64k;
     least_conn;
-    server litellm:4000;
+    server gateway:3000 resolve;
 }
 
 upstream dashboard_upstream {
+    zone dashboard_upstream 64k;
     least_conn;
-    server dashboard:3000;
+    server dashboard:3000 resolve;
 }
+
+# Docker's embedded DNS tracks service IPs across container recreation.
+resolver 127.0.0.11 valid=5s ipv6=off;
 
 server {
     listen 80;
-    server_name ${NGINX_SERVER_NAME:-_};
+    server_name _;
 
     # Security headers
     add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' http: https: ws: wss:; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
@@ -25,10 +30,11 @@ server {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
 
-    # LiteLLM proxy routes
-    location ~ ^/(v1|v2|key|team|user|model|health|metrics|compliance|chat|embeddings|responses|audio|image|moderations|assistants|threads|files|fine_tuning|batches|organization|project|guardrails|spend|budget)(/|$) {
-        proxy_pass http://litellm_upstream;
+    # All API and management traffic passes through the Zentris gateway.
+    location ~ ^/(v1|v2|v3|key|team|user|model|health|metrics|compliance|chat|embeddings|responses|audio|image|moderations|assistants|threads|files|fine_tuning|batches|organization|project|guardrails|spend|budget|global|sso|public|\.well-known)(/|$) {
+        proxy_pass http://gateway_upstream;
         proxy_read_timeout 300s;
+        proxy_buffering off;
     }
 
     # Dashboard routes

@@ -15,7 +15,7 @@ def test_audit_write_and_replay(tmp_path: Path):
     replayed = replay_audit(audit_path, pipeline)
 
     assert len(replayed) == 1
-    assert replayed[0].action.value == "block"
+    assert replayed[0].action.value == "sanitize"
 
 
 def test_red_team_simulator_passes_fixture_cases():

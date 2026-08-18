@@ -43,15 +43,20 @@ class SecurityPolicy:
                 sanitized_prompt=sanitized_prompt,
             )
 
+        injection_prefixes = ("ZPI-", "ZII-", "ZRP-")
+        enforcement_findings = [finding for finding in findings if not finding.rule_id.startswith(injection_prefixes)]
+        injection_detected = len(enforcement_findings) != len(findings)
         max_score = max(finding.score for finding in findings)
         risk = max((finding.risk for finding in findings), key=lambda item: RISK_ORDER[item])
-        action = max((finding.action for finding in findings), key=lambda item: ACTION_ORDER[item])
+        action = max((finding.action for finding in enforcement_findings), key=lambda item: ACTION_ORDER[item], default=Action.SANITIZE if injection_detected else Action.ALLOW)
 
-        if max_score >= self.block_threshold or risk == RiskLevel.CRITICAL:
+        enforcement_max_score = max((finding.score for finding in enforcement_findings), default=0.0)
+        enforcement_risk = max((finding.risk for finding in enforcement_findings), key=lambda item: RISK_ORDER[item], default=RiskLevel.NONE)
+        if enforcement_max_score >= self.block_threshold or enforcement_risk == RiskLevel.CRITICAL:
             action = Action.BLOCK
-        elif max_score >= self.approval_threshold and action != Action.BLOCK:
+        elif enforcement_max_score >= self.approval_threshold and action != Action.BLOCK:
             action = Action.REQUIRE_APPROVAL
-        elif max_score >= self.sanitize_threshold and action == Action.ALLOW:
+        elif (max_score >= self.sanitize_threshold or injection_detected) and action == Action.ALLOW:
             action = Action.SANITIZE
 
         return SecurityDecision(

@@ -1,0 +1,21 @@
+# Minimal production bootstrap configuration. Additional provider models can be
+# created through the authenticated LiteLLM dashboard and stored in PostgreSQL.
+# Test fixtures and fake upstreams intentionally remain in proxy_server_config.yaml.
+model_list:
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+litellm_settings:
+  drop_params: true
+  num_retries: 0
+  request_timeout: 30
+  telemetry: false
+  success_callback: ["prometheus"]
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  store_model_in_db: true
+  database_connection_pool_limit: 10
+  proxy_batch_write_at: 1

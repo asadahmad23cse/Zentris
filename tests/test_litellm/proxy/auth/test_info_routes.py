@@ -124,6 +124,31 @@ def test_v2_user_info_route_in_info_routes():
     assert "/v2/user/info" in LiteLLMRoutes.info_routes.value
 
 
+def test_zentris_self_introspection_is_an_authenticated_info_route():
+    assert "/v1/zentris/auth/introspect" in LiteLLMRoutes.info_routes.value
+    assert RouteChecks.is_info_route("/v1/zentris/auth/introspect") is True
+
+
+def test_zentris_admin_routes_defer_authorization_to_endpoint_dependency():
+    user_obj = LiteLLM_UserTable(
+        user_id="test_user",
+        user_email="test@example.com",
+        user_role=LitellmUserRoles.INTERNAL_USER,
+    )
+    valid_token = UserAPIKeyAuth(user_id="test_user")
+    request = MagicMock(spec=Request)
+    request.query_params = {}
+
+    RouteChecks.non_proxy_admin_allowed_routes_check(
+        user_obj=user_obj,
+        _user_role=LitellmUserRoles.INTERNAL_USER,
+        route="/v1/zentris/history",
+        request=request,
+        valid_token=valid_token,
+        request_data={},
+    )
+
+
 def test_v2_user_info_route_access():
     """Test access control for /v2/user/info route - handled by endpoint itself"""
     user_obj = LiteLLM_UserTable(

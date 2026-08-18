@@ -10,9 +10,10 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/server.js",
+    "start": "node dist/cluster.js",
     "test": "node scripts/run-node-tests.mjs",
     "test:integration": "tsx --test src/tests/integration.test.ts",
+    "benchmark:security": "npm run build && node scripts/benchmark-security.mjs",
     "audit:prod": "npm audit --audit-level=high"
   },
   "dependencies": {

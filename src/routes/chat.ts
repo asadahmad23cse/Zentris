@@ -2,11 +2,15 @@ import fp from "fastify-plugin";
 import { type FastifyPluginAsync, type FastifyReply } from "fastify";
 import { RagSecurityGuard, type RagChunkInput } from "../guards/ragSecurityGuard";
 import { StreamingGuard } from "../guards/streamingGuard";
+import { scanAndRedactSensitiveData } from "../guards/dlpGuard";
 import { wrapUntrustedData } from "../guards/ragWrapper";
 import { StreamingClient } from "../llm/streamingClient";
+import { LiteLLMError } from "../llm/litellmClient";
 import { type LLMChat, ZentrisPipeline } from "../middleware/pipeline";
 import { config } from "../config";
 import { StreamAbuseGuard } from "../services/streamAbuseGuard";
+import { CircuitOpenError } from "../services/circuitBreaker";
+import { TelemetryService } from "../services/telemetryService";
 import { type AuthenticatedIdentity, type ChatMessage, type ToolInvocation, type ZentrisRequest } from "../types";
 
 interface ClientMessage {
@@ -22,6 +26,9 @@ interface ChatRouteBody {
   ragContext?: string;
   ragChunks?: RagChunkInput[];
   toolInvocation?: ToolInvocation;
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
 }
 
 export type StreamChat = StreamingClient["streamChat"];
@@ -33,6 +40,13 @@ export interface ChatRouteOptions {
 
 const SESSION_ID_REGEX = /^[A-Za-z0-9-]{1,64}$/;
 
+const upstreamStatus = (error: unknown): number => {
+  if (error instanceof CircuitOpenError) return 503;
+  if (error instanceof LiteLLMError && error.llmReason === "request_timeout") return 504;
+  if (error instanceof LiteLLMError && [401, 403, 429].includes(error.statusCode)) return error.statusCode;
+  return 502;
+};
+
 const bodySchema = {
   type: "object",
   additionalProperties: false,
@@ -40,6 +54,9 @@ const bodySchema = {
   properties: {
     sessionId: { type: "string", maxLength: 64, pattern: "^[A-Za-z0-9-]{1,64}$" },
     message: { type: "string", minLength: 1, maxLength: 8000 },
+    model: { type: "string", minLength: 1, maxLength: 256 },
+    temperature: { type: "number", minimum: 0, maximum: 2 },
+    maxTokens: { type: "integer", minimum: 1, maximum: 131072 },
     ragContext: { type: "string" },
     ragChunks: {
       type: "array",
@@ -93,7 +110,7 @@ const hasClientSystemRole = (history: ClientMessage[] | undefined): boolean =>
 
 const normalizeClientHistory = (history: ClientMessage[] | undefined): ChatMessage[] =>
   (history ?? []).slice(-config.MAX_SESSION_MESSAGES).map((message) => ({
-    role: "user",
+    role: message.role,
     content: message.content,
     timestamp: message.timestamp
   }));
@@ -110,6 +127,12 @@ const buildRagInputs = (body: ChatRouteBody): RagChunkInput[] => {
 
   return chunks;
 };
+
+const telemetryModelParameters = (body: ChatRouteBody, stream: boolean): Record<string, unknown> => ({
+  ...(body.temperature !== undefined ? { temperature: body.temperature } : {}),
+  ...(body.maxTokens !== undefined ? { max_tokens: body.maxTokens } : {}),
+  stream
+});
 
 const toZentrisRequest = async (
   body: ChatRouteBody,
@@ -139,7 +162,12 @@ const toZentrisRequest = async (
     identity,
     rawInput: body.message,
     messages: boundedHistory,
-    toolInvocation: body.toolInvocation
+    toolInvocation: body.toolInvocation,
+    generation: {
+      model: body.model,
+      temperature: body.temperature,
+      maxTokens: body.maxTokens
+    }
   };
 };
 
@@ -166,6 +194,7 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
     config.STREAMING_ROLLING_BUFFER_CHARS,
     config.STREAMING_SUSPICIOUS_EVENT_LIMIT
   );
+  const telemetry = new TelemetryService();
 
   app.post<{ Body: ChatRouteBody }>(
     "/v1/chat",
@@ -190,6 +219,8 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
     async (request, reply) => {
       const requestId = request.id;
       const body = request.body;
+      const startedAt = Date.now();
+      const rawMessages = [...(body.history ?? []), { role: "user", content: body.message, timestamp: Date.now() }];
 
       if (!SESSION_ID_REGEX.test(body.sessionId)) {
         return sendJsonError(reply, 400, requestId, "high", {
@@ -203,15 +234,61 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
         });
       }
 
-      const pipelineResult = await pipeline.run(
-        await toZentrisRequest(body, request.identity, ragSecurityGuard)
-      );
+      let pipelineResult;
+      try {
+        pipelineResult = await pipeline.run({
+          ...(await toZentrisRequest(body, request.identity, ragSecurityGuard)),
+          requestId,
+          generation: {
+            model: body.model,
+            temperature: body.temperature,
+            maxTokens: body.maxTokens,
+            apiKey: request.headers.authorization?.startsWith("Bearer ") ? request.headers.authorization.slice(7).trim() : undefined
+          }
+        });
+      } catch (error) {
+        await telemetry.enqueue({
+          requestId, sessionId: body.sessionId, identity: request.identity, route: "/v1/chat",
+          model: body.model ?? config.LITELLM_MODEL, rawMessages, sanitizedMessages: [], status: "failed",
+          modelParameters: telemetryModelParameters(body, false),
+          httpStatus: upstreamStatus(error),
+          failureCode: error instanceof CircuitOpenError ? "circuit_open" : error instanceof LiteLLMError ? error.llmReason : "upstream_unavailable",
+          failureMessage: "Upstream model request failed", latencyMs: Date.now() - startedAt,
+          security: { requestId, injectionDetected: false, warningApplied: false, dlpDetected: false, risk: "none", score: 0, matchedRules: [], findings: [] }
+        });
+        return sendJsonError(reply, upstreamStatus(error), requestId, "low", {
+          error: "Upstream model request failed",
+          reason: error instanceof CircuitOpenError ? "circuit_open" : error instanceof LiteLLMError ? error.llmReason : "upstream_unavailable",
+          requestId
+        });
+      }
+
+      reply
+        .header("X-Zentris-Request-Id", requestId)
+        .header("X-Zentris-Injection-Detected", String(pipelineResult.security.injectionDetected))
+        .header("X-Zentris-Security-Action", pipelineResult.security.injectionDetected ? "warn" : pipelineResult.security.dlpDetected ? "redact" : "allow")
+        .header("X-Zentris-Risk", pipelineResult.security.risk);
+
+      const rejected = pipelineResult.action === "block" || pipelineResult.action === "require_confirmation";
+      void telemetry.enqueue({
+        requestId, sessionId: body.sessionId, identity: request.identity, route: "/v1/chat",
+        model: body.model ?? config.LITELLM_MODEL, rawMessages,
+        modelParameters: telemetryModelParameters(body, false),
+        sanitizedMessages: pipelineResult.modelMessages ?? [],
+        rawResult: pipelineResult.rawResponse === undefined ? undefined : { role: "assistant", content: pipelineResult.rawResponse },
+        sanitizedResult: pipelineResult.response === undefined ? undefined : { role: "assistant", content: pipelineResult.response },
+        status: rejected ? "rejected" : "success",
+        httpStatus: pipelineResult.action === "block" ? 400 : pipelineResult.action === "require_confirmation" ? 202 : 200,
+        failureCode: rejected ? pipelineResult.guardResult.reason : undefined,
+        latencyMs: Date.now() - startedAt, security: pipelineResult.security
+      });
 
       if (pipelineResult.action === "block") {
         return sendJsonError(reply, 400, requestId, pipelineResult.riskLevel, {
           error: "Request blocked",
           reason: pipelineResult.guardResult.reason,
-          requestId
+          requestId,
+          security: pipelineResult.security
         });
       }
 
@@ -223,7 +300,8 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
           .send({
             requiresConfirmation: true,
             message: "High risk action requires confirmation",
-            confirmationToken: pipelineResult.confirmationToken ?? null
+            confirmationToken: pipelineResult.confirmationToken ?? null,
+            security: pipelineResult.security
           });
       }
 
@@ -234,7 +312,8 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
         .send({
           response: pipelineResult.response ?? "",
           requestId,
-          riskLevel: pipelineResult.riskLevel
+          riskLevel: pipelineResult.riskLevel,
+          security: pipelineResult.security
         });
     }
   );
@@ -268,6 +347,8 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
     async (request, reply) => {
       const requestId = request.id;
       const body = request.body;
+      const startedAt = Date.now();
+      const rawMessages = [...(body.history ?? []), { role: "user", content: body.message, timestamp: Date.now() }];
 
       if (!SESSION_ID_REGEX.test(body.sessionId)) {
         return sendJsonError(reply, 400, requestId, "high", {
@@ -282,10 +363,26 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
       }
 
       const guardOutcome = await pipeline.runGuards(
-        await toZentrisRequest(body, request.identity, ragSecurityGuard)
+        {
+          ...(await toZentrisRequest(body, request.identity, ragSecurityGuard)),
+          requestId,
+          generation: {
+            model: body.model,
+            temperature: body.temperature,
+            maxTokens: body.maxTokens,
+            apiKey: request.headers.authorization?.startsWith("Bearer ") ? request.headers.authorization.slice(7).trim() : undefined
+          }
+        }
       );
 
       if (guardOutcome.action === "block") {
+        await telemetry.enqueue({
+          requestId, sessionId: body.sessionId, identity: request.identity, route: "/v1/chat/stream",
+          model: body.model ?? config.LITELLM_MODEL, rawMessages, sanitizedMessages: guardOutcome.llmMessages,
+          modelParameters: telemetryModelParameters(body, true),
+          status: "rejected", httpStatus: 400, failureCode: guardOutcome.guardResult.reason,
+          latencyMs: Date.now() - startedAt, security: guardOutcome.security
+        });
         return sendJsonError(reply, 400, requestId, guardOutcome.riskLevel, {
           error: "Request blocked",
           reason: guardOutcome.guardResult.reason,
@@ -294,6 +391,13 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
       }
 
       if (guardOutcome.action === "require_confirmation") {
+        await telemetry.enqueue({
+          requestId, sessionId: body.sessionId, identity: request.identity, route: "/v1/chat/stream",
+          model: body.model ?? config.LITELLM_MODEL, rawMessages, sanitizedMessages: guardOutcome.llmMessages,
+          modelParameters: telemetryModelParameters(body, true),
+          status: "rejected", httpStatus: 202, failureCode: guardOutcome.guardResult.reason,
+          latencyMs: Date.now() - startedAt, security: guardOutcome.security
+        });
         return reply
           .code(202)
           .header("X-Request-ID", requestId)
@@ -305,17 +409,16 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
           });
       }
 
-      if (await streamAbuseGuard.isSessionWatchdogExceeded(body.sessionId)) {
-        return sendJsonError(reply, 429, requestId, "high", {
-          error: "Request blocked",
-          reason: "stream_session_watchdog_limit_exceeded",
-          requestId
-        });
-      }
-
       const streamId = `${requestId}:${Date.now().toString(36)}`;
       const slotResult = await streamAbuseGuard.acquireSlot(request.identity.userId, body.sessionId, streamId);
       if (!slotResult.allowed) {
+        await telemetry.enqueue({
+          requestId, sessionId: body.sessionId, identity: request.identity, route: "/v1/chat/stream",
+          model: body.model ?? config.LITELLM_MODEL, rawMessages, sanitizedMessages: guardOutcome.llmMessages,
+          modelParameters: telemetryModelParameters(body, true),
+          status: "rejected", httpStatus: 429, failureCode: slotResult.reason ?? "concurrent_stream_limit_exceeded",
+          latencyMs: Date.now() - startedAt, security: guardOutcome.security
+        });
         return sendJsonError(reply, 429, requestId, "high", {
           error: "Request blocked",
           reason: slotResult.reason ?? "concurrent_stream_limit_exceeded",
@@ -332,11 +435,18 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
         "X-Request-ID": requestId,
-        "X-Risk-Level": guardOutcome.riskLevel
+        "X-Risk-Level": guardOutcome.riskLevel,
+        "X-Zentris-Request-Id": requestId,
+        "X-Zentris-Injection-Detected": String(guardOutcome.security.injectionDetected),
+        "X-Zentris-Security-Action": guardOutcome.security.injectionDetected ? "warn" : guardOutcome.security.dlpDetected ? "redact" : "allow",
+        "X-Zentris-Risk": guardOutcome.security.risk
       });
 
       let streamClosed = false;
       let slotReleased = false;
+      let rawOutput = "";
+      let sanitizedOutput = "";
+      let telemetryWrite: Promise<void> = Promise.resolve();
 
       const sendSse = (payload: Record<string, unknown>): void => {
         if (streamClosed || response.writableEnded) {
@@ -369,66 +479,67 @@ const chatRoutes: FastifyPluginAsync<ChatRouteOptions> = async (app, options) =>
 
       request.raw.socket.on("close", disconnectHandler);
 
+      sendSse({ security: guardOutcome.security });
+
       await streamChat(
         streamId,
         guardOutcome.llmMessages,
-        {},
+        guardOutcome.generation ?? {},
         (chunk) => {
+          rawOutput += chunk;
           const inspection = streamingGuard.inspectChunk(chunk, streamState);
           if (inspection.detectedTypes.length > 0) {
-            void (async () => {
-              const sessionTotal = await streamAbuseGuard.recordSuspiciousEvents(
-                body.sessionId,
-                inspection.detectedTypes.length
-              );
-              if (sessionTotal >= config.STREAMING_SESSION_SUSPICIOUS_EVENT_LIMIT) {
-                sendSse({
-                  error: "stream_terminated",
-                  reason: "session_suspicious_event_limit_exceeded"
-                });
-                streamingClient.abortStream(streamId);
-                closeStream();
-              }
-            })();
-          }
-
-          if (inspection.terminate) {
-            sendSse({
-              error: "stream_terminated",
-              reason: inspection.reason ?? "sensitive_pattern"
-            });
-            streamingClient.abortStream(streamId);
-            closeStream();
-            return;
+            request.log.warn({ detectedTypes: inspection.detectedTypes }, "stream_output_redacted");
           }
 
           for (const safeChunk of inspection.redactedChunks) {
+            sanitizedOutput += safeChunk;
             sendSse({ chunk: safeChunk });
           }
         },
         () => {
           const flushInspection = streamingGuard.flush(streamState);
-          if (flushInspection.terminate) {
-            sendSse({
-              error: "stream_terminated",
-              reason: flushInspection.reason ?? "sensitive_pattern"
-            });
-            closeStream();
-            return;
-          }
           for (const safeChunk of flushInspection.redactedChunks) {
+            sanitizedOutput += safeChunk;
             sendSse({ chunk: safeChunk });
           }
-          sendSse({ done: true });
+          const finalScan = scanAndRedactSensitiveData(rawOutput, "output");
+          guardOutcome.security.findings.push(...finalScan.findings);
+          guardOutcome.security.dlpDetected ||= finalScan.findings.length > 0;
+          guardOutcome.security.matchedRules = Array.from(new Set(guardOutcome.security.findings.map((finding) => finding.ruleId)));
+          guardOutcome.security.score = Math.max(guardOutcome.security.score, ...finalScan.findings.map((finding) => finding.score), 0);
+          if (guardOutcome.security.score >= 70) guardOutcome.security.risk = "high";
+          else if (guardOutcome.security.score >= 40) guardOutcome.security.risk = "medium";
+          telemetryWrite = telemetry.enqueue({
+            requestId, sessionId: body.sessionId, identity: request.identity, route: "/v1/chat/stream",
+            model: body.model ?? config.LITELLM_MODEL, rawMessages, sanitizedMessages: guardOutcome.llmMessages,
+            modelParameters: telemetryModelParameters(body, true),
+            rawResult: { role: "assistant", content: rawOutput },
+            sanitizedResult: { role: "assistant", content: sanitizedOutput || finalScan.redacted },
+            status: "success", httpStatus: 200, latencyMs: Date.now() - startedAt, security: guardOutcome.security
+          });
+          sendSse({ security: guardOutcome.security, done: true });
           closeStream();
         },
-        () => {
+        (error) => {
+          telemetryWrite = telemetry.enqueue({
+            requestId, sessionId: body.sessionId, identity: request.identity, route: "/v1/chat/stream",
+            model: body.model ?? config.LITELLM_MODEL, rawMessages, sanitizedMessages: guardOutcome.llmMessages,
+            modelParameters: telemetryModelParameters(body, true),
+            rawResult: rawOutput ? { role: "assistant", content: rawOutput } : undefined,
+            sanitizedResult: sanitizedOutput ? { role: "assistant", content: sanitizedOutput } : undefined,
+            status: "failed", httpStatus: upstreamStatus(error),
+            failureCode: error instanceof LiteLLMError ? error.llmReason : "upstream_unavailable",
+            failureMessage: "Upstream model stream failed", latencyMs: Date.now() - startedAt, security: guardOutcome.security
+          });
           if (!streamClosed) {
             sendSse({ error: "stream_error" });
             closeStream();
           }
         }
       );
+
+      await telemetryWrite;
 
       request.raw.socket.off("close", disconnectHandler);
       await releaseSlot();

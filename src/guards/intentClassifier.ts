@@ -86,8 +86,12 @@ const countOccurrences = (text: string, keyword: string): number => {
 };
 
 const classifyIntentByKeywords = (text: string): Record<IntentType, number> => {
-  const tokens = text.match(TOKEN_PATTERN) ?? [];
+  const tokens = (text.match(TOKEN_PATTERN) ?? []).map((token) => token.toLowerCase());
   const firstTenWords = tokens.slice(0, 10).join(" ");
+  const tokenCounts = new Map<string, number>();
+  const firstWindowCounts = new Map<string, number>();
+  for (const token of tokens) tokenCounts.set(token, (tokenCounts.get(token) ?? 0) + 1);
+  for (const token of tokens.slice(0, 10)) firstWindowCounts.set(token, (firstWindowCounts.get(token) ?? 0) + 1);
   const scores: Record<IntentType, number> = {
     read: 0,
     write: 0,
@@ -98,12 +102,16 @@ const classifyIntentByKeywords = (text: string): Record<IntentType, number> => {
 
   for (const intent of ["read", "write", "delete", "execute"] as const) {
     for (const keyword of INTENT_KEYWORDS[intent]) {
-      const totalMatches = countOccurrences(text, keyword);
+      const totalMatches = keyword.includes(" ")
+        ? countOccurrences(text, keyword)
+        : tokenCounts.get(keyword) ?? 0;
       if (totalMatches === 0) {
         continue;
       }
 
-      const firstWindowMatches = countOccurrences(firstTenWords, keyword);
+      const firstWindowMatches = keyword.includes(" ")
+        ? countOccurrences(firstTenWords, keyword)
+        : firstWindowCounts.get(keyword) ?? 0;
       const laterMatches = Math.max(0, totalMatches - firstWindowMatches);
       scores[intent] += firstWindowMatches * 2 + laterMatches;
     }
@@ -162,7 +170,10 @@ export class IntentClassifier {
       confidence = Math.min(0.99, top.score / Math.max(1, totalScore));
     }
 
-    if (threatClassification.category === "system_prompt_probing" || threatClassification.category === "jailbreak_attempt") {
+    if (
+      (threatClassification.category === "system_prompt_probing" || threatClassification.category === "jailbreak_attempt") &&
+      !["write", "delete", "execute"].includes(intent)
+    ) {
       intent = "unknown";
       confidence = Math.max(confidence, threatClassification.confidence);
     }
@@ -191,13 +202,14 @@ export class IntentClassifier {
     }
 
     const finalRiskScore = Math.min(100, riskScore);
-    const actionTaken = finalRiskScore >= 90 ? "block" : finalRiskScore >= 60 ? "sanitize" : "allow";
+    const injectionThreat = threatClassification.category === "system_prompt_probing" || threatClassification.category === "jailbreak_attempt";
+    const actionTaken = injectionThreat ? "sanitize" : finalRiskScore >= 90 ? "block" : finalRiskScore >= 60 ? "sanitize" : "allow";
     const telemetryConfidence =
       threatClassification.category === "none"
         ? confidence
         : Math.max(confidence, threatClassification.confidence);
 
-    logger.info(
+    logger.debug(
       {
         classifier: "intent_ml_gate",
         intent:

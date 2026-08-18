@@ -44,30 +44,12 @@ export class ExecutionGuard {
       const { injectionResult, contextResult, intentResult, authResult, piiDetected } =
         assertDecisionInputs(context);
 
-      if (injectionResult.safe === false && injectionResult.risk === "high") {
-        return {
-          safe: false,
-          risk: "high",
-          action: "block",
-          reason: "injection_detected_high"
-        };
-      }
-
       if (authResult.authorized === false) {
         return {
           safe: false,
           risk: "high",
           action: "block",
           reason: `unauthorized: ${authResult.reason}`
-        };
-      }
-
-      if (contextResult.riskScore >= 70) {
-        return {
-          safe: false,
-          risk: "high",
-          action: "block",
-          reason: `context_anomaly: ${contextResult.reason}`
         };
       }
 
@@ -93,13 +75,9 @@ export class ExecutionGuard {
             {
               securityEvent: "Privilege Escalation Attempt",
               reason: "ownership_verification_failed",
-              userId: context.request.identity.userId,
               userRole: context.request.identity.userRole,
-              identityTenantId: identityTenantId ?? null,
-              scopeTenantId: scopeTenantId || null,
               sessionId: context.request.sessionId,
-              toolName: context.request.toolInvocation.toolName,
-              resourceScope: context.request.toolInvocation.resourceScope
+              toolName: context.request.toolInvocation.toolName
             },
             "tool_scope_ownership_verification_failed"
           );
@@ -116,13 +94,9 @@ export class ExecutionGuard {
             {
               securityEvent: "Privilege Escalation Attempt",
               reason: "tenant_scope_mismatch",
-              userId: context.request.identity.userId,
               userRole: context.request.identity.userRole,
-              identityTenantId,
-              scopeTenantId,
               sessionId: context.request.sessionId,
-              toolName: context.request.toolInvocation.toolName,
-              resourceScope: context.request.toolInvocation.resourceScope
+              toolName: context.request.toolInvocation.toolName
             },
             "tool_scope_privilege_escalation_attempt"
           );
@@ -167,12 +141,12 @@ export class ExecutionGuard {
         }
       }
 
-      if (injectionResult.risk === "medium" || contextResult.riskScore >= 40) {
+      if (injectionResult.safe === false || contextResult.riskScore >= 40) {
         return {
           safe: false,
-          risk: "medium",
+          risk: injectionResult.risk === "high" || contextResult.riskScore >= 70 ? "high" : "medium",
           action: "sanitize",
-          reason: "elevated_risk"
+          reason: `prompt_injection_warned:${injectionResult.reason};${contextResult.reason}`
         };
       }
 

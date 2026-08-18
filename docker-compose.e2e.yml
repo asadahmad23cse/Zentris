@@ -1,0 +1,35 @@
+# Isolates release-validation state from developer and production volumes and
+# uses an internal deterministic provider. Production configuration is not
+# changed by this override.
+services:
+  mock-provider:
+    image: zentris-litellm:local
+    container_name: zentris_e2e_mock_provider
+    entrypoint: ["python"]
+    command: ["/e2e/e2e_mock_provider.py"]
+    volumes:
+      - ./scripts/e2e_mock_provider.py:/e2e/e2e_mock_provider.py:ro
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/health')\""]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    restart: unless-stopped
+
+  litellm:
+    command: ["--config=/app/proxy_server_config.e2e.yaml", "--port", "4000"]
+    volumes:
+      - ./proxy_server_config.e2e.yaml:/app/proxy_server_config.e2e.yaml:ro
+    depends_on:
+      mock-provider:
+        condition: service_healthy
+
+  gateway:
+    environment:
+      LITELLM_MODEL: "e2e-model"
+
+volumes:
+  postgres_data:
+    name: zentris_e2e_postgres_data

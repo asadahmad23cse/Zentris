@@ -60,7 +60,8 @@ describe("health endpoints", () => {
   test("readiness endpoint reports ready when Redis responds", async () => {
     await app.close();
     app = await buildServer({
-      redisHealthCheck: async () => ({ ok: true, status: "ready", latencyMs: 1 })
+      redisHealthCheck: async () => ({ ok: true, status: "ready", latencyMs: 1 }),
+      litellmHealthCheck: async () => ({ ok: true, status: "ready", latencyMs: 1 })
     });
     await app.ready();
 
@@ -73,12 +74,14 @@ describe("health endpoints", () => {
     assert.equal(response.statusCode, 200);
     assert.equal(body.status, "ready");
     assert.equal(body.dependencies.redis.ok, true);
+    assert.equal(body.dependencies.litellm.ok, true);
   });
 
   test("readiness endpoint returns 503 when Redis is unavailable", async () => {
     await app.close();
     app = await buildServer({
-      redisHealthCheck: async () => ({ ok: false, status: "end", latencyMs: 1, reason: "redis_down" })
+      redisHealthCheck: async () => ({ ok: false, status: "end", latencyMs: 1, reason: "redis_down" }),
+      litellmHealthCheck: async () => ({ ok: true, status: "ready", latencyMs: 1 })
     });
     await app.ready();
 
@@ -91,5 +94,18 @@ describe("health endpoints", () => {
     assert.equal(response.statusCode, 503);
     assert.equal(body.status, "not_ready");
     assert.equal(body.dependencies.redis.ok, false);
+  });
+
+  test("readiness endpoint returns 503 when LiteLLM is unavailable", async () => {
+    await app.close();
+    app = await buildServer({
+      redisHealthCheck: async () => ({ ok: true, status: "ready", latencyMs: 1 }),
+      litellmHealthCheck: async () => ({ ok: false, status: "unavailable", latencyMs: 1, reason: "connection_failed" })
+    });
+    await app.ready();
+
+    const response = await app.inject({ method: "GET", url: "/health/readiness" });
+    assert.equal(response.statusCode, 503);
+    assert.equal(response.json().dependencies.litellm.ok, false);
   });
 });

@@ -30,19 +30,19 @@ const columns: ColumnsType<TopModelData> = [
     title: "Successful",
     dataIndex: "successful_requests",
     key: "successful_requests",
-    render: (value) => <span className="text-green-600">{value?.toLocaleString() || 0}</span>,
+    render: (value) => <span className="text-green-600">{value?.toLocaleString("en-US") || 0}</span>,
   },
   {
     title: "Failed",
     dataIndex: "failed_requests",
     key: "failed_requests",
-    render: (value) => <span className="text-red-600">{value?.toLocaleString() || 0}</span>,
+    render: (value) => <span className="text-red-600">{value?.toLocaleString("en-US") || 0}</span>,
   },
   {
     title: "Tokens",
     dataIndex: "tokens",
     key: "tokens",
-    render: (value) => value?.toLocaleString() || 0,
+    render: (value) => value?.toLocaleString("en-US") || 0,
   },
 ];
 

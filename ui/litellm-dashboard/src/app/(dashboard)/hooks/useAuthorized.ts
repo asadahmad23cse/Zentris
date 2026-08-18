@@ -5,7 +5,7 @@ import { clearTokenCookies, getCookie } from "@/utils/cookieUtils";
 import { checkTokenValidity, decodeToken } from "@/utils/jwtUtils";
 import { buildLoginUrlWithReturn, storeReturnUrl } from "@/utils/returnUrlUtils";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { formatUserRole } from "@/utils/roles";
 import { useUIConfig } from "./uiConfig/useUIConfig";
 
@@ -21,21 +21,6 @@ const isLegacyInvalidAccessToken = (token: string): boolean => {
   }
 };
 
-const fetchPublicToken = async (): Promise<string | null> => {
-  try {
-    const res = await fetch(`${getProxyBaseUrl()}/public/dashboard-token`, { cache: "no-store" });
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (data?.token) {
-      document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
-      return data.token;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-};
-
 const useAuthorized = () => {
   const router = useRouter();
   const { data: uiConfig, isLoading: isUIConfigLoading } = useUIConfig();
@@ -46,26 +31,11 @@ const useAuthorized = () => {
     !isLegacyInvalidAccessToken(rawCookie) &&
     checkTokenValidity(rawCookie);
 
-  const [token, setToken] = useState<string | null>(isRawValid ? rawCookie : null);
-  const [fetchingToken, setFetchingToken] = useState(!isRawValid);
-
-  useEffect(() => {
-    if (isRawValid) {
-      setToken(rawCookie);
-      setFetchingToken(false);
-      return;
-    }
-    setFetchingToken(true);
-    fetchPublicToken().then((t) => {
-      setToken(t);
-      setFetchingToken(false);
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const token = isRawValid ? rawCookie : null;
 
   const decoded = useMemo(() => decodeToken(token), [token]);
   const isTokenValid = useMemo(() => checkTokenValidity(token), [token]);
-  const isLoading = isUIConfigLoading || fetchingToken;
+  const isLoading = isUIConfigLoading;
   const isAuthorized = isTokenValid && !uiConfig?.admin_ui_disabled;
 
   const redirectToLogin = useCallback(() => {
@@ -81,10 +51,10 @@ const useAuthorized = () => {
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthorized) {
-      if (token) clearTokenCookies();
+      if (rawCookie) clearTokenCookies();
       redirectToLogin();
     }
-  }, [isLoading, isAuthorized, token, redirectToLogin]);
+  }, [isLoading, isAuthorized, rawCookie, redirectToLogin]);
 
   return {
     isLoading,

@@ -1,0 +1,21 @@
+# Deterministic provider configuration for the isolated Docker Compose E2E run.
+# Production continues to use proxy_server_config.production.yaml.
+model_list:
+  - model_name: e2e-model
+    litellm_params:
+      model: openai/e2e-model
+      api_base: http://mock-provider:8080/v1
+      api_key: e2e-internal-only
+
+litellm_settings:
+  drop_params: true
+  num_retries: 0
+  request_timeout: 10
+  telemetry: false
+  success_callback: ["prometheus"]
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  store_model_in_db: true
+  database_connection_pool_limit: 10
+  proxy_batch_write_at: 1

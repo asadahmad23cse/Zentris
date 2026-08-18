@@ -14,9 +14,25 @@ if (testFiles.length === 0) {
 }
 
 const tsxCli = join(process.cwd(), "node_modules", "tsx", "dist", "cli.cjs");
+const testEnvironment = {
+  ...process.env,
+  NODE_ENV: "test",
+  ZENTRIS_STRICT_CONFIG: "false",
+  ZENTRIS_DEMO_ENABLED: "false",
+  ZENTRIS_TEST_TELEMETRY: "false",
+  REDIS_URL: "redis://localhost:6379",
+  LITELLM_BASE_URL: "http://localhost:4000/v1",
+  LITELLM_API_KEY: "test-key-not-secret",
+  LITELLM_MODEL: "test-model",
+  JWT_SECRET: "test-jwt-secret-at-least-32-characters",
+  CONFIRMATION_TOKEN_SECRET: "test-confirmation-secret-at-least-32",
+  LOG_LEVEL: "error",
+  PORT: "3100"
+};
 const result = spawnSync(process.execPath, [tsxCli, "--test", "--test-concurrency=1", "--test-force-exit", ...testFiles], {
   stdio: "inherit",
-  shell: false
+  shell: false,
+  env: testEnvironment
 });
 
 if (result.error) {

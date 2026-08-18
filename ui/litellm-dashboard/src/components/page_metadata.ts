@@ -18,6 +18,7 @@ export const pageDescriptions: Record<string, string> = {
   new_usage: "View usage analytics and metrics",
   logs: "Access request and response logs",
   "guardrails-monitor": "Monitor guardrail performance and view logs",
+  "zentris-security": "Review security findings, failed calls, conversation history, and training datasets",
   users: "Manage internal user accounts and permissions",
   teams: "Create and manage teams for access control",
   organizations: "Manage organizations and their members",

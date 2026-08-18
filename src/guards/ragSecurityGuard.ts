@@ -11,6 +11,8 @@ export interface SanitizedRagChunk {
   source: string;
   trustLevel: "untrusted";
   chunkId: string;
+  injectionDetected: boolean;
+  matchedRules: string[];
 }
 
 export interface DroppedRagChunk {
@@ -66,17 +68,15 @@ export class RagSecurityGuard {
       const injectionResult = await this.injectionDetector.detect(normalizedContent, rawContent);
       const instructionLike = hasInstructionLikePattern(normalizedContent);
 
-      if (instructionLike || injectionResult.action !== "allow" || injectionResult.risk !== "low") {
-        const reason = instructionLike ? "instruction_like_pattern" : injectionResult.reason;
-        dropped.push({ source, chunkId, reason });
-        continue;
-      }
-
       accepted.push({
-        content: rawContent,
+        content: instructionLike || injectionResult.detected
+          ? `[PROMPT_INJECTION_WARNING rules="${injectionResult.matchedRules.join(",") || "instruction_like_pattern"}"]\n${rawContent}`
+          : rawContent,
         source,
         trustLevel: "untrusted",
-        chunkId
+        chunkId,
+        injectionDetected: instructionLike || injectionResult.detected,
+        matchedRules: injectionResult.matchedRules
       });
     }
 

@@ -1204,3 +1204,81 @@ model LiteLLM_ClaudeCodePluginTable {
 
   @@map("LiteLLM_ClaudeCodePluginTable")
 }
+
+// Zentris security telemetry and curated training history
+model LiteLLM_ZentrisConversationHistory {
+  id                  String   @id @default(uuid())
+  request_id          String   @unique
+  session_id          String
+  user_id             String?
+  tenant_id           String?
+  organization_id     String?
+  route               String
+  model               String?
+  model_parameters    Json     @default("{}")
+  raw_messages        Json
+  sanitized_messages  Json
+  raw_result          Json?
+  sanitized_result    Json?
+  status              String
+  http_status         Int?
+  failure_code        String?
+  failure_message     String?
+  latency_ms          Int
+  security_summary    Json
+  metric_recorded     Boolean  @default(false)
+  review_status       String   @default("unreviewed")
+  dataset_targets     String[] @default([])
+  security_label      String?
+  review_notes        String?
+  reviewed_by         String?
+  reviewed_at         DateTime?
+  created_at          DateTime @default(now())
+  expires_at          DateTime
+
+  @@index([created_at])
+  @@index([expires_at])
+  @@index([status, created_at])
+  @@index([review_status, created_at])
+  @@index([user_id, created_at])
+}
+
+model LiteLLM_ZentrisSecurityEvent {
+  id              String   @id @default(uuid())
+  event_key       String   @unique
+  request_id      String
+  conversation_id String?
+  session_id      String
+  user_id         String?
+  tenant_id       String?
+  event_type      String
+  stage           String
+  risk            String
+  score           Int
+  action          String
+  rule_ids        String[] @default([])
+  details         Json
+  model           String?
+  route           String
+  latency_ms      Int?
+  created_at      DateTime @default(now())
+  expires_at      DateTime
+
+  @@index([request_id])
+  @@index([created_at])
+  @@index([expires_at])
+  @@index([event_type, created_at])
+  @@index([risk, created_at])
+}
+
+model LiteLLM_ZentrisDailyMetric {
+  day                  DateTime @id @client.Date
+  request_count        Int      @default(0)
+  success_count        Int      @default(0)
+  failure_count        Int      @default(0)
+  injection_count      Int      @default(0)
+  dlp_count            Int      @default(0)
+  latency_sum_ms       BigInt   @default(0)
+  latency_sample_count Int      @default(0)
+  updated_at           DateTime @default(now()) @updatedAt
+}

@@ -75,7 +75,7 @@ vi.mock("@/components/networking", () => {
     // Used to build the redirect URL
     proxyBaseUrl: "https://example.com",
     // Called when decoding a valid token
-    setGlobalLitellmHeaderName: vi.fn(),
+    setGlobalZentrisHeaderName: vi.fn(),
     Organization: {},
     // Daily activity calls used by UsagePage components in the render tree
     tagDailyActivityCall: vi.fn().mockResolvedValue({ results: [], metadata: {} }),
@@ -103,6 +103,7 @@ vi.mock("@/utils/returnUrlUtils", async (importOriginal) => {
 
 // Super-light stubs for all heavy components so rendering doesn't explode
 vi.mock("@/components/navbar", () => ({ default: stub("navbar") }));
+vi.mock("@/app/(dashboard)/playground/page", () => ({ default: stub("playground") }));
 vi.mock("@/components/user_dashboard", () => ({ default: stub("user-dashboard") }));
 vi.mock("@/components/templates/model_dashboard", () => ({ default: stub("model-dashboard") }));
 vi.mock("@/components/view_users", () => ({ default: stub("view-users") }));
@@ -193,13 +194,16 @@ afterEach(() => {
  * --------------------------- */
 
 describe("CreateKeyPage auth behavior", () => {
-  it("redirects to SSO when cookie token is expired and clears it (no spasms)", async () => {
+  const jwt = (suffix: string) => `eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.${suffix}`;
+
+  it("shows the real login when the token is expired and clears it", async () => {
     // Arrange: expired token in cookie
-    setCookie("token=expiredtoken");
+    const expiredToken = jwt("expired-signature");
+    setCookie(`token=${expiredToken}`);
 
     // jwtDecode returns past exp → expired
     jwtDecodeMock.mockImplementation((tok: string) => {
-      expect(tok).toBe("expiredtoken");
+      expect(tok).toBe(expiredToken);
       return { exp: Math.floor(Date.now() / 1000) - 60 }; // expired 60s ago
     });
 
@@ -209,12 +213,9 @@ describe("CreateKeyPage auth behavior", () => {
     // Act
     render(<CreateKeyPage />);
 
-    // Assert: we eventually redirect to SSO login with return URL (single replace, not assign/href)
-    await waitFor(() => {
-      expect(window.location.replace).toHaveBeenCalledWith(
-        expect.stringContaining("https://example.com/ui/login?redirect_to=")
-      );
-    });
+    // The production dashboard no longer installs a public-admin token or auto-enters SSO.
+    expect(await screen.findByRole("heading", { name: "Login" })).toBeInTheDocument();
+    expect(window.location.replace).not.toHaveBeenCalled();
 
     // And we attempted to clear the cookie (defensive deletion)
     const wroteDeletion = cookieSetSpy.mock.calls.some(
@@ -225,11 +226,12 @@ describe("CreateKeyPage auth behavior", () => {
 
   it("does NOT redirect when token is valid and renders the app chrome", async () => {
     // Arrange: valid token in cookie
-    setCookie("token=validtoken");
+    const validToken = jwt("valid-signature");
+    setCookie(`token=${validToken}`);
 
     // jwtDecode returns future exp and expected shape
     jwtDecodeMock.mockImplementation((tok: string) => {
-      expect(tok).toBe("validtoken");
+      expect(tok).toBe(validToken);
       return {
         exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1h in the future
         key: "accessKey-123",
@@ -257,10 +259,11 @@ describe("CreateKeyPage auth behavior", () => {
   });
 
   it("should not redirect when return URL only differs by query order", async () => {
-    setCookie("token=validtoken");
+    const validToken = jwt("valid-query-signature");
+    setCookie(`token=${validToken}`);
 
     jwtDecodeMock.mockImplementation((tok: string) => {
-      expect(tok).toBe("validtoken");
+      expect(tok).toBe(validToken);
       return {
         exp: Math.floor(Date.now() / 1000) + 60 * 60,
         key: "accessKey-123",

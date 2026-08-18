@@ -18,7 +18,7 @@ RISK_MAP = {
 ACTION_MAP = {
     "allow": Action.ALLOW,
     "sanitize": Action.SANITIZE,
-    "block": Action.BLOCK,
+    "block": Action.SANITIZE,
 }
 
 
@@ -27,7 +27,7 @@ def detect_prompt_injection(prompt: str) -> list[SecurityFinding]:
     if result.action == "allow" and not result.matched_rules:
         return []
     risk = RISK_MAP.get(result.risk, RiskLevel.MEDIUM)
-    action = ACTION_MAP.get(result.action, Action.REQUIRE_APPROVAL)
+    action = Action.SANITIZE if result.matched_rules else ACTION_MAP.get(result.action, Action.ALLOW)
     return [
         SecurityFinding(
             rule_id="ZPI-001",

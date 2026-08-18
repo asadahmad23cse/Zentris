@@ -1,218 +1,144 @@
-import { type GuardResult } from "../types";
+import injectionCatalog from "../security/injection-rules.json";
+import {
+  type InjectionDetectionResult,
+  type SecurityFinding,
+  type SecurityRisk
+} from "../types";
 import { logger } from "../utils/logger";
-import { classifyPromptInjectionThreat } from "./localThreatClassifier";
 
-interface DetectionRule {
+interface CatalogRule {
   id: string;
-  pattern: RegExp;
-  risk: GuardResult["risk"];
+  category: string;
+  severity: "low" | "medium" | "high";
+  weight: number;
   reason: string;
+  pattern: string;
 }
 
-const RULES: ReadonlyArray<DetectionRule> = [
-  {
-    id: "ignore_previous_instructions",
-    pattern:
-      /\b(?:ignore|disregard)\b[\s\S]{0,40}\b(?:previous|prior|earlier|all)\b[\s\S]{0,30}\b(?:instructions?|directives?|prompts?)\b/im,
-    risk: "high",
-    reason: "Attempt to bypass existing instruction hierarchy"
-  },
-  {
-    id: "reveal_system_prompt",
-    pattern: /\b(?:reveal|show|print|display|dump|expose)\b[\s\S]{0,30}\b(?:the\s+)?system\s+prompt\b/im,
-    risk: "high",
-    reason: "Attempt to extract protected prompt context"
-  },
-  {
-    id: "act_as_role_override",
-    pattern: /\bact\s+as\b[\s\S]{0,40}\b(?:admin|developer|dan|unrestricted|root|superuser)\b/im,
-    risk: "medium",
-    reason: "Attempt to force role or privilege override"
-  },
-  {
-    id: "you_are_now_override",
-    pattern: /\byou\s+are\s+now\b[\s\S]{0,50}\b(?:admin|developer|dan|unrestricted|system|root|assistant)\b/im,
-    risk: "medium",
-    reason: "Persona override attempt detected"
-  },
-  {
-    id: "jailbreak_or_dan",
-    pattern: /\b(?:jailbreak|do\s+anything\s+now|dan\s+(?:mode|prompt|jailbreak)|developer\s+mode)\b/im,
-    risk: "high",
-    reason: "Known jailbreak phrase detected"
-  },
-  {
-    id: "markup_or_script_injection_marker",
-    pattern: /(?:<!--|<script\b|<\?php\b)/im,
-    risk: "high",
-    reason: "Code or markup injection marker detected"
-  },
-  {
-    id: "prompt_boundary_injection",
-    pattern: /(?:\n\s*\n|\\n\\n)\s*(?:Human|Assistant)\s*:/im,
-    risk: "medium",
-    reason: "Prompt boundary injection marker detected"
-  },
-  {
-    id: "boundary_breaker_repetition",
-    pattern: /(?:>{5,}|-{10,})/im,
-    risk: "low",
-    reason: "Boundary-break character sequence detected"
-  },
-  {
-    id: "context_reset_attempt",
-    pattern: /\b(?:forget\s+everything|new\s+session|reset\s+context)\b/im,
-    risk: "medium",
-    reason: "Context reset attempt detected"
-  },
-  {
-    id: "env_or_path_exfiltration",
-    pattern: /\bprocess\.env\b|\/etc\/passwd|\.\.\//im,
-    risk: "high",
-    reason: "Environment variable or file traversal probing detected"
-  }
-];
+interface CompiledRule extends CatalogRule {
+  regex: RegExp;
+}
 
-const IMPERATIVE_VERB_PATTERN = /\b(?:ignore|reveal|execute|bypass|override|forget|print|show|dump)\b/im;
-const QUESTION_WORD_PATTERN = /\b(?:what|how|why|when|where)\b/im;
+const MAX_DECODED_CANDIDATE_CHARS = 4096;
+const SCAN_CHUNK_CHARS = 16_384;
+const SCAN_OVERLAP_CHARS = 512;
+const URL_ENCODED_PATTERN = /(?:%[0-9A-Fa-f]{2}|[A-Za-z0-9._~-]){6,}/g;
+const BASE64_PATTERN = /(?:^|[^A-Za-z0-9+/=])([A-Za-z0-9+/]{16,}={0,2})(?=$|[^A-Za-z0-9+/=])/g;
+const HEX_PATTERN = /(?:^|[^A-Fa-f0-9])((?:[A-Fa-f0-9]{2}){8,})(?=$|[^A-Fa-f0-9])/g;
+const CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/gu;
+const WHITESPACE_PATTERN = /[\s\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+/gu;
+
+const catalog = injectionCatalog as { version: number; rules: CatalogRule[] };
+if (catalog.version !== 1) {
+  throw new Error(`Unsupported prompt-injection catalog version: ${catalog.version}`);
+}
+
+const RULES: ReadonlyArray<CompiledRule> = catalog.rules.map((rule) => ({
+  ...rule,
+  regex: new RegExp(rule.pattern, "imu")
+}));
+
+const decodeUrlCandidates = (text: string): string =>
+  text.replace(URL_ENCODED_PATTERN, (candidate) => {
+    if (!candidate.includes("%")) return candidate;
+    try {
+      return `[URL: ${decodeURIComponent(candidate).slice(0, MAX_DECODED_CANDIDATE_CHARS)}]`;
+    } catch {
+      return candidate;
+    }
+  });
+
+const decodeBase64Candidates = (text: string): string =>
+  text.replace(BASE64_PATTERN, (full, candidate: string) => {
+    if (candidate.length > MAX_DECODED_CANDIDATE_CHARS * 2 || candidate.length % 4 !== 0) return full;
+    try {
+      const decoded = Buffer.from(candidate, "base64");
+      if (decoded.length === 0 || decoded.toString("base64").replace(/=+$/, "") !== candidate.replace(/=+$/, "")) return full;
+      const value = decoded.toString("utf8");
+      if (value.includes("\uFFFD") || /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/u.test(value)) return full;
+      return full.replace(candidate, `[BASE64: ${value.slice(0, MAX_DECODED_CANDIDATE_CHARS)}]`);
+    } catch {
+      return full;
+    }
+  });
+
+const decodeHexCandidates = (text: string): string =>
+  text.replace(HEX_PATTERN, (full, candidate: string) => {
+    if (candidate.length > MAX_DECODED_CANDIDATE_CHARS * 2) return full;
+    try {
+      const value = Buffer.from(candidate, "hex").toString("utf8");
+      if (!value || value.includes("\uFFFD") || /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/u.test(value)) return full;
+      return full.replace(candidate, `[HEX: ${value.slice(0, MAX_DECODED_CANDIDATE_CHARS)}]`);
+    } catch {
+      return full;
+    }
+  });
+
+export const buildInjectionScanViews = (raw: string, normalized = raw): string[] => {
+  const canonicalSource = raw === normalized ? raw : `${raw}\n${normalized}`;
+  const canonical = canonicalSource
+    .normalize("NFKC")
+    .replace(CONTROL_PATTERN, "")
+    .replace(WHITESPACE_PATTERN, " ")
+    .trim();
+  const decoded = decodeHexCandidates(decodeBase64Candidates(decodeUrlCandidates(canonical)));
+  return Array.from(new Set([raw, normalized, canonical, decoded]));
+};
+
+const scanView = (view: string, matched: Map<string, CompiledRule>): void => {
+  if (view.length === 0) return;
+  const step = Math.max(1, SCAN_CHUNK_CHARS - SCAN_OVERLAP_CHARS);
+  for (let offset = 0; offset < view.length; offset += step) {
+    const chunk = view.slice(offset, offset + SCAN_CHUNK_CHARS);
+    for (const rule of RULES) {
+      if (!matched.has(rule.id) && rule.regex.test(chunk)) matched.set(rule.id, rule);
+    }
+  }
+};
+
+const scoreRisk = (rules: ReadonlyArray<CompiledRule>): { score: number; risk: SecurityRisk } => {
+  if (rules.length === 0) return { score: 0, risk: "none" };
+  const categories = new Set(rules.map((rule) => rule.category));
+  const score = Math.min(100, Math.max(...rules.map((rule) => rule.weight)) + Math.max(0, categories.size - 1) * 10);
+  if (score >= 70) return { score, risk: "high" };
+  if (score >= 40) return { score, risk: "medium" };
+  return { score, risk: "low" };
+};
 
 export class InjectionDetector {
-  public async detect(normalized: string, raw: string): Promise<GuardResult> {
-    const text = `${raw}\n${normalized}`;
-    const triggeredRules = RULES.filter((rule) => rule.pattern.test(text));
-    const semantic = await this.semanticClassify(normalized);
+  public async detect(normalized: string, raw: string, stage: SecurityFinding["stage"] = "input"): Promise<InjectionDetectionResult> {
+    const matched = new Map<string, CompiledRule>();
+    for (const view of buildInjectionScanViews(raw, normalized)) scanView(view, matched);
 
-    const highMatches = triggeredRules.filter((rule) => rule.risk === "high").length;
-    const mediumMatches = triggeredRules.filter((rule) => rule.risk === "medium").length;
-    const lowMatches = triggeredRules.filter((rule) => rule.risk === "low").length;
-
-    const ruleIds = triggeredRules.map((rule) => rule.id);
-    const reasonParts: string[] = [];
-    reasonParts.push(
-      ruleIds.length > 0 ? `Triggered rules: ${ruleIds.join(", ")}` : "Triggered rules: none"
-    );
-    reasonParts.push(`Semantic: ${semantic.label} (${semantic.confidence.toFixed(2)})`);
-    if (semantic.matchedSignals.length > 0) {
-      reasonParts.push(`Semantic signals: ${semantic.matchedSignals.join(", ")}`);
-    }
-
-    if (highMatches > 0) {
-      const decision: GuardResult = {
-        safe: false,
-        risk: "high",
-        action: "block",
-        reason: reasonParts.join(" | ")
-      };
-      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
-      return decision;
-    }
-
-    if (mediumMatches >= 2) {
-      const decision: GuardResult = {
-        safe: false,
-        risk: "high",
-        action: "block",
-        reason: reasonParts.join(" | ")
-      };
-      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
-      return decision;
-    }
-
-    if (mediumMatches === 1 && semantic.label === "malicious") {
-      const decision: GuardResult = {
-        safe: false,
-        risk: "high",
-        action: "block",
-        reason: reasonParts.join(" | ")
-      };
-      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
-      return decision;
-    }
-
-    if (mediumMatches === 1 && semantic.label === "suspicious") {
-      const decision: GuardResult = {
-        safe: false,
-        risk: "medium",
-        action: "sanitize",
-        reason: reasonParts.join(" | ")
-      };
-      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
-      return decision;
-    }
-
-    if (lowMatches > 0 && semantic.label === "safe") {
-      const decision: GuardResult = {
-        safe: true,
-        risk: "low",
-        action: "allow",
-        reason: reasonParts.join(" | ")
-      };
-      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
-      return decision;
-    }
-
-    if (semantic.label === "malicious") {
-      const decision: GuardResult = {
-        safe: false,
-        risk: "high",
-        action: "block",
-        reason: reasonParts.join(" | ")
-      };
-      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
-      return decision;
-    }
-
-    if (semantic.label === "suspicious" || mediumMatches === 1) {
-      const decision: GuardResult = {
-        safe: false,
-        risk: "medium",
-        action: "sanitize",
-        reason: reasonParts.join(" | ")
-      };
-      this.logTelemetry(semantic.label, semantic.confidence, decision.action);
-      return decision;
-    }
-
-    const decision: GuardResult = {
-      safe: true,
-      risk: "low",
-      action: "allow",
-      reason: reasonParts.join(" | ")
+    const rules = Array.from(matched.values());
+    const { score, risk } = scoreRisk(rules);
+    const detected = rules.length > 0;
+    const findings: SecurityFinding[] = rules.map((rule) => ({
+      kind: "prompt_injection",
+      ruleId: rule.id,
+      category: rule.category,
+      stage,
+      risk: rule.severity,
+      score: rule.weight,
+      action: "warn"
+    }));
+    const result: InjectionDetectionResult = {
+      safe: !detected,
+      detected,
+      risk: risk === "none" ? "low" : risk,
+      score,
+      action: detected ? "sanitize" : "allow",
+      matchedRules: rules.map((rule) => rule.id),
+      findings,
+      reason: detected ? `prompt_injection_warning:${rules.map((rule) => rule.id).join(",")}` : "prompt_injection_rules=none"
     };
-    this.logTelemetry(semantic.label, semantic.confidence, decision.action);
-    return decision;
-  }
 
-  public async semanticClassify(
-    text: string
-  ): Promise<{ label: "safe" | "suspicious" | "malicious"; confidence: number; matchedSignals: string[] }> {
-    const normalized = text.trim().toLowerCase();
-
-    if (normalized.length < 20) {
-      return { label: "safe", confidence: 0.75, matchedSignals: [] };
+    if (detected) {
+      // The bounded telemetry stream persists every finding. Keep the local log
+      // metadata-only and debug-level to avoid a log-amplification vector when an
+      // attacker sends injection payloads at high volume.
+      logger.debug({ ruleIds: result.matchedRules, risk: result.risk, score, action: "warn" }, "prompt_injection_detected");
     }
-
-    const mlClassification = classifyPromptInjectionThreat(normalized);
-    if (mlClassification.label === "safe" && IMPERATIVE_VERB_PATTERN.test(normalized) && !QUESTION_WORD_PATTERN.test(normalized)) {
-      return {
-        label: "suspicious",
-        confidence: 0.7,
-        matchedSignals: mlClassification.matchedSignals
-      };
-    }
-
-    return mlClassification;
-  }
-
-  private logTelemetry(label: "safe" | "suspicious" | "malicious", confidence: number, actionTaken: GuardResult["action"]): void {
-    logger.info(
-      {
-        classifier: "prompt_injection_ml_gate",
-        intent: label,
-        confidenceScore: Number(confidence.toFixed(2)),
-        actionTaken
-      },
-      "classification_event"
-    );
+    return result;
   }
 }

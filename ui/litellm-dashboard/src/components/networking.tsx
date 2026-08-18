@@ -78,7 +78,7 @@ import { jsonFields } from "./common_components/check_openapi_schema";
 import NotificationsManager from "./molecules/notifications_manager";
 
 const isLocal = process.env.NODE_ENV === "development";
-const productionProxyBaseUrl = process.env.NEXT_PUBLIC_ZENTRIS_API_URL || "https://zentris-api.onrender.com";
+const productionProxyBaseUrl = process.env.NEXT_PUBLIC_ZENTRIS_API_URL || null;
 // In dev, if NEXT_PUBLIC_USE_REWRITES=true the Next.js dev server proxies API calls
 // to the backend — use relative URLs (null) so rewrites can intercept them.
 const defaultProxyBaseUrl =
@@ -115,7 +115,7 @@ const getWindowLocation = () => {
   return window.location;
 };
 
-const updateProxyBaseUrl = (serverRootPath: string, receivedProxyBaseUrl: string | null = null) => {
+const updateProxyBaseUrl = (receivedServerRootPath: string | null | undefined, receivedProxyBaseUrl: string | null = null) => {
   /**
    * Special function for updating the proxy base url. Should only be called by getUiConfig.
    */
@@ -129,8 +129,12 @@ const updateProxyBaseUrl = (serverRootPath: string, receivedProxyBaseUrl: string
       ? "http://localhost:4000"
       : browserLocation?.origin ?? null;
   let initialProxyBaseUrl = receivedProxyBaseUrl || resolvedDefaultProxyBaseUrl;
+  const normalizedServerRootPath =
+    typeof receivedServerRootPath === "string" && receivedServerRootPath !== "/"
+      ? receivedServerRootPath.replace(/\/$/, "")
+      : "";
   console.log("proxyBaseUrl:", proxyBaseUrl);
-  console.log("serverRootPath:", serverRootPath);
+  console.log("serverRootPath:", normalizedServerRootPath);
 
   if (!initialProxyBaseUrl) {
     proxyBaseUrl = proxyBaseUrl ?? null;
@@ -138,8 +142,8 @@ const updateProxyBaseUrl = (serverRootPath: string, receivedProxyBaseUrl: string
     return;
   }
 
-  if (serverRootPath.length > 0 && !initialProxyBaseUrl.endsWith(serverRootPath) && serverRootPath != "/") {
-    initialProxyBaseUrl += serverRootPath;
+  if (normalizedServerRootPath && !initialProxyBaseUrl.endsWith(normalizedServerRootPath)) {
+    initialProxyBaseUrl += normalizedServerRootPath;
   }
 
   proxyBaseUrl = initialProxyBaseUrl;
@@ -453,6 +457,7 @@ export const getUiConfig = async () => {
    */
   console.log("jsonData in getUiConfig:", jsonData);
   updateProxyBaseUrl(jsonData.server_root_path, jsonData.proxy_base_url);
+  updateServerRootPath(jsonData.server_root_path || "");
   return jsonData;
 };
 

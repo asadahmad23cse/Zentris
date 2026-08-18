@@ -38,17 +38,17 @@ export default function TopModelView({ topModels, topModelsLimit, setTopModelsLi
     {
       header: "Successful",
       accessorKey: "successful_requests",
-      cell: (info: any) => <span className="text-green-600">{info.getValue()?.toLocaleString() || 0}</span>,
+      cell: (info: any) => <span className="text-green-600">{info.getValue()?.toLocaleString("en-US") || 0}</span>,
     },
     {
       header: "Failed",
       accessorKey: "failed_requests",
-      cell: (info: any) => <span className="text-red-600">{info.getValue()?.toLocaleString() || 0}</span>,
+      cell: (info: any) => <span className="text-red-600">{info.getValue()?.toLocaleString("en-US") || 0}</span>,
     },
     {
       header: "Tokens",
       accessorKey: "tokens",
-      cell: (info: any) => info.getValue()?.toLocaleString() || 0,
+      cell: (info: any) => info.getValue()?.toLocaleString("en-US") || 0,
     },
   ];
   const processedTopModels = topModels.slice(0, topModelsLimit);

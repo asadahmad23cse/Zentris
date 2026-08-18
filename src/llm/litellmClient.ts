@@ -1,11 +1,7 @@
 import { config } from "../config";
-import { type ChatMessage } from "../types";
+import { type ChatMessage, type GenerationOptions } from "../types";
 
-export interface LLMOptions {
-  model?: string;
-  temperature?: number;
-  maxTokens?: number;
-}
+export type LLMOptions = GenerationOptions;
 
 interface LiteLLMChoice {
   message?: {
@@ -13,8 +9,13 @@ interface LiteLLMChoice {
   };
 }
 
-interface LiteLLMResponse {
+interface LiteLLMResponse extends Record<string, unknown> {
   choices?: LiteLLMChoice[];
+}
+
+export interface LiteLLMCompletion {
+  content: string;
+  response: LiteLLMResponse;
 }
 
 const DEFAULT_TEMPERATURE = 0.7;
@@ -63,6 +64,10 @@ export class LiteLLMError extends Error {
 
 export class LiteLLMClient {
   public async chat(messages: ChatMessage[], options?: LLMOptions): Promise<string> {
+    return (await this.chatCompletion(messages, options)).content;
+  }
+
+  public async chatCompletion(messages: ChatMessage[], options?: LLMOptions): Promise<LiteLLMCompletion> {
     const url = `${config.LITELLM_BASE_URL.replace(/\/$/, "")}/chat/completions`;
     const body = {
       model: options?.model ?? config.LITELLM_MODEL,
@@ -72,7 +77,12 @@ export class LiteLLMClient {
       })),
       stream: false,
       temperature: options?.temperature ?? DEFAULT_TEMPERATURE,
-      ...(options?.maxTokens ? { max_tokens: options.maxTokens } : {})
+      ...(options?.maxTokens !== undefined ? { max_tokens: options.maxTokens } : {}),
+      ...(options?.topP !== undefined ? { top_p: options.topP } : {}),
+      ...(options?.stop !== undefined ? { stop: options.stop } : {}),
+      ...(options?.tools !== undefined ? { tools: options.tools } : {}),
+      ...(options?.toolChoice !== undefined ? { tool_choice: options.toolChoice } : {}),
+      ...(options?.responseFormat !== undefined ? { response_format: options.responseFormat } : {})
     };
 
     for (let attempt = 0; attempt <= RETRY_BACKOFF_MS.length; attempt += 1) {
@@ -83,7 +93,7 @@ export class LiteLLMClient {
         const response = await fetch(url, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${config.LITELLM_API_KEY}`,
+            Authorization: `Bearer ${options?.apiKey ?? config.LITELLM_API_KEY}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify(body),
@@ -91,20 +101,20 @@ export class LiteLLMClient {
         });
 
         if (response.status >= 400 && response.status < 500) {
-          const errorText = await response.text();
           throw new LiteLLMError(
             `LiteLLM client error: ${response.status}`,
             response.status,
-            errorText || "client_error"
+            response.status === 401 || response.status === 403
+              ? "upstream_authentication_failed"
+              : response.status === 429 ? "upstream_rate_limited" : "upstream_client_error"
           );
         }
 
         if (response.status >= 500) {
-          const errorText = await response.text();
           throw new LiteLLMError(
             `LiteLLM server error: ${response.status}`,
             response.status,
-            errorText || "server_error"
+            "upstream_server_error"
           );
         }
 
@@ -114,7 +124,7 @@ export class LiteLLMClient {
           throw new LiteLLMError("LiteLLM malformed response", 502, "malformed_response");
         }
 
-        return content;
+        return { content, response: parsed };
       } catch (error) {
         const isLastAttempt = attempt === RETRY_BACKOFF_MS.length;
 

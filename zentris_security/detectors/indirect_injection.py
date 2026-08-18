@@ -27,7 +27,7 @@ def detect_indirect_injection(documents: list[DocumentChunk]) -> list[SecurityFi
             continue
         score = min(1.0, 0.42 + 0.16 * len(pattern_hits) + density * 0.35)
         risk = RiskLevel.HIGH if score >= 0.78 else RiskLevel.MEDIUM
-        action = Action.BLOCK if risk == RiskLevel.HIGH else Action.SANITIZE
+        action = Action.SANITIZE
         findings.append(
             SecurityFinding(
                 rule_id="ZII-001",

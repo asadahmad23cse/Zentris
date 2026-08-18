@@ -476,6 +476,10 @@ class LiteLLMRoutes(enum.Enum):
         + agent_routes
     )
     info_routes = [
+        # Private self-introspection used by the Zentris gateway. The endpoint
+        # still requires user_api_key_auth and returns only the current
+        # principal, so every valid key must be allowed to reach it.
+        "/v1/zentris/auth/introspect",
         "/key/info",
         "/key/health",
         "/team/info",
@@ -495,6 +499,21 @@ class LiteLLMRoutes(enum.Enum):
         "/user/filter/ui",
         "/models",
         "/v1/models",
+    ]
+
+    # Authentication is still performed globally. Authorization for this
+    # private surface is owned by Zentris' _require_proxy_admin dependency so
+    # valid non-admin principals receive an accurate 403 instead of being
+    # misclassified as invalid keys by LiteLLM's generic custom-route check.
+    zentris_admin_routes = [
+        "/v1/zentris/security/summary",
+        "/v1/zentris/security/events",
+        "/v1/zentris/security/events/{event_id}",
+        "/v1/zentris/history",
+        "/v1/zentris/history/{history_id}",
+        "/v1/zentris/history/{history_id}/review",
+        "/v1/zentris/history/bulk-review",
+        "/v1/zentris/training-exports",
     ]
 
     # NOTE: ROUTES ONLY FOR MASTER KEY - only the Master Key should be able to Reset Spend
@@ -665,7 +684,7 @@ class LiteLLMRoutes(enum.Enum):
         "/invitation/delete",
         # Team guardrail submission - requires team-scoped key; endpoint enforces team_id
         "/guardrails/register",
-    ]  # routes that manage their own allowed/disallowed logic
+    ] + zentris_admin_routes  # routes that manage their own allowed/disallowed logic
 
     ## Org Admin Routes ##
 

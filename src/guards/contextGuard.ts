@@ -1,11 +1,6 @@
 import { config } from "../config";
 import { type ChatMessage, type GuardResult } from "../types";
-import {
-  appendToSession,
-  getSession,
-  redisClient,
-  setSessionMeta
-} from "../services/redisClient";
+import { updateContextState } from "../services/redisClient";
 
 type DetectionSeverity = "high" | "medium" | "low";
 
@@ -14,9 +9,6 @@ interface DetectionOutcome {
   severity: DetectionSeverity;
   reason: string;
 }
-
-const PROBE_LIST_KEY = (sessionId: string): string => `zentris:session:${sessionId}:probes`;
-const TIMESTAMP_LIST_KEY = (sessionId: string): string => `zentris:session:${sessionId}:timestamps`;
 
 const PROBE_WINDOW_SIZE = 10;
 const PROBE_INACTIVITY_TTL_SECONDS = 30 * 60;
@@ -83,7 +75,7 @@ const buildRiskResult = (
   hasHighDetection: boolean
 ): GuardResult & { riskScore: number } => {
   if (riskScore >= 70) {
-    return { safe: false, risk: "high", action: "block", reason, riskScore };
+    return { safe: false, risk: "high", action: "sanitize", reason, riskScore };
   }
 
   if (riskScore >= 40) {
@@ -107,7 +99,8 @@ export class ContextGuard {
   public async analyze(
     sessionId: string,
     currentInput: string,
-    history: ChatMessage[]
+    history: ChatMessage[],
+    persistContext = true
   ): Promise<GuardResult & { riskScore: number }> {
     const now = Date.now();
     const currentMessage: ChatMessage = {
@@ -116,8 +109,19 @@ export class ContextGuard {
       timestamp: now
     };
 
-    await appendToSession(sessionId, currentMessage, config.MAX_SESSION_MESSAGES);
-    const storedHistory = await getSession(sessionId);
+    const currentWarning = hasPatternMatch(currentInput, WARNING_PATTERNS);
+    const contextState = persistContext
+      ? await updateContextState(
+          sessionId,
+          currentMessage,
+          config.MAX_SESSION_MESSAGES,
+          currentWarning,
+          PROBE_WINDOW_SIZE,
+          PROBE_INACTIVITY_TTL_SECONDS,
+          VELOCITY_WINDOW_MS
+        )
+      : { storedHistory: [], probeCount: currentWarning ? 1 : 0, recentTimestampCount: 1 };
+    const storedHistory = contextState.storedHistory;
     const timeline = mergeChronologicalHistory(history, storedHistory, currentMessage).slice(
       -config.MAX_SESSION_MESSAGES
     );
@@ -139,17 +143,7 @@ export class ContextGuard {
       }
     }
 
-    const currentWarning = hasPatternMatch(currentInput, WARNING_PATTERNS);
-    const probeKey = PROBE_LIST_KEY(sessionId);
-    const probePipeline = redisClient.multi();
-    probePipeline.rpush(probeKey, currentWarning ? "1" : "0");
-    probePipeline.ltrim(probeKey, -PROBE_WINDOW_SIZE, -1);
-    probePipeline.expire(probeKey, PROBE_INACTIVITY_TTL_SECONDS);
-    await probePipeline.exec();
-
-    const recentProbeSignals = await redisClient.lrange(probeKey, 0, -1);
-    const probeCount = recentProbeSignals.reduce((count, value) => (value === "1" ? count + 1 : count), 0);
-    await setSessionMeta(sessionId, "probeCount", probeCount.toString(), PROBE_INACTIVITY_TTL_SECONDS);
+    const probeCount = contextState.probeCount;
 
     if (probeCount >= 3) {
       detections.push({
@@ -184,18 +178,7 @@ export class ContextGuard {
       });
     }
 
-    const timestampKey = TIMESTAMP_LIST_KEY(sessionId);
-    const timestampPipeline = redisClient.multi();
-    timestampPipeline.rpush(timestampKey, now.toString());
-    timestampPipeline.ltrim(timestampKey, -100, -1);
-    timestampPipeline.expire(timestampKey, 60 * 60);
-    await timestampPipeline.exec();
-
-    const timestamps = await redisClient.lrange(timestampKey, 0, -1);
-    const recentTimestampCount = timestamps.reduce((count, value) => {
-      const timestamp = Number.parseInt(value, 10);
-      return Number.isFinite(timestamp) && now - timestamp <= VELOCITY_WINDOW_MS ? count + 1 : count;
-    }, 0);
+    const recentTimestampCount = contextState.recentTimestampCount;
 
     if (recentTimestampCount > VELOCITY_THRESHOLD) {
       detections.push({

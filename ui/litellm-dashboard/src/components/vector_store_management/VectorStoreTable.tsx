@@ -112,7 +112,7 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
       sortingFn: "datetime",
       cell: ({ row }) => {
         const vectorStore = row.original;
-        return <span className="text-xs">{new Date(vectorStore.created_at).toLocaleDateString()}</span>;
+        return <span className="text-xs">{new Date(vectorStore.created_at).toLocaleDateString("en-US")}</span>;
       },
     },
     {
@@ -121,7 +121,7 @@ const VectorStoreTable: React.FC<VectorStoreTableProps> = ({ data, onView, onEdi
       sortingFn: "datetime",
       cell: ({ row }) => {
         const vectorStore = row.original;
-        return <span className="text-xs">{new Date(vectorStore.updated_at).toLocaleDateString()}</span>;
+        return <span className="text-xs">{new Date(vectorStore.updated_at).toLocaleDateString("en-US")}</span>;
       },
     },
     {

@@ -22,7 +22,7 @@ import { Team } from "@/components/key_team_helpers/key_list";
 import { MCPServers } from "@/components/mcp_tools";
 import ModelHubTable from "@/components/AIHub/ModelHubTable";
 import Navbar from "@/components/navbar";
-import { getUiConfig, Organization, proxyBaseUrl, setGlobalZentrisHeaderName, getInProductNudgesCall, getProxyBaseUrl } from "@/components/networking";
+import { getUiConfig, Organization, proxyBaseUrl, setGlobalZentrisHeaderName, getInProductNudgesCall } from "@/components/networking";
 import NewUsagePage from "@/components/UsagePage/components/UsagePageView";
 import OldTeams from "@/components/OldTeams";
 import { fetchUserModels, CreateKeyPrefillData } from "@/components/organisms/create_key_button";
@@ -32,7 +32,6 @@ import PromptsPanel from "@/components/prompts";
 import PublicModelHub from "@/components/public_model_hub";
 import { SearchTools } from "@/components/SearchTools";
 import Settings from "@/components/settings";
-import { SurveyPrompt, SurveyModal, ClaudeCodePrompt, ClaudeCodeModal } from "@/components/survey";
 import TagManagement from "@/components/tag_management";
 import TransformRequestPanel from "@/components/transform_request";
 import UIThemeSettings from "@/components/ui_theme_settings";
@@ -48,7 +47,6 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { isJwtExpired } from "@/utils/jwtUtils";
 import { consumeReturnUrl, isValidReturnUrl, normalizeUrlForCompare } from "@/utils/returnUrlUtils";
 import { formatUserRole, isAdminRole } from "@/utils/roles";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -517,21 +515,9 @@ function CreateKeyPageContent() {
       if (cancelled) return;
 
       const raw = getCookie("token");
-      let valid = raw && !isJwtExpired(raw) && !isLegacyInvalidAccessToken(raw) ? raw : null;
-
-      if (!valid) {
-        try {
-          const res = await fetch(`${getProxyBaseUrl()}/public/dashboard-token`, { cache: "no-store" });
-          if (res.ok) {
-            const data = await res.json();
-            if (data?.token) {
-              document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
-              valid = data.token;
-            }
-          }
-        } catch {
-          // backend unreachable — dashboard will show limited UI
-        }
+      const valid = raw && !isJwtExpired(raw) && !isLegacyInvalidAccessToken(raw) ? raw : null;
+      if (raw && !valid) {
+        deleteCookie("token", "/");
       }
 
       if (!cancelled) {

@@ -67,6 +67,8 @@ const createQueryClient = () =>
   });
 
 describe("LoginPage", () => {
+  const signedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiJ9.signature";
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockPush.mockClear();
@@ -98,7 +100,7 @@ describe("LoginPage", () => {
   });
 
   it("should call router.replace to dashboard when jwt is valid", async () => {
-    const validToken = "valid-token";
+    const validToken = signedToken;
     (useUIConfig as ReturnType<typeof vi.fn>).mockReturnValue({
       data: {
         auto_redirect_to_sso: false,
@@ -179,7 +181,7 @@ describe("LoginPage", () => {
   });
 
   it("should send user to dashboard when jwt is valid even if auto_redirect_to_sso is true", async () => {
-    const validToken = "valid-token";
+    const validToken = signedToken;
     (useUIConfig as ReturnType<typeof vi.fn>).mockReturnValue({
       data: {
         auto_redirect_to_sso: true,

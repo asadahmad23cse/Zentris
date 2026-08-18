@@ -4,7 +4,7 @@ import { config } from "../config";
 import { StreamingGuard } from "../guards/streamingGuard";
 import { scanAndRedactSensitiveData } from "../guards/dlpGuard";
 import { LiteLLMError } from "../llm/litellmClient";
-import { StreamingClient } from "../llm/streamingClient";
+import { StreamingClient, type StreamPayload } from "../llm/streamingClient";
 import { ZentrisPipeline } from "../middleware/pipeline";
 import { CircuitOpenError } from "../services/circuitBreaker";
 import { TelemetryService } from "../services/telemetryService";
@@ -57,6 +57,9 @@ const bearerToken = (request: FastifyRequest): string | undefined => {
 
 const generationOptions = (body: ChatCompletionsBody, request: FastifyRequest): GenerationOptions => ({
   model: body.model ?? config.LITELLM_MODEL,
+  streamOptions: body.stream_options === undefined
+    ? undefined
+    : { includeUsage: body.stream_options.include_usage },
   temperature: body.temperature,
   maxTokens: body.max_tokens,
   topP: body.top_p,
@@ -75,12 +78,16 @@ const telemetryModelParameters = (body: ChatCompletionsBody): Record<string, unk
   ...(body.tools !== undefined ? { tools: body.tools } : {}),
   ...(body.tool_choice !== undefined ? { tool_choice: body.tool_choice } : {}),
   ...(body.response_format !== undefined ? { response_format: body.response_format } : {}),
+  ...(body.stream_options !== undefined ? { stream_options: body.stream_options } : {}),
   stream: Boolean(body.stream)
 });
 
-const setSecurityHeaders = (reply: FastifyReply, security: SecurityMetadata): void => {
-  const action = security.injectionDetected && security.dlpDetected ? "warn_and_redact"
+const securityAction = (security: SecurityMetadata): string =>
+  security.injectionDetected && security.dlpDetected ? "warn_and_redact"
     : security.injectionDetected ? "warn" : security.dlpDetected ? "redact" : "allow";
+
+const setSecurityHeaders = (reply: FastifyReply, security: SecurityMetadata): void => {
+  const action = securityAction(security);
   reply.header("X-Zentris-Request-Id", security.requestId);
   reply.header("X-Request-ID", security.requestId);
   reply.header("X-Zentris-Injection-Detected", String(security.injectionDetected));
@@ -133,8 +140,10 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     const history: ChatMessage[] = body.messages.slice(0, lastUserIndex).map((message, index) => ({
       role: message.role, content: message.content, timestamp: Date.now() + index
     }));
+    const hasStableSession = typeof body.user === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(body.user);
     const zentrisRequest: ZentrisRequest = {
-      sessionId: typeof body.user === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(body.user) ? body.user : request.id,
+      sessionId: hasStableSession ? body.user as string : request.id,
+      persistContext: hasStableSession,
       requestId: request.id,
       identity: request.identity,
       rawInput: body.messages[lastUserIndex].content,
@@ -144,10 +153,11 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
 
     if (body.stream) return handleStreaming(request, reply, zentrisRequest, body, startedAt);
 
-    const security = makeSecurityState(request.id);
+    let security = makeSecurityState(request.id);
     try {
       const result = await pipeline.run(zentrisRequest);
-      await telemetry.enqueue({
+      security = result.security;
+      void telemetry.enqueue({
         requestId: request.id,
         sessionId: zentrisRequest.sessionId,
         identity: request.identity,
@@ -155,8 +165,8 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
         model: body.model ?? config.LITELLM_MODEL,
         modelParameters: telemetryModelParameters(body),
         rawMessages: body.messages,
-        sanitizedMessages: [],
-        rawResult: result.response === undefined ? undefined : { role: "assistant", content: result.response },
+        sanitizedMessages: result.modelMessages ?? [],
+        rawResult: result.rawResponse === undefined ? undefined : { role: "assistant", content: result.rawResponse },
         sanitizedResult: result.response === undefined ? undefined : { role: "assistant", content: result.response },
         status: result.action === "block" || result.action === "require_confirmation" ? "rejected" : "success",
         httpStatus: result.action === "block" ? 400 : result.action === "require_confirmation" ? 202 : 200,
@@ -178,15 +188,21 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
           zentris_security: safePublicSecurity(security)
         });
       }
-      return reply.send({
-        id: `chatcmpl-${request.id}`,
-        object: "chat.completion",
-        created: Math.floor(Date.now() / 1000),
-        model: body.model ?? config.LITELLM_MODEL,
-        choices: [{ index: 0, message: { role: "assistant", content: result.response ?? "" }, finish_reason: "stop" }],
-        usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        zentris_security: safePublicSecurity(security)
-      });
+      if (!result.upstreamResponse) {
+        throw new LiteLLMError("LiteLLM response body was unavailable", 502, "malformed_response");
+      }
+      const responseBody = structuredClone(result.upstreamResponse) as Record<string, unknown>;
+      const choices = responseBody.choices;
+      if (!Array.isArray(choices) || !choices[0] || typeof choices[0] !== "object") {
+        throw new LiteLLMError("LiteLLM choices were unavailable", 502, "malformed_response");
+      }
+      const firstChoice = choices[0] as Record<string, unknown>;
+      if (!firstChoice.message || typeof firstChoice.message !== "object") {
+        throw new LiteLLMError("LiteLLM message was unavailable", 502, "malformed_response");
+      }
+      (firstChoice.message as Record<string, unknown>).content = result.response ?? "";
+      responseBody.zentris_security = safePublicSecurity(security);
+      return reply.send(responseBody);
     } catch (error) {
       await telemetry.enqueue({
         requestId: request.id,
@@ -223,7 +239,7 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     } catch {
       return reply.code(500).send({ error: { message: "Security pipeline failed", type: "security_error" } });
     }
-    const security = makeSecurityState(request.id);
+    const security = guards.security;
     setSecurityHeaders(reply, security);
     if (guards.action === "block") {
       await telemetry.enqueue({
@@ -253,50 +269,86 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     const response = reply.raw;
     response.writeHead(200, {
       "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache, no-transform", Connection: "keep-alive",
-      "X-Zentris-Request-Id": request.id, "X-Zentris-Injection-Detected": "false",
-      "X-Zentris-Security-Action": "allow", "X-Zentris-Risk": "none"
+      "X-Zentris-Request-Id": request.id, "X-Zentris-Injection-Detected": String(security.injectionDetected),
+      "X-Zentris-Security-Action": securityAction(security), "X-Zentris-Risk": security.risk
     });
     const completionId = `chatcmpl-${request.id}`;
-    const created = Math.floor(Date.now() / 1000);
     const model = body.model ?? config.LITELLM_MODEL;
     const state = streamingGuard.createState();
     let rawOutput = "";
     let sanitizedOutput = "";
     let telemetryWrite: Promise<void> = Promise.resolve();
     let closed = false;
-    const emit = (payload: Record<string, unknown>): void => {
-      if (!closed && !response.writableEnded) response.write(`data: ${JSON.stringify(payload)}\n\n`);
+    let securitySent = false;
+    let lastContentTemplate: StreamPayload | undefined;
+    const pendingTerminalEvents: StreamPayload[] = [];
+    const emit = (payload: Record<string, unknown>, finalSecurity = false): void => {
+      const decorated = structuredClone(payload);
+      if (!securitySent || finalSecurity) {
+        decorated.zentris_security = safePublicSecurity(security);
+        securitySent = true;
+      }
+      if (!closed && !response.writableEnded) response.write(`data: ${JSON.stringify(decorated)}\n\n`);
     };
-    const emitContent = (content: string, first = false): void => emit({
-      id: completionId, object: "chat.completion.chunk", created, model,
-      choices: [{ index: 0, delta: { ...(first ? { role: "assistant" } : {}), content }, finish_reason: null }],
-      ...(first ? { zentris_security: safePublicSecurity(security) } : {})
-    });
-    emitContent("", true);
+    const emitContent = (content: string): void => {
+      const payload = structuredClone(lastContentTemplate ?? {
+        id: completionId,
+        object: "chat.completion.chunk",
+        model,
+        choices: [{ index: 0, delta: {}, finish_reason: null }]
+      }) as StreamPayload;
+      const choices = payload.choices;
+      if (Array.isArray(choices) && choices[0]) {
+        choices[0].delta = { ...(choices[0].delta ?? {}), content };
+      }
+      emit(payload);
+    };
+    const recordOutputFindings = (findings: ReturnType<typeof scanAndRedactSensitiveData>["findings"]): void => {
+      security.findings.push(...findings);
+      security.dlpDetected ||= findings.length > 0;
+    };
+    const sanitizeToolArguments = (payload: StreamPayload): StreamPayload => {
+      const copy = structuredClone(payload);
+      const visit = (value: unknown, key?: string): unknown => {
+        if (typeof value === "string" && key === "arguments") {
+          const scan = scanAndRedactSensitiveData(value, "output");
+          recordOutputFindings(scan.findings);
+          return scan.redacted;
+        }
+        if (Array.isArray(value)) return value.map((entry) => visit(entry));
+        if (value && typeof value === "object") {
+          for (const [childKey, child] of Object.entries(value)) {
+            (value as Record<string, unknown>)[childKey] = visit(child, childKey);
+          }
+        }
+        return value;
+      };
+      return visit(copy) as StreamPayload;
+    };
+    const isTerminalEvent = (payload: StreamPayload): boolean => {
+      const choices = payload.choices;
+      return (Array.isArray(choices) && choices.some((choice) => choice.finish_reason != null)) || "usage" in payload;
+    };
 
     await streamingClient.streamChat(
       completionId,
       guards.llmMessages,
-      generationOptions(body, request),
-      (chunk) => {
-        rawOutput += chunk;
-        const inspection = streamingGuard.inspectChunk(chunk, state);
-        for (const safeChunk of inspection.redactedChunks) {
-          sanitizedOutput += safeChunk;
-          emitContent(safeChunk);
-        }
-      },
+      guards.generation ?? {},
+      () => {},
       () => {
         const final = streamingGuard.flush(state);
         for (const safeChunk of final.redactedChunks) {
           sanitizedOutput += safeChunk;
           emitContent(safeChunk);
         }
-        const finalScan = scanAndRedactSensitiveData(rawOutput);
-        if (finalScan.detectedTypes.length > 0) {
-          security.dlpDetected = true;
-          security.matchedRules = Array.from(new Set([...security.matchedRules, ...finalScan.detectedTypes]));
-        }
+        const finalScan = scanAndRedactSensitiveData(rawOutput, "output");
+        security.findings.push(...finalScan.findings);
+        security.dlpDetected ||= finalScan.findings.length > 0;
+        security.matchedRules = Array.from(new Set(security.findings.map((finding) => finding.ruleId)));
+        security.score = Math.max(security.score, ...finalScan.findings.map((finding) => finding.score), 0);
+        if (security.score >= 70) security.risk = "high";
+        else if (security.score >= 40) security.risk = "medium";
+        else if (security.score > 0) security.risk = "low";
         telemetryWrite = telemetry.enqueue({
           requestId: request.id, sessionId: zentrisRequest.sessionId, identity: request.identity,
           route: "/v1/chat/completions", model, rawMessages: body.messages, sanitizedMessages: guards.llmMessages,
@@ -305,12 +357,15 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
           sanitizedResult: { role: "assistant", content: sanitizedOutput || finalScan.redacted },
           status: "success", httpStatus: 200, latencyMs: Date.now() - startedAt, security
         });
-        const stopChunk: Record<string, unknown> = {
-          id: completionId, object: "chat.completion.chunk", created, model,
-          choices: [{ index: 0, delta: {}, finish_reason: "stop" }]
-        };
-        if (body.stream_options?.include_usage) stopChunk.usage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
-        emit(stopChunk);
+        if (pendingTerminalEvents.length > 0) {
+          for (const terminalEvent of pendingTerminalEvents) emit(terminalEvent, true);
+        } else if (lastContentTemplate) {
+          const metadataEvent = structuredClone(lastContentTemplate);
+          if (Array.isArray(metadataEvent.choices)) {
+            for (const choice of metadataEvent.choices) choice.delta = {};
+          }
+          emit(metadataEvent, true);
+        }
         if (!response.writableEnded) response.write("data: [DONE]\n\n");
         closed = true;
         response.end();
@@ -330,6 +385,22 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
         emit({ error: { message: "Upstream model stream failed", type: "upstream_error" } });
         closed = true;
         response.end();
+      },
+      (payload, content) => {
+        const safePayload = sanitizeToolArguments(payload);
+        if (content.length > 0) {
+          rawOutput += content;
+          lastContentTemplate = safePayload;
+          const inspection = streamingGuard.inspectChunk(content, state);
+          for (const safeChunk of inspection.redactedChunks) {
+            sanitizedOutput += safeChunk;
+            emitContent(safeChunk);
+          }
+        } else if (isTerminalEvent(safePayload)) {
+          pendingTerminalEvents.push(safePayload);
+        } else {
+          emit(safePayload);
+        }
       }
     );
     await telemetryWrite;

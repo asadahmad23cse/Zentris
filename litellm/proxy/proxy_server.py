@@ -526,6 +526,7 @@ from litellm.router import (
     LiteLLM_Params,
     ModelGroupInfo,
 )
+from zentris_security.admin_api import router as zentris_admin_router
 from litellm.scheduler import FlowItem, Scheduler
 from litellm.secret_managers.aws_secret_manager import load_aws_kms
 from litellm.secret_managers.google_kms import load_google_kms
@@ -13845,6 +13846,7 @@ app.include_router(agent_endpoints_router)
 app.include_router(compliance_router)
 app.include_router(a2a_router)
 app.include_router(access_group_router)
+app.include_router(zentris_admin_router)
 ########################################################
 # MCP Server
 ########################################################

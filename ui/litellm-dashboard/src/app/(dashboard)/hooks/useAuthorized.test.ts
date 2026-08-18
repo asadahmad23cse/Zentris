@@ -74,8 +74,12 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
 };
 
 const createJwt = (payload: Record<string, unknown>) => {
+  const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }))
+    .replace(/=+$/, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
   const base64Url = btoa(JSON.stringify(payload)).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
-  return `eyJhbGciOiJub25lIn0.${base64Url}.signature`;
+  return `${header}.${base64Url}.signature`;
 };
 
 const clearCookie = () => {

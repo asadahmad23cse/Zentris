@@ -39,7 +39,7 @@ def detect_rag_poisoning(documents: list[DocumentChunk], trusted_domains: set[st
                 title="Potential RAG poisoning artifact",
                 stage=PipelineStage.RETRIEVAL,
                 risk=risk,
-                action=Action.SANITIZE if risk == RiskLevel.MEDIUM else Action.BLOCK,
+                action=Action.SANITIZE,
                 score=score,
                 evidence=excerpt(document.content),
                 owasp=["LLM08:2025", "LLM10:2025"],

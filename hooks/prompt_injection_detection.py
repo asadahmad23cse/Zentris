@@ -15,8 +15,9 @@ import json
 import re
 import sys
 import unicodedata
+import urllib.parse
 from dataclasses import asdict, dataclass
-from difflib import SequenceMatcher
+from pathlib import Path
 from typing import Iterable
 
 
@@ -25,6 +26,10 @@ ZERO_WIDTH_PATTERN = re.compile(r"[\u200b-\u200f\u202a-\u202e\u2060\ufeff]")
 WHITESPACE_PATTERN = re.compile(r"\s+")
 BASE64_CANDIDATE_PATTERN = re.compile(r"(?<![A-Za-z0-9+/=])([A-Za-z0-9+/=]{12,})(?![A-Za-z0-9+/=])")
 HEX_CANDIDATE_PATTERN = re.compile(r"\b(?:0x)?[a-fA-F0-9]{16,}\b")
+URL_CANDIDATE_PATTERN = re.compile(r"(?:%[0-9A-Fa-f]{2}|[A-Za-z0-9._~-]){6,}")
+SCAN_CHUNK_CHARS = 16_384
+SCAN_OVERLAP_CHARS = 512
+MAX_DECODED_CANDIDATE_CHARS = 4_096
 SPLIT_JOIN_SEPARATOR = r"[\s\W_\u200b-\u200f\ufeff]*"
 SPLIT_TOKEN_TARGETS = (
     "ignore",
@@ -46,6 +51,7 @@ class DetectionRule:
     risk: str
     reason: str
     score: int
+    category: str
 
 
 @dataclass(frozen=True)
@@ -60,64 +66,25 @@ class DetectionResult:
     normalized_text: str
 
 
-RULES: tuple[DetectionRule, ...] = (
-    DetectionRule(
-        "ignore_previous_instructions",
-        re.compile(r"\b(?:ignore|disregard|forget)\b[\s\S]{0,60}\b(?:previous|prior|earlier|all)\b[\s\S]{0,40}\b(?:instructions?|directives?|prompts?)\b", re.I),
-        "high",
-        "Attempts to override the instruction hierarchy",
-        55,
-    ),
-    DetectionRule(
-        "system_prompt_exfiltration",
-        re.compile(r"\b(?:reveal|show|print|display|dump|expose|leak)\b[\s\S]{0,50}\b(?:system|hidden|developer)\b[\s\S]{0,30}\b(?:prompt|instructions?|message)\b", re.I),
-        "high",
-        "Attempts to exfiltrate protected system or developer context",
-        55,
-    ),
-    DetectionRule(
-        "role_override",
-        re.compile(r"\b(?:act\s+as|you\s+are\s+now|switch\s+to)\b[\s\S]{0,50}\b(?:admin|developer|root|system|unrestricted|dan)\b", re.I),
-        "medium",
-        "Attempts to force a privileged role or persona",
-        35,
-    ),
-    DetectionRule(
-        "jailbreak_phrase",
-        re.compile(r"\b(?:jailbreak|do\s+anything\s+now|developer\s+mode|dan\s+(?:mode|prompt)|unfiltered\s+mode)\b", re.I),
-        "high",
-        "Known jailbreak phrasing detected",
-        50,
-    ),
-    DetectionRule(
-        "tool_or_policy_bypass",
-        re.compile(r"\b(?:bypass|disable|override|circumvent)\b[\s\S]{0,35}\b(?:guardrails?|policy|filters?|safety|moderation|tool\s+rules?)\b", re.I),
-        "high",
-        "Attempts to bypass safety policy or tool controls",
-        45,
-    ),
-    DetectionRule(
-        "prompt_boundary_injection",
-        re.compile(r"(?:^|\n)\s*(?:system|developer|assistant|human|user)\s*:\s*", re.I),
-        "medium",
-        "Prompt boundary marker appears in user-controlled text",
-        25,
-    ),
-    DetectionRule(
-        "markup_or_script_injection",
-        re.compile(r"(?:<!--|<script\b|<\?php\b|</system>|</developer>)", re.I),
-        "high",
-        "Markup or code boundary injection marker detected",
-        45,
-    ),
-    DetectionRule(
-        "env_or_path_probe",
-        re.compile(r"\bprocess\.env\b|/etc/passwd|\.\./|\.ssh/id_|aws_secret_access_key", re.I),
-        "high",
-        "Environment, path traversal, or credential probing detected",
-        45,
-    ),
-)
+def _load_rules() -> tuple[DetectionRule, ...]:
+    catalog_path = Path(__file__).resolve().parents[1] / "src" / "security" / "injection-rules.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    if catalog.get("version") != 1:
+        raise RuntimeError("Unsupported prompt-injection rule catalog version")
+    return tuple(
+        DetectionRule(
+            rule_id=item["id"],
+            pattern=re.compile(item["pattern"], re.I | re.M),
+            risk=item["severity"],
+            reason=item["reason"],
+            score=int(item["weight"]),
+            category=item["category"],
+        )
+        for item in catalog["rules"]
+    )
+
+
+RULES = _load_rules()
 
 FUZZY_ATTACK_TEMPLATES = (
     "ignore previous instructions",
@@ -179,69 +146,63 @@ def normalize_text(raw_text: str) -> str:
         decoded = _decode_base64_candidate(candidate)
         return f"{candidate} [decoded:{decoded}]" if decoded else candidate
 
-    with_decoded_base64 = BASE64_CANDIDATE_PATTERN.sub(annotate_base64, joined)
-    with_hex_annotation = HEX_CANDIDATE_PATTERN.sub(lambda match: f"{match.group(0)} [hex_blob]", with_decoded_base64)
-    return with_hex_annotation
+    def annotate_url(match: re.Match[str]) -> str:
+        candidate = match.group(0)
+        if "%" not in candidate:
+            return candidate
+        try:
+            decoded = urllib.parse.unquote(candidate)
+        except (UnicodeDecodeError, ValueError):
+            return candidate
+        return f"{candidate} [URL:{decoded[:MAX_DECODED_CANDIDATE_CHARS]}]"
+
+    def annotate_hex(match: re.Match[str]) -> str:
+        candidate = match.group(0)
+        encoded = candidate[2:] if candidate.lower().startswith("0x") else candidate
+        if len(encoded) % 2 or len(encoded) > MAX_DECODED_CANDIDATE_CHARS * 2:
+            return candidate
+        try:
+            decoded = bytes.fromhex(encoded).decode("utf-8")
+        except (UnicodeDecodeError, ValueError):
+            return candidate
+        if not decoded or any(ord(char) < 32 and not char.isspace() for char in decoded):
+            return candidate
+        return f"{candidate} [HEX:{decoded[:MAX_DECODED_CANDIDATE_CHARS]}]"
+
+    with_decoded_url = URL_CANDIDATE_PATTERN.sub(annotate_url, joined)
+    with_decoded_base64 = BASE64_CANDIDATE_PATTERN.sub(annotate_base64, with_decoded_url)
+    return HEX_CANDIDATE_PATTERN.sub(annotate_hex, with_decoded_base64)
 
 
 def _highest_risk(risks: Iterable[str]) -> str:
     return max(risks, key=lambda risk: RISK_ORDER[risk], default="low")
 
 
-def _fuzzy_score(text: str) -> tuple[int, list[str]]:
-    compact_text = re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
-    matches: list[str] = []
-    score = 0
-
-    for template in FUZZY_ATTACK_TEMPLATES:
-        ratio = SequenceMatcher(None, compact_text, template).ratio()
-        window = len(template)
-        window_ratio = max(
-            (SequenceMatcher(None, compact_text[start : start + window], template).ratio() for start in range(0, max(1, len(compact_text) - window + 1))),
-            default=0.0,
-        )
-        best_ratio = max(ratio, window_ratio)
-        if best_ratio >= 0.82:
-            matches.append(f"fuzzy:{template}")
-            score += 20
-
-    return score, matches
-
-
 def detect_prompt_injection(raw_text: str) -> DetectionResult:
     normalized_text = normalize_text(raw_text)
-    scan_text = f"{raw_text}\n{normalized_text}"
+    scan_text = raw_text if raw_text == normalized_text else f"{raw_text}\n{normalized_text}"
 
     matched_rules: list[str] = []
     reasons: list[str] = []
-    score = 0
+    weights: list[int] = []
+    categories: set[str] = set()
     risks: list[str] = []
 
-    for rule in RULES:
-        if rule.pattern.search(scan_text):
-            matched_rules.append(rule.rule_id)
-            reasons.append(rule.reason)
-            risks.append(rule.risk)
-            score += rule.score
+    step = max(1, SCAN_CHUNK_CHARS - SCAN_OVERLAP_CHARS)
+    for offset in range(0, len(scan_text), step):
+        chunk = scan_text[offset : offset + SCAN_CHUNK_CHARS]
+        for rule in RULES:
+            if rule.rule_id not in matched_rules and rule.pattern.search(chunk):
+                matched_rules.append(rule.rule_id)
+                reasons.append(rule.reason)
+                risks.append(rule.risk)
+                weights.append(rule.score)
+                categories.add(rule.category)
 
-    fuzzy_points, fuzzy_matches = _fuzzy_score(normalized_text)
-    if fuzzy_matches:
-        matched_rules.extend(fuzzy_matches)
-        reasons.append("Fuzzy match to known prompt injection templates")
-        risks.append("medium")
-        score += fuzzy_points
-
-    for pattern, points, signal_id in SEMANTIC_SIGNALS:
-        if pattern.search(scan_text):
-            matched_rules.append(signal_id)
-            reasons.append(f"Semantic signal detected: {signal_id}")
-            risks.append("medium")
-            score += points
-
-    score = min(score, 100)
+    score = min(100, (max(weights) if weights else 0) + max(0, len(categories) - 1) * 10)
     risk = _highest_risk(risks)
     if score >= 70 or risk == "high":
-        action = "block"
+        action = "sanitize"
         risk = "high"
         safe = False
     elif score >= 35 or risk == "medium":

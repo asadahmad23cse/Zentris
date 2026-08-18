@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "instruction_hierarchy_override",
+      "category": "instruction_override",
+      "severity": "high",
+      "weight": 80,
+      "reason": "Attempts to discard or replace trusted instructions",
+      "pattern": "\\b(?:ignore|disregard|forget|override|bypass)\\b[\\s\\S]{0,80}\\b(?:previous|prior|earlier|all|system|developer|safety)\\b[\\s\\S]{0,60}\\b(?:instructions?|directives?|prompts?|rules?|polic(?:y|ies))\\b"
+    },
+    {
+      "id": "system_prompt_extraction",
+      "category": "prompt_exfiltration",
+      "severity": "high",
+      "weight": 85,
+      "reason": "Attempts to obtain protected system or developer instructions",
+      "pattern": "\\b(?:reveal|show|print|display|dump|repeat|expose|leak|quote)\\b[\\s\\S]{0,60}\\b(?:system|developer|hidden|initial|internal)\\b[\\s\\S]{0,35}\\b(?:prompt|instructions?|message|policy|context)\\b"
+    },
+    {
+      "id": "role_or_persona_override",
+      "category": "role_override",
+      "severity": "medium",
+      "weight": 55,
+      "reason": "Attempts to force an elevated or unrestricted persona",
+      "pattern": "\\b(?:(?:act|behave|respond)\\s+as|you\\s+are\\s+now|enter|enable|simulate)\\b[\\s\\S]{0,60}\\b(?:admin|developer|root|superuser|system|unrestricted|uncensored|dan|god\\s*mode|developer\\s*mode)\\b"
+    },
+    {
+      "id": "known_jailbreak_language",
+      "category": "jailbreak",
+      "severity": "high",
+      "weight": 75,
+      "reason": "Contains established jailbreak terminology",
+      "pattern": "\\b(?:jailbreak|do\\s+anything\\s+now|dan\\s+(?:mode|prompt|jailbreak)|developer\\s+mode|unfiltered\\s+mode|no\\s+ethical\\s+guidelines)\\b"
+    },
+    {
+      "id": "fake_role_or_prompt_boundary",
+      "category": "boundary_injection",
+      "severity": "medium",
+      "weight": 50,
+      "reason": "Uses fake role or instruction boundaries",
+      "pattern": "(?:^|[\\r\\n])\\s*(?:system|developer|assistant|human)\\s*[:>] |<\\|(?:system|assistant|developer|im_start|im_end)\\|>|\\[(?:system|developer|assistant)\\]"
+    },
+    {
+      "id": "policy_disable_request",
+      "category": "policy_bypass",
+      "severity": "high",
+      "weight": 75,
+      "reason": "Requests disabling security or policy enforcement",
+      "pattern": "\\b(?:disable|turn\\s+off|remove|bypass|evade)\\b[\\s\\S]{0,50}\\b(?:safety|security|guardrails?|filters?|moderation|policy|restrictions?)\\b"
+    },
+    {
+      "id": "tool_or_secret_exfiltration",
+      "category": "data_exfiltration",
+      "severity": "high",
+      "weight": 90,
+      "reason": "Attempts to invoke tools or extract protected data",
+      "pattern": "\\b(?:call|invoke|execute|run|use|print|read|send|upload|exfiltrate)\\b[\\s\\S]{0,70}\\b(?:tool|function|process\\.env|environment\\s+variables?|api\\s*keys?|credentials?|secrets?|passwords?|/etc/passwd|private\\s+key)\\b"
+    },
+    {
+      "id": "protected_file_or_environment_probe",
+      "category": "data_exfiltration",
+      "severity": "high",
+      "weight": 90,
+      "reason": "Attempts to read credential files, environment secrets, or operating-system identity files",
+      "pattern": "\\b(?:read|open|find|show|print|dump|include)\\b[\\s\\S]{0,80}(?:\\.\\.?[/\\\\](?:\\.env|etc[/\\\\]passwd)|/etc/passwd|aws[_ -]?secret[_ -]?access[_ -]?key|\\.ssh[/\\\\]id_(?:rsa|ed25519)|process\\.env|environment\\s+variables?)"
+    },
+    {
+      "id": "tool_policy_override",
+      "category": "tool_exploitation",
+      "severity": "high",
+      "weight": 80,
+      "reason": "Attempts to override server-controlled tool authorization rules",
+      "pattern": "\\b(?:ignore|override|bypass|disable|circumvent)\\b[\\s\\S]{0,60}\\b(?:tool|function|plugin|mcp)\\b[\\s\\S]{0,35}\\b(?:rules?|policy|authorization|allowlist|restrictions?)\\b"
+    },
+    {
+      "id": "guardrail_circumvention",
+      "category": "policy_bypass",
+      "severity": "high",
+      "weight": 75,
+      "reason": "Requests circumvention of safety or security controls",
+      "pattern": "\\b(?:circumvent|evade|defeat|work\\s+around)\\b[\\s\\S]{0,50}\\b(?:safety|security|guardrails?|filters?|moderation|policy|restrictions?)\\b"
+    },
+    {
+      "id": "hidden_prompt_probe",
+      "category": "prompt_exfiltration",
+      "severity": "medium",
+      "weight": 55,
+      "reason": "Probes for hidden or protected model instructions",
+      "pattern": "\\b(?:what|which|where|can\\s+you\\s+tell\\s+me)\\b[\\s\\S]{0,45}\\b(?:hidden|system|developer|internal)\\b[\\s\\S]{0,30}\\b(?:prompt|instructions?|message|policy)\\b"
+    },
+    {
+      "id": "context_reset",
+      "category": "context_manipulation",
+      "severity": "medium",
+      "weight": 45,
+      "reason": "Attempts to reset or replace the active context",
+      "pattern": "\\b(?:forget\\s+everything|reset\\s+(?:the\\s+)?context|start\\s+(?:a\\s+)?new\\s+session|new\\s+instructions?\\s+follow)\\b"
+    },
+    {
+      "id": "indirect_instruction_marker",
+      "category": "indirect_injection",
+      "severity": "medium",
+      "weight": 55,
+      "reason": "Marks retrieved content as instructions for the model",
+      "pattern": "\\b(?:instructions?\\s+(?:for|to)\\s+(?:the\\s+)?(?:ai|assistant|model)|when\\s+(?:an\\s+)?ai\\s+reads\\s+this|assistant\\s+must\\s+now)\\b"
+    },
+    {
+      "id": "encoded_instruction_annotation",
+      "category": "obfuscation",
+      "severity": "medium",
+      "weight": 50,
+      "reason": "Decoded or obfuscated text contains instruction language",
+      "pattern": "\\[(?:BASE64|URL|HEX):[\\s\\S]{0,240}\\b(?:ignore|override|reveal|execute|system\\s+prompt|instructions?)\\b[\\s\\S]{0,120}\\]"
+    },
+    {
+      "id": "markup_instruction_smuggling",
+      "category": "instruction_smuggling",
+      "severity": "medium",
+      "weight": 45,
+      "reason": "Uses markup commonly associated with hidden instructions",
+      "pattern": "(?:<!--[^>]{0,300}\\b(?:ignore|instruction|system|assistant)\\b[^>]{0,300}-->|<script\\b|<\\?php\\b)"
+    }
+  ]
+}

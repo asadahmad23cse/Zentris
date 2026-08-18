@@ -49,6 +49,11 @@ build/
 *.egg-info/
 .DS_Store
 **/node_modules
+**/.next/
+**/.turbo/
+**/*.tsbuildinfo
 *.log
 .env
 .env.local
+.local/
+logs/

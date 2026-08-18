@@ -38,6 +38,7 @@ export interface SecurityMetadata {
 
 export interface GenerationOptions {
   model?: string;
+  streamOptions?: { includeUsage?: boolean };
   temperature?: number;
   maxTokens?: number;
   topP?: number;
@@ -64,6 +65,7 @@ export interface ToolInvocation {
 
 export interface ZentrisRequest {
   sessionId: string;
+  persistContext?: boolean;
   identity: AuthenticatedIdentity;
   rawInput: string;
   messages: ChatMessage[];
@@ -114,9 +116,7 @@ export interface PipelineContext {
 export interface AuditLogEntry {
   timestamp: number;
   sessionId: string;
-  userId: string;
-  input: string;
-  normalizedInput: string;
+  contentLength: number;
   decisions: GuardResult[];
   finalAction: GuardResult["action"];
   riskScore: number;

@@ -38,11 +38,11 @@ export class StreamingGuard {
   }
 
   public inspectChunk(chunk: string, state: StreamingInspectionState): StreamingInspectionResult {
-    const chunkResult = scanAndRedactSensitiveData(chunk);
+    const chunkResult = scanAndRedactSensitiveData(chunk, "output");
     state.pendingRaw += chunk;
 
     const rollingWindow = state.pendingRaw.slice(-state.rollingWindowChars);
-    const rollingResult = scanAndRedactSensitiveData(rollingWindow);
+    const rollingResult = scanAndRedactSensitiveData(rollingWindow, "output");
 
     const crossChunkLeakDetected =
       chunkResult.detectedTypes.length === 0 && rollingResult.detectedTypes.length > 0;
@@ -62,42 +62,23 @@ export class StreamingGuard {
       );
     }
 
-    if (crossChunkLeakDetected) {
-      return {
-        safe: false,
-        terminate: true,
-        redactedChunks: [],
-        detectedTypes: Array.from(suspiciousTypes),
-        reason: "cross_chunk_sensitive_pattern"
-      };
-    }
-
-    if (state.suspiciousEvents >= state.suspiciousEventLimit) {
-      return {
-        safe: false,
-        terminate: true,
-        redactedChunks: [],
-        detectedTypes: Array.from(suspiciousTypes),
-        reason: "suspicious_stream_circuit_open"
-      };
-    }
-
     const redactedChunks: string[] = [];
     const rawEmitLength = Math.max(0, state.pendingRaw.length - state.rollingWindowChars);
     if (rawEmitLength > 0) {
       const rawToEmit = state.pendingRaw.slice(0, rawEmitLength);
       state.pendingRaw = state.pendingRaw.slice(rawEmitLength);
-      const redactedToEmit = scanAndRedactSensitiveData(rawToEmit).redacted;
+      const redactedToEmit = scanAndRedactSensitiveData(rawToEmit, "output").redacted;
       if (redactedToEmit.length > 0) {
         redactedChunks.push(redactedToEmit);
       }
     }
 
     return {
-      safe: true,
+      safe: suspiciousTypes.size === 0,
       terminate: false,
       redactedChunks,
-      detectedTypes: Array.from(suspiciousTypes)
+      detectedTypes: Array.from(suspiciousTypes),
+      ...(crossChunkLeakDetected ? { reason: "cross_chunk_sensitive_pattern_redacted" } : {})
     };
   }
 
@@ -111,7 +92,7 @@ export class StreamingGuard {
       };
     }
 
-    const redacted = scanAndRedactSensitiveData(state.pendingRaw);
+    const redacted = scanAndRedactSensitiveData(state.pendingRaw, "output");
     state.pendingRaw = "";
 
     return {

@@ -38,7 +38,7 @@ const WRITE_ADJACENT_INTENTS: ReadonlySet<IntentType> = new Set(["write", "delet
 
 export class AuthorizationService {
   public authorize(
-    userId: string,
+    _userId: string,
     userRole: UserRole,
     intent: IntentType,
     riskScore: number
@@ -48,31 +48,31 @@ export class AuthorizationService {
 
     if (!rolePolicies) {
       decision = { authorized: false, reason: "unknown_role" };
-      logger.info({ userId, userRole, intent, riskScore, ...decision }, "authorization_decision");
+      logger.debug({ userRole, intent, riskScore, ...decision }, "authorization_decision");
       return decision;
     }
 
     const intentPolicy = rolePolicies[intent];
     if (!intentPolicy) {
       decision = { authorized: false, reason: "unknown_intent" };
-      logger.info({ userId, userRole, intent, riskScore, ...decision }, "authorization_decision");
+      logger.debug({ userRole, intent, riskScore, ...decision }, "authorization_decision");
       return decision;
     }
 
     if (userRole === "anonymous" && WRITE_ADJACENT_INTENTS.has(intent)) {
       decision = { authorized: false, reason: "require_confirmation" };
-      logger.info({ userId, userRole, intent, riskScore, ...decision }, "authorization_decision");
+      logger.debug({ userRole, intent, riskScore, ...decision }, "authorization_decision");
       return decision;
     }
 
     if (riskScore > intentPolicy.maxRiskScore) {
       decision = { authorized: false, reason: "risk_exceeds_role_limit" };
-      logger.info({ userId, userRole, intent, riskScore, ...decision }, "authorization_decision");
+      logger.debug({ userRole, intent, riskScore, ...decision }, "authorization_decision");
       return decision;
     }
 
     decision = { authorized: true, reason: "authorized" };
-    logger.info({ userId, userRole, intent, riskScore, ...decision }, "authorization_decision");
+    logger.debug({ userRole, intent, riskScore, ...decision }, "authorization_decision");
     return decision;
   }
 }

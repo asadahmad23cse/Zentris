@@ -6,11 +6,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const nextConfig = {
+  output: "standalone",
   // output: "export" removed — static export breaks dev server auth/routing
   basePath: "",
   assetPrefix: "",
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
   async rewrites() {
     return [
       {

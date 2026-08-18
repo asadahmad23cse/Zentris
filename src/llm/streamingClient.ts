@@ -8,14 +8,15 @@ interface StreamDelta {
 
 interface StreamChoice {
   delta?: StreamDelta;
+  finish_reason?: unknown;
 }
 
-interface StreamPayload {
+export interface StreamPayload extends Record<string, unknown> {
   choices?: StreamChoice[];
 }
 
-const DEFAULT_MODEL = "gpt-4o";
 const DEFAULT_TEMPERATURE = 0.7;
+const REQUEST_TIMEOUT_MS = 30_000;
 
 const extractContent = (value: unknown): string => {
   if (typeof value === "string") {
@@ -53,28 +54,42 @@ export class StreamingClient {
     options: LLMOptions,
     onChunk: (chunk: string) => void,
     onEnd: () => void,
-    onError: (err: Error) => void
+    onError: (err: Error) => void,
+    onEvent?: (payload: StreamPayload, content: string) => void
   ): Promise<void> {
     const url = `${config.LITELLM_BASE_URL.replace(/\/$/, "")}/chat/completions`;
     const abortController = new AbortController();
+    let timedOut = false;
+    const timeout = setTimeout(() => {
+      timedOut = true;
+      abortController.abort();
+    }, REQUEST_TIMEOUT_MS);
     this.abortControllersByStreamId.set(streamId, abortController);
 
     try {
       const response = await fetch(url, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${config.LITELLM_API_KEY}`,
+          Authorization: `Bearer ${options.apiKey ?? config.LITELLM_API_KEY}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: options.model ?? DEFAULT_MODEL,
+          model: options.model ?? config.LITELLM_MODEL,
           messages: messages.map((message) => ({
             role: message.role,
             content: message.content
           })),
           stream: true,
+          ...(options.streamOptions !== undefined ? {
+            stream_options: { include_usage: options.streamOptions.includeUsage }
+          } : {}),
           temperature: options.temperature ?? DEFAULT_TEMPERATURE,
-          ...(options.maxTokens ? { max_tokens: options.maxTokens } : {})
+          ...(options.maxTokens !== undefined ? { max_tokens: options.maxTokens } : {}),
+          ...(options.topP !== undefined ? { top_p: options.topP } : {}),
+          ...(options.stop !== undefined ? { stop: options.stop } : {}),
+          ...(options.tools !== undefined ? { tools: options.tools } : {}),
+          ...(options.toolChoice !== undefined ? { tool_choice: options.toolChoice } : {}),
+          ...(options.responseFormat !== undefined ? { response_format: options.responseFormat } : {})
         }),
         signal: abortController.signal
       });
@@ -115,7 +130,9 @@ export class StreamingClient {
 
           const parsed = JSON.parse(payload) as StreamPayload;
           const content = extractContent(parsed.choices?.[0]?.delta?.content);
-          if (content.length > 0) {
+          if (onEvent) {
+            onEvent(parsed, content);
+          } else if (content.length > 0) {
             onChunk(content);
           }
 
@@ -131,7 +148,9 @@ export class StreamingClient {
         }
         const parsed = JSON.parse(payload) as StreamPayload;
         const content = extractContent(parsed.choices?.[0]?.delta?.content);
-        if (content.length > 0) {
+        if (onEvent) {
+          onEvent(parsed, content);
+        } else if (content.length > 0) {
           onChunk(content);
         }
       }
@@ -139,11 +158,13 @@ export class StreamingClient {
       onEnd();
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
+        if (timedOut) onError(new LiteLLMError("LiteLLM streaming request timed out", 504, "request_timeout"));
         return;
       }
       const normalizedError = error instanceof Error ? error : new Error("streaming_failed");
       onError(normalizedError);
     } finally {
+      clearTimeout(timeout);
       this.abortControllersByStreamId.delete(streamId);
     }
   }

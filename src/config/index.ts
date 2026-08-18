@@ -95,6 +95,14 @@ const getStringEnv = (name: string, defaultValue: string): string => {
   return rawValue.trim();
 };
 
+const getLiteLLMBaseUrl = (): string => {
+  const explicit = process.env.LITELLM_BASE_URL?.trim();
+  if (explicit) return explicit;
+  const hostPort = process.env.LITELLM_HOSTPORT?.trim();
+  if (hostPort) return `http://${hostPort}/v1`;
+  throw new Error("Missing required environment variable: LITELLM_BASE_URL or LITELLM_HOSTPORT");
+};
+
 const getLogLevel = (): LogLevel => {
   const rawValue = getRequiredEnv("LOG_LEVEL") as LogLevel;
   if (!LOG_LEVELS.includes(rawValue)) {
@@ -195,7 +203,7 @@ export const config: AppConfig = {
   ZENTRIS_STRICT_CONFIG: getBooleanEnv("ZENTRIS_STRICT_CONFIG", false),
   ZENTRIS_DEMO_ENABLED: getBooleanEnv("ZENTRIS_DEMO_ENABLED", false),
   REDIS_URL: getRequiredEnv("REDIS_URL"),
-  LITELLM_BASE_URL: getRequiredEnv("LITELLM_BASE_URL"),
+  LITELLM_BASE_URL: getLiteLLMBaseUrl(),
   LITELLM_API_KEY: getRequiredEnv("LITELLM_API_KEY"),
   LITELLM_MODEL: getStringEnv("LITELLM_MODEL", "gpt-4o-mini"),
   JWT_SECRET: getRequiredEnv("JWT_SECRET"),
@@ -222,7 +230,7 @@ export const config: AppConfig = {
   CIRCUIT_BREAKER_ENABLED: getBooleanEnv("CIRCUIT_BREAKER_ENABLED", true),
   LOG_LEVEL: getLogLevel(),
   PORT: getNumberEnv("PORT"),
-  PUBLIC_WEB_ORIGIN: getStringEnv("PUBLIC_WEB_ORIGIN", "https://litellm-dashboard-rose.vercel.app")
+  PUBLIC_WEB_ORIGIN: getStringEnv("PUBLIC_WEB_ORIGIN", "http://localhost:3000")
 };
 
 validateConfig(config);

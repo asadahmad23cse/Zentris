@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ "$1" = "python" ] || [ "$1" = "python3" ]; then
+    exec "$@"
+fi
+
 if [ "$SEPARATE_HEALTH_APP" = "1" ]; then
     export LITELLM_ARGS="$@"
     export SUPERVISORD_STOPWAITSECS="${SUPERVISORD_STOPWAITSECS:-3600}"

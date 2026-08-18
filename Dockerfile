@@ -27,6 +27,11 @@ RUN sed -i 's/\r$//' docker/build_admin_ui.sh && chmod +x docker/build_admin_ui.
 # Build the package
 RUN rm -rf dist/* && python -m build
 
+# Build the matching proxy-extras package from this checkout.  The extras wheel
+# owns the Prisma migration catalog; installing the published dependency here
+# would silently omit Zentris-owned schema migrations from the runtime image.
+RUN cd litellm-proxy-extras && rm -rf dist && python -m build --wheel
+
 # There should be only one wheel file now, assume the build only creates one
 RUN ls -1 dist/*.whl | head -1
 
@@ -87,10 +92,15 @@ RUN ls -la /app
 
 # Copy the built wheel from the builder stage to the runtime stage; assumes only one wheel file is present
 COPY --from=builder /app/dist/*.whl .
+COPY --from=builder /app/litellm-proxy-extras/dist/*.whl /local-extras/
 COPY --from=builder /wheels/ /wheels/
 
 # Install the built wheel using pip; again using a wildcard if it's the only file
 RUN pip install *.whl /wheels/* --no-index --find-links=/wheels/ --no-deps && rm -f *.whl && rm -rf /wheels
+
+# Override the dependency wheel with the migration catalog built from the same
+# source revision as the proxy and Prisma schemas.
+RUN pip install --force-reinstall --no-deps /local-extras/*.whl && rm -rf /local-extras
 
 # Replace the nodejs-wheel-binaries bundled node with the system node (fixes CVE-2025-55130)
 RUN NODEJS_WHEEL_NODE=$(find /usr/lib -path "*/nodejs_wheel/bin/node" 2>/dev/null) && \
