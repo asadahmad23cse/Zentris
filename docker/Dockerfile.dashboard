@@ -5,6 +5,7 @@ RUN npm ci
 
 FROM node:22-alpine AS builder
 WORKDIR /app/ui/litellm-dashboard
+ENV BUILD_STANDALONE=true
 COPY --from=deps /app/ui/litellm-dashboard/node_modules ./node_modules
 COPY ui/litellm-dashboard ./
 RUN npm run build

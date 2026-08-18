@@ -6,8 +6,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const nextConfig = {
-  output: "standalone",
-  // output: "export" removed — static export breaks dev server auth/routing
+  // "standalone" is for Docker self-hosting; Vercel uses its own output pipeline.
+  // Set BUILD_STANDALONE=true in Dockerfile to activate standalone mode.
+  output: process.env.BUILD_STANDALONE === "true" ? "standalone" : undefined,
   basePath: "",
   assetPrefix: "",
   async rewrites() {
