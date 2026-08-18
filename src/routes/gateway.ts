@@ -438,10 +438,27 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
       { id: "groq/compound",       object: "model", owned_by: "groq" }
     ]
   };
+  // The Models + Endpoints table/tabs read many fields per row. Provide the full
+  // shape (Zentris_params mirror of litellm_params, max_tokens, db_model,
+  // access_groups, timestamps, team_id) so row rendering never hits undefined.
+  const nowIso = new Date().toISOString();
+  const mkModelInfo = (id: string, opts: { input: number; output: number; maxOut: number; vision: boolean }) => ({
+    model_name: id,
+    litellm_params: { model: id },
+    Zentris_params: { model: id },
+    model_info: {
+      id, mode: "chat",
+      input_cost_per_token: opts.input, output_cost_per_token: opts.output,
+      max_tokens: opts.maxOut, max_input_tokens: 131072, max_output_tokens: opts.maxOut,
+      supports_function_calling: true, supports_vision: opts.vision,
+      db_model: false, access_groups: [] as string[], team_id: null as string | null,
+      created_by: "system", created_at: nowIso, updated_at: nowIso
+    }
+  });
   const modelInfoData = [
-    { model_name: "openai/gpt-oss-120b", litellm_params: { model: "openai/gpt-oss-120b" }, model_info: { id: "openai/gpt-oss-120b", mode: "chat", input_cost_per_token: 0.00000015, output_cost_per_token: 0.0000006, max_input_tokens: 131072, max_output_tokens: 65536, supports_function_calling: true, supports_vision: false } },
-    { model_name: "openai/gpt-oss-20b",  litellm_params: { model: "openai/gpt-oss-20b"  }, model_info: { id: "openai/gpt-oss-20b",  mode: "chat", input_cost_per_token: 0.00000005, output_cost_per_token: 0.0000002, max_input_tokens: 131072, max_output_tokens: 65536, supports_function_calling: true, supports_vision: false } },
-    { model_name: "qwen/qwen3.6-27b",    litellm_params: { model: "qwen/qwen3.6-27b"    }, model_info: { id: "qwen/qwen3.6-27b",    mode: "chat", input_cost_per_token: 0.0000006,  output_cost_per_token: 0.000003,  max_input_tokens: 131072, max_output_tokens: 16384, supports_function_calling: true, supports_vision: true } }
+    mkModelInfo("openai/gpt-oss-120b", { input: 0.00000015, output: 0.0000006, maxOut: 65536, vision: false }),
+    mkModelInfo("openai/gpt-oss-20b",  { input: 0.00000005, output: 0.0000002, maxOut: 65536, vision: false }),
+    mkModelInfo("qwen/qwen3.6-27b",    { input: 0.0000006,  output: 0.000003,  maxOut: 16384, vision: true })
   ];
   // Drives the Playground model dropdown (fetchAvailableModels -> /model_group/info).
   // model_group must equal the ID forwarded to Groq so completions succeed.
