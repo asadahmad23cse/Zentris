@@ -10,6 +10,7 @@ import { ZentrisPipeline } from "../middleware/pipeline";
 import { CircuitOpenError } from "../services/circuitBreaker";
 import { TelemetryService } from "../services/telemetryService";
 import { listAgents, createAgent, deleteAgent, setAgentsPublic } from "../services/agentStore";
+import { listMCPServers, createMCPServer, updateMCPServer, deleteMCPServer } from "../services/mcpServerStore";
 import { type ChatMessage, type GenerationOptions, type SecurityMetadata, type ZentrisRequest } from "../types";
 
 interface OpenAIMessage { role: "system" | "user" | "assistant"; content: string; }
@@ -624,7 +625,17 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/mcp_server/list",         async () => []);
   // fetchMCPServers/fetchAvailableAgents consume the raw body as an array
   // (mcpServers.map(...), agents.sort(...)), so these MUST return a bare array.
-  app.get("/v1/mcp/server",          async () => []);
+  // MCP server registry — persisted in Redis (see services/mcpServerStore.ts).
+  // GET returns a bare array (the page does mcpServers.map(...)); create/update/
+  // delete power the "Add New MCP Server" flow.
+  app.get("/v1/mcp/server",          async () => await listMCPServers());
+  app.post("/v1/mcp/server",         async (request) => await createMCPServer((request.body ?? {}) as Record<string, unknown>));
+  app.put("/v1/mcp/server",          async (request) => (await updateMCPServer((request.body ?? {}) as Record<string, unknown>)) ?? {});
+  app.delete("/v1/mcp/server/:serverId", async (request) => {
+    const { serverId } = request.params as { serverId: string };
+    const deleted = await deleteMCPServer(serverId);
+    return { deleted, server_id: serverId };
+  });
   app.get("/v1/mcp/server/health",   async () => []);
 
   // A2A agent registry — persisted in Redis (see services/agentStore.ts). The
