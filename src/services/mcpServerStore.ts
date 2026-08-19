@@ -86,6 +86,11 @@ export const updateMCPServer = async (form: Record<string, unknown>): Promise<St
   return updated;
 };
 
+export const getMCPServer = async (serverId: string): Promise<StoredMCPServer | null> => {
+  const raw = await redisClient.hget(MCP_SERVERS_KEY, serverId);
+  return raw ? parseServer(raw) : null;
+};
+
 export const deleteMCPServer = async (serverId: string): Promise<boolean> => {
   const removed = await redisClient.hdel(MCP_SERVERS_KEY, serverId);
   return removed > 0;

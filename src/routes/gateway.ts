@@ -10,7 +10,8 @@ import { ZentrisPipeline } from "../middleware/pipeline";
 import { CircuitOpenError } from "../services/circuitBreaker";
 import { TelemetryService } from "../services/telemetryService";
 import { listAgents, createAgent, deleteAgent, setAgentsPublic } from "../services/agentStore";
-import { listMCPServers, createMCPServer, updateMCPServer, deleteMCPServer } from "../services/mcpServerStore";
+import { listMCPServers, createMCPServer, updateMCPServer, deleteMCPServer, getMCPServer } from "../services/mcpServerStore";
+import { mcpListTools, mcpCallTool, mcpAuthHeaders } from "../services/mcpClient";
 import { type ChatMessage, type GenerationOptions, type SecurityMetadata, type ZentrisRequest } from "../types";
 
 interface OpenAIMessage { role: "system" | "user" | "assistant"; content: string; }
@@ -637,6 +638,71 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
     return { deleted, server_id: serverId };
   });
   app.get("/v1/mcp/server/health",   async () => []);
+
+  // Real MCP execution: connect to the stored server's URL over the MCP protocol
+  // and list/call its actual tools. This is what makes MCP servers functional —
+  // the Playground can discover and invoke live tools.
+  const toolInfo = (server: Record<string, unknown>, serverId: string) => ({
+    server_name: (server.server_name as string) ?? (server.alias as string) ?? serverId
+  });
+  app.get("/mcp-rest/tools/list", async (request) => {
+    const serverId = (request.query as { server_id?: string } | undefined)?.server_id;
+    const server = serverId ? await getMCPServer(serverId) : null;
+    const url = server?.url as string | undefined;
+    if (!server || !url) return { tools: [], error: "not_found", message: "MCP server not found or has no URL", stack_trace: null };
+    try {
+      const tools = await mcpListTools(url, mcpAuthHeaders(server));
+      return {
+        tools: tools.map((tool) => ({
+          name: tool.name,
+          description: tool.description ?? "",
+          inputSchema: tool.inputSchema ?? { type: "object", properties: {} },
+          mcp_info: toolInfo(server, serverId as string)
+        })),
+        error: null, message: null, stack_trace: null
+      };
+    } catch (error) {
+      return { tools: [], error: "mcp_error", message: error instanceof Error ? error.message : "MCP request failed", stack_trace: null };
+    }
+  });
+  app.post("/mcp-rest/test/tools/list", async (request) => {
+    const body = (request.body ?? {}) as Record<string, unknown>;
+    const url = (body.url as string) ?? (body.server_url as string);
+    if (!url) return { tools: [], error: "bad_request", message: "url is required", stack_trace: null };
+    try {
+      const tools = await mcpListTools(url, mcpAuthHeaders(body));
+      return {
+        tools: tools.map((tool) => ({
+          name: tool.name,
+          description: tool.description ?? "",
+          inputSchema: tool.inputSchema ?? { type: "object", properties: {} },
+          mcp_info: { server_name: (body.server_name as string) ?? "test" }
+        })),
+        error: null, message: null, stack_trace: null
+      };
+    } catch (error) {
+      return { tools: [], error: "mcp_error", message: error instanceof Error ? error.message : "MCP request failed", stack_trace: null };
+    }
+  });
+  app.post("/mcp-rest/tools/call", async (request) => {
+    const body = (request.body ?? {}) as { server_id?: string; name?: string; arguments?: Record<string, unknown> };
+    const server = body.server_id ? await getMCPServer(body.server_id) : null;
+    const url = server?.url as string | undefined;
+    if (!server || !url || !body.name) {
+      return { content: [{ type: "text", text: "MCP server not found or tool name missing" }], isError: true, _meta: null, structuredContent: null };
+    }
+    try {
+      const result = await mcpCallTool(url, body.name, body.arguments ?? {}, mcpAuthHeaders(server));
+      return {
+        content: (result.content as unknown[]) ?? [{ type: "text", text: JSON.stringify(result) }],
+        isError: (result.isError as boolean) ?? false,
+        _meta: (result._meta as unknown) ?? null,
+        structuredContent: (result.structuredContent as unknown) ?? null
+      };
+    } catch (error) {
+      return { content: [{ type: "text", text: error instanceof Error ? error.message : "tool call failed" }], isError: true, _meta: null, structuredContent: null };
+    }
+  });
 
   // A2A agent registry — persisted in Redis (see services/agentStore.ts). The
   // dashboard Agents page reads GET (bare array) and writes via POST/DELETE.
