@@ -305,7 +305,7 @@ const menuGroups: MenuGroup[] = [
         page: "learning-resources",
         label: "Learning Resources",
         icon: <BookOutlined />,
-        external_url: "https://models.Zentris.ai/cookbook",
+        external_url: "https://github.com/asadahmad23cse/Zentris#readme",
       },
       {
         key: "experimental",

@@ -552,7 +552,9 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   app.get("/global/spend/models",  async () => []);
   app.get("/global/predict/spend/logs", async () => ({ data: [] }));
   app.get("/global/activity",      async () => ({ data: [] }));
-  app.get("/global/activity/cache_hits", async () => ({ data: [] }));
+  // Caching dashboard consumes the raw response with data.map(...), so this must
+  // be a bare array, not { data: [] }.
+  app.get("/global/activity/cache_hits", async () => []);
   app.get("/global/activity/model", async () => ({ data: [] }));
 
   // Logs / audit
