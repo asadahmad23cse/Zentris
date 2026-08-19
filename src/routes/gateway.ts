@@ -9,6 +9,7 @@ import { StreamingClient, type StreamPayload } from "../llm/streamingClient";
 import { ZentrisPipeline } from "../middleware/pipeline";
 import { CircuitOpenError } from "../services/circuitBreaker";
 import { TelemetryService } from "../services/telemetryService";
+import { listAgents, createAgent, deleteAgent, setAgentsPublic } from "../services/agentStore";
 import { type ChatMessage, type GenerationOptions, type SecurityMetadata, type ZentrisRequest } from "../types";
 
 interface OpenAIMessage { role: "system" | "user" | "assistant"; content: string; }
@@ -625,7 +626,22 @@ const gatewayRoutes: FastifyPluginAsync = async (app) => {
   // (mcpServers.map(...), agents.sort(...)), so these MUST return a bare array.
   app.get("/v1/mcp/server",          async () => []);
   app.get("/v1/mcp/server/health",   async () => []);
-  app.get("/v1/agents",              async () => []);
+
+  // A2A agent registry — persisted in Redis (see services/agentStore.ts). The
+  // dashboard Agents page reads GET (bare array) and writes via POST/DELETE.
+  app.get("/v1/agents", async () => await listAgents());
+  app.post("/v1/agents", async (request) => await createAgent((request.body ?? {}) as Record<string, unknown>));
+  app.post("/v1/agents/make_public", async (request) => {
+    const body = (request.body ?? {}) as { agent_ids?: string[]; agent_id?: string };
+    const ids = body.agent_ids ?? (body.agent_id ? [body.agent_id] : []);
+    await setAgentsPublic(ids);
+    return { success: true, agent_ids: ids };
+  });
+  app.delete("/v1/agents/:agentId", async (request) => {
+    const { agentId } = request.params as { agentId: string };
+    const deleted = await deleteAgent(agentId);
+    return { deleted, agent_id: agentId };
+  });
   app.get("/health/test_connection",  async () => ({ status: "ok" }));
   app.get("/health/latest",          async () => ({ status: "ok" }));
   app.get("/public/providers/fields", async () => []);
