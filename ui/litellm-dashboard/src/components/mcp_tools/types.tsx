@@ -77,7 +77,9 @@ export const handleAuth = (authType?: string | null): string => {
 
 // Define the structure for tool input schema properties
 export interface InputSchemaProperty {
-  type: string;
+  type?: string; // May be absent when the property uses anyOf/oneOf (JSON-schema union)
+  anyOf?: InputSchemaProperty[]; // JSON-schema union (e.g. string | array)
+  oneOf?: InputSchemaProperty[]; // JSON-schema union
   description?: string;
   properties?: Record<string, InputSchemaProperty>; // For nested object properties
   required?: string[]; // For required fields in nested objects

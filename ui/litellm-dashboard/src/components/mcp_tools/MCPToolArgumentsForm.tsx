@@ -6,6 +6,39 @@ import { MCPTool, InputSchema, InputSchemaProperty } from "./types";
 const isPlainObject = (value: unknown): value is Record<string, any> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+const KNOWN_TYPES = new Set(["string", "number", "integer", "boolean", "object", "array"]);
+
+// Resolve a concrete input type for a property. MCP tools may describe a field
+// with `anyOf`/`oneOf` (e.g. string | array) or a JSON-schema union `type: []`
+// instead of a plain `type`. Without a concrete type the form renders no input,
+// so fall back to a scalar (preferring string) and ultimately "string".
+function resolveType(prop?: InputSchemaProperty): string {
+  if (!prop) return "string";
+  if (typeof prop.type === "string" && KNOWN_TYPES.has(prop.type)) return prop.type;
+  const rawType: unknown = prop.type;
+  if (Array.isArray(rawType)) {
+    const scalar = rawType.find((t) => typeof t === "string" && KNOWN_TYPES.has(t) && t !== "null");
+    if (typeof scalar === "string") return scalar;
+  }
+  const variants = prop.anyOf ?? prop.oneOf;
+  if (Array.isArray(variants) && variants.length > 0) {
+    const scalar = variants.find(
+      (v) => v?.type && v.type !== "null" && v.type !== "array" && v.type !== "object",
+    );
+    if (scalar?.type) return scalar.type;
+    const nonNull = variants.find((v) => v?.type && v.type !== "null");
+    if (nonNull?.type) return nonNull.type;
+  }
+  return "string";
+}
+
+// Return a copy of the property with a guaranteed concrete `type` so that every
+// downstream step (default value, render, conversion) has a type to switch on.
+const withResolvedType = (prop: InputSchemaProperty): InputSchemaProperty => ({
+  ...prop,
+  type: resolveType(prop),
+});
+
 function buildArrayItems(items?: InputSchemaProperty | InputSchemaProperty[]): any[] {
   if (!items) return [];
   if (Array.isArray(items)) {
@@ -165,17 +198,24 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
     }, [tool.inputSchema]);
 
     const actualSchema: InputSchema = useMemo(() => {
-      if (
-        schema.properties?.params?.type === "object" &&
-        schema.properties.params.properties
-      ) {
-        return {
-          type: "object",
-          properties: schema.properties.params.properties,
-          required: schema.properties.params.required || [],
-        };
-      }
-      return schema;
+      const base: InputSchema =
+        schema.properties?.params?.type === "object" && schema.properties.params.properties
+          ? {
+              type: "object",
+              properties: schema.properties.params.properties,
+              required: schema.properties.params.required || [],
+            }
+          : schema;
+
+      if (!base.properties) return base;
+
+      // Normalize every property to a concrete type so fields that use
+      // anyOf/oneOf (e.g. DeepWiki's `repoName`) still render an input.
+      const normalizedProperties: Record<string, InputSchemaProperty> = {};
+      Object.entries(base.properties).forEach(([key, prop]) => {
+        normalizedProperties[key] = prop.type ? prop : withResolvedType(prop);
+      });
+      return { ...base, properties: normalizedProperties };
     }, [schema]);
 
     useImperativeHandle(ref, () => ({
